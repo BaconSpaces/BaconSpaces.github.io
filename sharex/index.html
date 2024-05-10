@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareX Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .settings {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .settings h2 {
+            margin-top: 0;
+        }
+        .setting-item {
+            margin-bottom: 10px;
+        }
+        .setting-item span {
+            font-weight: bold;
+        }
+        .download-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .download-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .download-link a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Add more settings sections as needed -->
+
+        <div class="download-link">
+            <a href="kappa.lol.sxcu" download>Click here to download the ShareX configuration file</a>
+        </div>
+
+        <script>
+            // Populate general settings
+            var generalSettingsDiv = document.getElementById("generalSettings");
+            generalSettingsDiv.innerHTML += `
+                <div class="setting-item">
+                    <span>Upload Destination:</span> Your Upload Destination Here
+                </div>
+                <div class="setting-item">
+                    <span>Shortcuts:</span> Your Shortcuts Here
+                </div>
+            `;
+
+            // Populate image settings
+            var imageSettingsDiv = document.getElementById("imageSettings");
+            imageSettingsDiv.innerHTML += `
+                <div class="setting-item">
+                    <span>Image Format:</span> Your Image Format Here
+                </div>
+                <div class="setting-item">
+                    <span>Image Quality:</span> Your Image Quality Here
+                </div>
+            `;
+
+            // Add more settings sections as needed
+        </script>
+    </div>
+</body>
+</html>
