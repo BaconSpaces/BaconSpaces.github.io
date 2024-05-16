@@ -6,30 +6,46 @@
     <title>ShareX Settings</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
         }
-        h1 {
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
             text-align: center;
         }
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .settings {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 20px;
             margin-bottom: 20px;
         }
         .settings h2 {
             margin-top: 0;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
         .setting-item {
             margin-bottom: 10px;
+            font-size: 1.1rem;
         }
         .setting-item span {
             font-weight: bold;
+            color: #333;
         }
         .download-link {
             text-align: center;
@@ -42,6 +58,8 @@
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
         }
         .download-link a:hover {
             background-color: #0056b3;
@@ -50,40 +68,56 @@
 </head>
 <body>
 
-        <!-- Add more settings sections as needed -->
+<header>
+    <h1>ShareX Settings</h1>
+</header>
 
-        <div class="download-link">
-            <a href="kappa.lol.sxcu" download>Click here to download the Kappa.lol configuration file</a>
-            <a href="femboy.beauty.sxcu" download>Click here to download the femboy.beauty configuration file</a>
-            <a href="i.supa.codes.sxcu" download>Click here to download the i.supa.codes configuration file</a>
-            <a href="gachi.gay.sxcu" download>Click here to download the gachi.gay configuration file</a>
-        </div>
+<div class="container">
 
-        <script>
-            // Populate general settings
-            var generalSettingsDiv = document.getElementById("generalSettings");
-            generalSettingsDiv.innerHTML += `
-                <div class="setting-item">
-                    <span>Upload Destination:</span> Your Upload Destination Here
-                </div>
-                <div class="setting-item">
-                    <span>Shortcuts:</span> Your Shortcuts Here
-                </div>
-            `;
-
-            // Populate image settings
-            var imageSettingsDiv = document.getElementById("imageSettings");
-            imageSettingsDiv.innerHTML += `
-                <div class="setting-item">
-                    <span>Image Format:</span> Your Image Format Here
-                </div>
-                <div class="setting-item">
-                    <span>Image Quality:</span> Your Image Quality Here
-                </div>
-            `;
-
-            // Add more settings sections as needed
-        </script>
+    <div class="settings" id="generalSettings">
+        <h2>General Settings</h2>
     </div>
+
+    <div class="settings" id="imageSettings">
+        <h2>Image Settings</h2>
+    </div>
+
+    <!-- Add more settings sections as needed -->
+
+    <div class="download-link">
+        <a href="kappa.lol.sxcu" download>Click here to download the Kappa.lol configuration file</a>
+        <a href="femboy.beauty.sxcu" download>Click here to download the femboy.beauty configuration file</a>
+        <a href="i.supa.codes.sxcu" download>Click here to download the i.supa.codes configuration file</a>
+        <a href="gachi.gay.sxcu" download>Click here to download the gachi.gay configuration file</a>
+    </div>
+
+</div>
+
+<script>
+    // Populate general settings
+    var generalSettingsDiv = document.getElementById("generalSettings");
+    generalSettingsDiv.innerHTML += `
+        <div class="setting-item">
+            <span>Upload Destination:</span> Your Upload Destination Here
+        </div>
+        <div class="setting-item">
+            <span>Shortcuts:</span> Your Shortcuts Here
+        </div>
+    `;
+
+    // Populate image settings
+    var imageSettingsDiv = document.getElementById("imageSettings");
+    imageSettingsDiv.innerHTML += `
+        <div class="setting-item">
+            <span>Image Format:</span> Your Image Format Here
+        </div>
+        <div class="setting-item">
+            <span>Image Quality:</span> Your Image Quality Here
+        </div>
+    `;
+
+    // Add more settings sections as needed
+</script>
+
 </body>
 </html>
