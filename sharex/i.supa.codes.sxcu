@@ -1,0 +1,11 @@
+﻿{
+  "Version": "14.0.1",
+  "DestinationType": "ImageUploader, FileUploader",
+  "RequestMethod": "POST",
+  "RequestURL": "https://i.supa.codes/api/upload",
+  "Body": "MultipartFormData",
+  "FileFormName": "file",
+  "URL": "{json:link}.{filename}",
+  "DeletionURL": "{json:delete}",
+  "ErrorMessage": "{json:message}"
+}
