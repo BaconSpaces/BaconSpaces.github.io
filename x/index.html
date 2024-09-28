@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post URL Fixer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Post URL Fixer</h2>
+    <p>Paste a Post with a link to <strong>x.com</strong>, and this tool will replace it with <strong>fixupx.com</strong>.</p>
+
+    <textarea id="tweetInput" placeholder="Paste your tweet here"></textarea>
+    <button onclick="fixTweet()">Fix Post</button>
+    <button onclick="copyToClipboard()">Copy Fixed Post</button>
+
+    <p><strong>Fixed Post:</strong></p>
+    <textarea id="result" readonly></textarea>
+
+    <script>
+        function fixTweet() {
+            const input = document.getElementById('tweetInput').value;
+            const result = document.getElementById('result');
+
+            // Replace 'x.com' with 'fixupx.com' in the tweet
+            const fixedTweet = input.replace(/https:\/\/x\.com/g, "https://fixupx.com");
+            result.value = fixedTweet;
+        }
+
+        function copyToClipboard() {
+            const resultText = document.getElementById('result');
+
+            // Select and copy the fixed tweet
+            resultText.select();
+            document.execCommand('copy');
+
+            alert('Copied to clipboard: ' + resultText.value);
+        }
+    </script>
+
+</body>
+</html>
