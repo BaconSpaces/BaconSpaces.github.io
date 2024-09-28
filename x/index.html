@@ -23,20 +23,28 @@
             color: white;
             cursor: pointer;
             border-radius: 4px;
+            margin-right: 10px;
         }
         button:hover {
             background-color: #45a049;
+        }
+        .clear-button {
+            background-color: #f44336;
+        }
+        .clear-button:hover {
+            background-color: #e53935;
         }
     </style>
 </head>
 <body>
 
     <h2>Post URL Fixer</h2>
-    <p>Paste a Post with a link to <strong>x.com</strong>, and this tool will replace it with <strong>fixupx.com</strong>.</p>
+    <p>Paste a post with a link to <strong>x.com</strong>, and this tool will replace it with <strong>fixupx.com</strong>.</p>
 
-    <textarea id="tweetInput" placeholder="Paste your tweet here"></textarea>
+    <textarea id="tweetInput" placeholder="Paste your post here"></textarea>
     <button onclick="fixTweet()">Fix Post</button>
     <button onclick="copyToClipboard()">Copy Fixed Post</button>
+    <button class="clear-button" onclick="clearFields()">Clear</button>
 
     <p><strong>Fixed Post:</strong></p>
     <textarea id="result" readonly></textarea>
@@ -46,7 +54,7 @@
             const input = document.getElementById('tweetInput').value;
             const result = document.getElementById('result');
 
-            // Replace 'x.com' with 'fixupx.com' in the tweet
+            // Replace 'x.com' with 'fixupx.com' in the post
             const fixedTweet = input.replace(/https:\/\/x\.com/g, "https://fixupx.com");
             result.value = fixedTweet;
         }
@@ -54,11 +62,17 @@
         function copyToClipboard() {
             const resultText = document.getElementById('result');
 
-            // Select and copy the fixed tweet
+            // Select and copy the fixed post
             resultText.select();
             document.execCommand('copy');
 
             alert('Copied to clipboard: ' + resultText.value);
+        }
+
+        function clearFields() {
+            // Clear the input and result fields
+            document.getElementById('tweetInput').value = '';
+            document.getElementById('result').value = '';
         }
     </script>
 
