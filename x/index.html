@@ -58,12 +58,12 @@
             const input = document.getElementById('tweetInput').value;
             const result = document.getElementById('result');
 
-            // Replace links and keep the original ones
-            let fixedTweet = input
+            // Replace links
+            const fixedTweet = input
                 .replace(/https:\/\/x\.com/g, "https://fixupx.com") // Replace x.com
                 .replace(/https:\/\/twitter\.com/g, "https://fxtwitter.com"); // Replace twitter.com
 
-            result.value = fixedTweet + '\n\nOriginal Post:\n' + input; // Show both fixed and original
+            result.value = fixedTweet; // Only show the fixed post
         }
 
         function copyToClipboard() {
