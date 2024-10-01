@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <head>
     
     <meta charset="UTF-8">
@@ -39,9 +41,16 @@
     tiktok.com ➜ tnktok.com
     instagram.com ➜ ddinstagram.com
 " />
+
+    <!-- Include Simple Notify JavaScript and CSS -->
+    <script src="https://thecursedgroup.github.io/joke/dad/noty.js"></script>
+    <link href="https://thecursedgroup.github.io/joke/dad/noty.css" rel="stylesheet">
 <meta property="twitter:image" content="https://avatars.githubusercontent.com/u/16171045?v=4" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" >
   <link rel="icon" type="image/x-icon" href="https://i.vgy.me/r3OBLz.png">
+  <!-- Include Noty CSS -->
+
+<link rel="stylesheet" href="https://thecursedgroup.github.io/css/gtatheme.css">
 <!-- Meta Tags Generated with https://metatags.io -->
     <style>
         body {
@@ -78,7 +87,7 @@
 <body>
 
     <h2>Post URL Fixer</h2>
-    <p>Paste a post with links to <strong><i class="fa-brands fa-x-twitter"></i></strong> or <strong><i class="fa-brands fa-twitter" style="color: #74C0FC;"></i></strong> or <strong><i class="fa-brands fa-tiktok" style="color: #400040;"></i></strong>or <strong><i class="fa-brands fa-instagram" style="color: #ff0069;"></i></strong>, and this tool will replace them:</p>
+    <p>Paste a post with links to <strong><i class="fa-brands fa-x-twitter"></i></strong> or <strong><i class="fa-brands fa-twitter" style="color: #74C0FC;"></i></strong> or <strong><i class="fa-brands fa-tiktok"></i></strong> or <strong><i class="fa-brands fa-instagram" style="color: #ff0069;"></i></strong>, and this tool will replace them:</p>
     <ul>
         <li><strong>x.com</strong> ➜ <strong>fixupx.com</strong></li>
         <li><strong>twitter.com</strong> ➜ <strong>fxtwitter.com</strong></li>
@@ -116,16 +125,48 @@
         resultText.select();
         document.execCommand('copy');
 
-        alert('Copied to clipboard: ' + resultText.value);
+        // Show success notification
+        showSuccessNotification('Copied to clipboard: ' + resultText.value);
     }
 
     function clearFields() {
         // Clear the input and result fields
         document.getElementById('tweetInput').value = '';
         document.getElementById('result').value = '';
+
+        // Show notification for cleared fields
+        showErrorNotification('Cleared the text');
+    }
+
+    // Success notification function
+    function showSuccessNotification(text) {
+        new Notify({
+            status: 'success',
+            title: "Post URL Fixer For Discord",
+            text: text,
+            autoclose: true,
+            showCloseButton: false,
+            showIcon: false,
+            autotimeout: 3000
+        }).show();
+    }
+
+    // Error notification function for clearing fields
+    function showErrorNotification(text) {
+        new Notify({
+            status: 'error',
+            title: "Post URL Fixer For Discord",
+            text: text,
+            autoclose: true,
+            showCloseButton: false,
+            showIcon: false,
+            autotimeout: 3000
+        }).show();
     }
 </script>
-    
+
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-9L3VN7W2X1"></script>
 <script>
