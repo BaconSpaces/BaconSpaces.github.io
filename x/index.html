@@ -7,34 +7,41 @@
     <title>Post URL Fixer</title>
     <!-- Primary Meta Tags -->
 <meta name="title" content="Post Fix URL" />
-<meta name="description" content="Paste a post with links to x.com or twitter.com, and this tool will replace them:
+<meta name="description" content="Paste a post with links to x.com or twitter.com or tiktok.com or instagram.com, and this tool will replace them:
 
     x.com ➜ fixupx.com
     twitter.com ➜ fxtwitter.com
+    tiktok.com ➜ tnktok.com
+    instagram.com ➜ ddinstagram.com
 " />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://baconspaces.github.io/x/" />
 <meta property="og:title" content="Post Fix URL" />
-<meta property="og:description" content="Paste a post with links to x.com or twitter.com, and this tool will replace them:
+<meta property="og:description" content="Paste a post with links to x.com or twitter.com or tiktok.com or instagram.com, and this tool will replace them:
 
     x.com ➜ fixupx.com
     twitter.com ➜ fxtwitter.com
+    tiktok.com ➜ tnktok.com
+    instagram.com ➜ ddinstagram.com
 " />
-<meta property="og:image" content="https://i.vgy.me/7bggKW.png" />
+<meta property="og:image" content="https://i.vgy.me/r3OBLz.png" />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content="https://baconspaces.github.io/x/" />
 <meta property="twitter:title" content="Post Fix URL" />
-<meta property="twitter:description" content="Paste a post with links to x.com or twitter.com, and this tool will replace them:
+<meta property="twitter:description" content="Paste a post with links to x.com or twitter.com or tiktok.com or instagram.com, and this tool will replace them:
 
     x.com ➜ fixupx.com
     twitter.com ➜ fxtwitter.com
+    tiktok.com ➜ tnktok.com
+    instagram.com ➜ ddinstagram.com
 " />
-<meta property="twitter:image" content="https://i.vgy.me/7bggKW.png" />
-
+<meta property="twitter:image" content="https://avatars.githubusercontent.com/u/16171045?v=4" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" >
+  <link rel="icon" type="image/x-icon" href="https://i.vgy.me/r3OBLz.png">
 <!-- Meta Tags Generated with https://metatags.io -->
     <style>
         body {
@@ -71,10 +78,12 @@
 <body>
 
     <h2>Post URL Fixer</h2>
-    <p>Paste a post with links to <strong>x.com</strong> or <strong>twitter.com</strong>, and this tool will replace them:</p>
+    <p>Paste a post with links to <strong><i class="fa-brands fa-x-twitter"></i></strong> or <strong><i class="fa-brands fa-twitter" style="color: #74C0FC;"></i></strong> or <strong><i class="fa-brands fa-tiktok" style="color: #400040;"></i></strong>or <strong><i class="fa-brands fa-instagram" style="color: #ff0069;"></i></strong>, and this tool will replace them:</p>
     <ul>
         <li><strong>x.com</strong> ➜ <strong>fixupx.com</strong></li>
         <li><strong>twitter.com</strong> ➜ <strong>fxtwitter.com</strong></li>
+        <li><strong>tiktok.com</strong> ➜ <strong>tnktok.com</strong></li>
+        <li><strong>instagram.com</strong> ➜ <strong>ddinstagram.com</strong></li>
     </ul>
 
     <textarea id="tweetInput" placeholder="Paste your post here"></textarea>
@@ -85,36 +94,37 @@
     <p><strong>Fixed Post:</strong></p>
     <textarea id="result" readonly></textarea>
 
-    <script>
-        
-        function fixTweet() {
-            const input = document.getElementById('tweetInput').value;
-            const result = document.getElementById('result');
+<script>
+    function fixTweet() {
+        const input = document.getElementById('tweetInput').value;
+        const result = document.getElementById('result');
 
-            // Replace links
-            const fixedTweet = input
-                .replace(/https:\/\/x\.com/g, "https://fixupx.com") // Replace x.com
-                .replace(/https:\/\/twitter\.com/g, "https://fxtwitter.com"); // Replace twitter.com
+        // Replace links
+        const fixedTweet = input
+            .replace(/https:\/\/x\.com/g, "https://fixupx.com") // Replace x.com
+            .replace(/https:\/\/twitter\.com/g, "https://fxtwitter.com") // Replace twitter.com
+            .replace(/https:\/\/www\.instagram\.com\/([\w\/-]+)/g, "https://ddinstagram.com/$1") // Replace all instagram.com links
+            .replace(/https:\/\/www\.tiktok\.com\/(@[\w-]+)\/video\/(\d+)/g, "https://tnktok.com/$1/video/$2"); // Replace tiktok.com
 
-            result.value = fixedTweet; // Only show the fixed post
-        }
+        result.value = fixedTweet; // Only show the fixed post
+    }
 
-        function copyToClipboard() {
-            const resultText = document.getElementById('result');
+    function copyToClipboard() {
+        const resultText = document.getElementById('result');
 
-            // Select and copy the fixed post
-            resultText.select();
-            document.execCommand('copy');
+        // Select and copy the fixed post
+        resultText.select();
+        document.execCommand('copy');
 
-            alert('Copied to clipboard: ' + resultText.value);
-        }
+        alert('Copied to clipboard: ' + resultText.value);
+    }
 
-        function clearFields() {
-            // Clear the input and result fields
-            document.getElementById('tweetInput').value = '';
-            document.getElementById('result').value = '';
-        }
-    </script>
+    function clearFields() {
+        // Clear the input and result fields
+        document.getElementById('tweetInput').value = '';
+        document.getElementById('result').value = '';
+    }
+</script>
     
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-9L3VN7W2X1"></script>
