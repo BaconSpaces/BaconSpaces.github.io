@@ -137,12 +137,14 @@ function fixTweet() {
         .replace(/https:\/\/(www\.)?youtube\.com\/watch\?v=([\w-]+)/g, "https://yt.cdn.13373333.one/watch?v=$2") // Replace YouTube watch links
         .replace(/https:\/\/youtu\.be\/([\w-]+)/g, "https://yt.cdn.13373333.one/$1") // Replace youtu.be links
         .replace(/https:\/\/clips\.twitch\.tv\/([\w-]+)/g, "https://clips.fxtwitch.tv/$1") // Replace clips.twitch.tv links
+        .replace(/https:\/\/www\.twitch\.tv\/([\w-]+)\/clip\/([\w-]+)/g, "https://clips.fxtwitch.tv/$2") // Replace specific twitch.tv clips
         .replace(/https:\/\/(www\.)?reddit\.com\/([\w\/-]+)/g, "https://redditez.com/$2") // Replace reddit.com links
         .replace(/https:\/\/(www\.)?threads\.net\/([\w\/-]+)/g, "https://www.fixthreads.net/$2") // Replace threads.net links
         .replace(/https:\/\/(www\.)?threads\.net\/@([\w-]+)\/post\/([\w-]+)/g, "https://www.fixthreads.net/@$2/post/$3"); // Replace specific threads.net post links
 
     result.value = fixedTweet; // Only show the fixed post
 }
+
 
 
 
