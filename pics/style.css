@@ -1,0 +1,39 @@
+/* General Styling */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Title Styling */
+h1 {
+    font-size: 26px;
+    font-weight: bold;
+    color: #222;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Centering the Carousel */
+.carousel {
+    max-width: 600px;
+    margin: auto;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Make images responsive */
+.carousel img {
+    border-radius: 10px;
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+}
+
+/* Improve carousel control visibility */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    padding: 10px;
+}
