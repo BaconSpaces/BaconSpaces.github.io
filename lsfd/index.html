@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ten Code</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="https://thecursedgroup.github.io/css/gtatheme.css">
+  <!-- AOS CSS -->
+  <link
+    href="https://unpkg.com/aos@2.3.4/dist/aos.css"
+    rel="stylesheet"
+  >
+  <link
+    href="style.css"
+    rel="stylesheet"
+  >
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 2rem;
+    }
+    .offense-card {
+      border-left: 8px solid;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      background-color: white;
+      box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05);
+    }
+    .offense-card h5 {
+      margin-bottom: 0.5rem;
+    }
+    .search-button {
+      margin-top: 10px;
+    }
+    #penal-list {
+      display: none; /* Hide offenses until search */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center mb-4">📜 Ten Code List</h1>
+
+    <!-- Search Input -->
+    <div class="d-flex">
+      <input type="text" id="search" class="form-control mb-4" placeholder="Search A Ten Code...">
+      <button id="search-btn" class="btn btn-dark search-button">Search</button>
+    </div>
+
+    <!-- List of Offenses -->
+    <div id="penal-list"></div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+  ></script>
+
+  <!-- AOS JS -->
+  <script
+    src="https://unpkg.com/aos@2.3.4/dist/aos.js"
+  ></script>
+
+  <script>
+    // Initialize AOS
+    AOS.init();
+
+    let allOffenses = [];
+
+    // Render offenses to the DOM with AOS animations
+    function renderOffenses(offenses) {
+      const penalList = document.getElementById('penal-list');
+      penalList.innerHTML = ''; // Clear the current list
+
+      offenses.forEach((offense, index) => {
+        const card = document.createElement('div');
+        card.className = 'offense-card';
+        card.setAttribute('data-aos', 'fade-up'); // Add fade-up animation
+        card.setAttribute('data-aos-delay', index * 50); // Add slight delay for each card
+
+        card.style.borderColor = offense.color || '#007bff'; // Default to blue if no color is provided
+
+        card.innerHTML = `
+          <h5>${offense.title} <small class="text-muted">(${offense.id})</small></h5>
+          <p><strong>Class:</strong> ${offense.class}</p>
+          <p><strong>Description:</strong> ${offense.description}</p>
+        `;
+
+        penalList.appendChild(card);
+      });
+
+      penalList.style.display = offenses.length > 0 ? 'block' : 'none'; // Show offenses only if any matches
+      AOS.refresh(); // Refresh AOS to trigger animations
+    }
+    function handleSearch() {
+      const searchTerm = document.getElementById('search').value.toLowerCase();
+      if (searchTerm.trim() === '') {
+        document.getElementById('penal-list').style.display = 'none'; // Hide offenses if search is empty
+        return;
+      }
+
+      // Filter offenses by checking if the search term matches title, ID, or description
+      const filteredOffenses = allOffenses.filter(offense =>
+        offense.title.toLowerCase().includes(searchTerm) ||
+        offense.id.toLowerCase().includes(searchTerm) ||
+        offense.description.toLowerCase().includes(searchTerm)
+      );
+
+      renderOffenses(filteredOffenses);
+    }
+
+    // Event listener for the search input field (when typing)
+    document.getElementById('search').addEventListener('input', handleSearch);
+
+    // Event listener for the search button (when clicking the button)
+    document.getElementById('search-btn').addEventListener('click', handleSearch);
+
+    // Event listener for pressing "Enter" (keyboard input)
+    document.getElementById('search').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        handleSearch();
+      }
+    });
+
+    // Fetch the JSON data and render the offenses
+    fetch('ten.json')
+      .then(res => res.json())
+      .then(data => {
+        allOffenses = Object.values(data.PenalCode).flat(); // Flatten all offenses if categorized
+      })
+      .catch(err => {
+        const penalList = document.getElementById('penal-list');
+        penalList.innerHTML = `<div class="alert alert-dark">Error loading penal code.</div>`;
+
+        console.log('Failed to load penal code:', err);
+      });
+  </script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9L3VN7W2X1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9L3VN7W2X1');
+  </script>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-KL99S5DG');</script>
+  <!-- End Google Tag Manager -->
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL99S5DG"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+</body>
+</html>
