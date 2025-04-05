@@ -1,0 +1,384 @@
+{
+    "PenalCode": {
+        "1": [{
+                "title": "Poor Radio Reception",
+                "class": "Communication",
+                "id": "10-1",
+                "color": "red",
+                "description": "Indicates poor radio signal reception during communication."
+            },
+            {
+                "title": "Good Radio Reception",
+                "class": "Communication",
+                "id": "10-2",
+                "color": "green",
+                "description": "Indicates clear and good radio signal reception."
+            },
+            {
+                "title": "Stop Transmission",
+                "class": "Communication",
+                "id": "10-3",
+                "color": "red",
+                "description": "Request to immediately cease all radio transmissions."
+            },
+            {
+                "title": "Message Received",
+                "class": "Communication",
+                "id": "10-4",
+                "color": "green",
+                "description": "Confirmation that a message has been successfully received."
+            },
+            {
+                "title": "Relay Message",
+                "class": "Communication",
+                "id": "10-5",
+                "color": "#1c3652",
+                "description": "Request to pass a message to another party or unit."
+            },
+            {
+                "title": "Change Radio Channel",
+                "class": "Communication",
+                "id": "10-6",
+                "color": "gray",
+                "description": "Instruction to switch to a different radio frequency or channel."
+            },
+            {
+                "title": "Out of Service",
+                "class": "Status",
+                "id": "10-7",
+                "color": "red",
+                "description": "Indicates that the unit is currently unavailable for service."
+            },
+            {
+                "title": "In Service",
+                "class": "Status",
+                "id": "10-8",
+                "color": "green",
+                "description": "Indicates that the unit is available and ready for service."
+            },
+            {
+                "title": "Repeat Message",
+                "class": "Communication",
+                "id": "10-9",
+                "color": "gray",
+                "description": "Request to repeat a previously transmitted message."
+            },
+            {
+                "title": "Return or Go to ___",
+                "class": "Instruction",
+                "id": "10-19",
+                "color": "gray",
+                "description": "Instruction for a unit to return to or proceed to a specified location."
+            },
+            {
+                "title": "Location",
+                "class": "Information",
+                "id": "10-20",
+                "color": "gray",
+                "description": "Request or provision of the current location of a unit."
+            },
+            {
+                "title": "Cancel or Disregard",
+                "class": "Instruction",
+                "id": "10-22",
+                "color": "gray",
+                "description": "Instruction to cancel a previous order or disregard a message."
+            },
+            {
+                "title": "Stand-By",
+                "class": "Instruction",
+                "id": "10-23",
+                "color": "gray",
+                "description": "Request for a unit to wait or hold their position temporarily."
+            },
+            {
+                "title": "Do You Have Contact With ___?",
+                "class": "Communication",
+                "id": "10-25",
+                "color": "gray",
+                "description": "Inquiry to check if contact has been established with a specified unit or person."
+            },
+            {
+                "title": "Clear of Warrants",
+                "class": "Status",
+                "id": "10-26",
+                "color": "gray",
+                "description": "Confirmation that a person or unit is free of any outstanding warrants."
+            },
+            {
+                "title": "Subject Wanted",
+                "class": "Status",
+                "id": "10-27",
+                "color": "gray",
+                "description": "Indicates that a subject is wanted by law enforcement."
+            },
+            {
+                "title": "Registration Check",
+                "class": "Information",
+                "id": "10-28",
+                "color": "gray",
+                "description": "Request to check the registration status of a vehicle."
+            },
+            {
+                "title": "Check for Warrants",
+                "class": "Information",
+                "id": "10-29",
+                "color": "gray",
+                "description": "Request to verify if a person has any outstanding warrants."
+            },
+            {
+                "title": "Time Check",
+                "class": "Information",
+                "id": "10-35",
+                "color": "gray",
+                "description": "Request for the current time from the dispatcher or control."
+            },
+            {
+                "title": "Correct Time",
+                "class": "Information",
+                "id": "10-36",
+                "color": "gray",
+                "description": "Response providing the accurate current time."
+            },
+            {
+                "title": "Please Identify Your Unit",
+                "class": "Communication",
+                "id": "10-37",
+                "color": "gray",
+                "description": "Request for a unit to identify itself with its call sign or number."
+            },
+            {
+                "title": "Can ___ Come to Radio?",
+                "class": "Communication",
+                "id": "10-39",
+                "color": "gray",
+                "description": "Request for a specified person to come to the radio for communication."
+            },
+            {
+                "title": "Available for Phone Call?",
+                "class": "Communication",
+                "id": "10-40",
+                "color": "gray",
+                "description": "Inquiry to check if a unit is available for a phone call."
+            },
+            {
+                "title": "Ambulance Needed",
+                "class": "Emergency",
+                "id": "10-52",
+                "color": "red",
+                "description": "Request for an ambulance due to a medical emergency."
+            },
+            {
+                "title": "Person Down",
+                "class": "Emergency",
+                "id": "10-53",
+                "color": "red",
+                "description": "Report of an individual who has collapsed or is incapacitated."
+            },
+            {
+                "title": "Possible Body",
+                "class": "Emergency",
+                "id": "10-54",
+                "color": "red",
+                "description": "Indication of a potential deceased person at the scene."
+            },
+            {
+                "title": "Coroner's Case",
+                "class": "Emergency",
+                "id": "10-55",
+                "color": "red",
+                "description": "Situation requiring the coroner's involvement, typically a death."
+            },
+            {
+                "title": "Suicide (a) Attempted",
+                "class": "Emergency",
+                "id": "10-56",
+                "color": "red",
+                "description": "Report of a suicide attempt or completed suicide."
+            },
+            {
+                "title": "Security Check",
+                "class": "Routine",
+                "id": "10-59",
+                "color": "gray",
+                "description": "Request to perform a security check on a location or area."
+            },
+            {
+                "title": "Shots Fired",
+                "class": "Emergency",
+                "id": "10-71",
+                "color": "red",
+                "description": "Report of gunfire or shots being fired in the area."
+            },
+            {
+                "title": "How Do You Copy?",
+                "class": "Communication",
+                "id": "10-73",
+                "color": "gray",
+                "description": "Inquiry to check the clarity or reception of the radio communication."
+            },
+            {
+                "title": "Hazard",
+                "class": "Emergency",
+                "id": "10-91",
+                "color": "yellow",
+                "description": "Report of a hazardous situation or condition requiring attention."
+            },
+            {
+                "title": "Bike Theft",
+                "class": "Crime",
+                "id": "10-61",
+                "color": "orange",
+                "description": "Report of a bicycle being stolen."
+            },
+            {
+                "title": "Prepare to Copy",
+                "class": "Communication",
+                "id": "10-63",
+                "color": "gray",
+                "description": "Instruction to get ready to receive and record information."
+            },
+            {
+                "title": "Explosion",
+                "class": "Emergency",
+                "id": "10-80",
+                "color": "red",
+                "description": "Report of an explosion occurring at the scene."
+            },
+            {
+                "title": "Arrived at Scene",
+                "class": "Status",
+                "id": "10-97",
+                "color": "gray",
+                "description": "Confirmation that a unit has reached the location of an incident."
+            },
+            {
+                "title": "Completed Assignment",
+                "class": "Status",
+                "id": "10-98",
+                "color": "gray",
+                "description": "Indication that a assigned task or call has been completed."
+            },
+            {
+                "title": "Prisoner in Custody",
+                "class": "Status",
+                "id": "10-15",
+                "color": "gray",
+                "description": "Report that a prisoner is currently in custody."
+            },
+            {
+                "title": "Pick Up",
+                "class": "Instruction",
+                "id": "10-16",
+                "color": "yellow",
+                "description": "Instruction to pick up a person, item, or evidence."
+            },
+            {
+                "title": "Alarm is Sounding",
+                "class": "Emergency",
+                "id": "10-33",
+                "color": "yellow",
+                "description": "Report of an activated alarm at a location."
+            },
+            {
+                "title": "Drugged",
+                "class": "Medical",
+                "id": "10-50",
+                "color": "#2b11bd",
+                "description": "Report of an individual under the influence of drugs."
+            },
+            {
+                "title": "Drunk",
+                "class": "Medical",
+                "id": "10-51",
+                "color": "#2b11bd",
+                "description": "Report of an individual who is intoxicated by alcohol."
+            },
+            {
+                "title": "Suspicious Person",
+                "class": "Observation",
+                "id": "10-66",
+                "color": "orange",
+                "description": "Report of a person behaving suspiciously."
+            },
+            {
+                "title": "Person Calling for Help",
+                "class": "Emergency",
+                "id": "10-67",
+                "color": "red",
+                "description": "Report of an individual requesting assistance."
+            },
+            {
+                "title": "Any Traffic for Me?",
+                "class": "Communication",
+                "id": "10-86",
+                "color": "gray",
+                "description": "Inquiry to check if there are any messages or calls for the unit."
+            },
+            {
+                "title": "Provide Cover for Units",
+                "class": "Instruction",
+                "id": "10-87",
+                "color": "gray",
+                "description": "Instruction to provide backup or support to other units."
+            },
+            {
+                "title": "Prowler",
+                "class": "Crime",
+                "id": "10-70",
+
+                "color": "orange",
+                "description": "Report of a suspicious person lurking or trespassing."
+            },
+            {
+                "title": "Visitors Can Hear Radio",
+                "class": "Security",
+                "id": "10-11",
+                "color": "orange",
+                "description": "Warning that visitors can overhear radio communications"
+            },
+            {
+                "title": "Advise Weather / Road Conditions",
+                "class": "Information",
+                "id": "10-12",
+                "color": "gray",
+                "description": "Request for an update on weather or road conditions"
+            },
+            {
+                "title": "Getting Fuel",
+                "class": "Status",
+                "id": "10-17",
+                "color": "gray",
+                "description": "Notification that a unit is refueling"
+            },
+            {
+                "title": "Available?",
+                "class": "Status",
+                "id": "10-41",
+                "color": "gray",
+                "description": "Inquiry about the availability of a unit"
+            },
+            {
+                "title": "Proceeding to ___",
+                "class": "Movement",
+                "id": "10-49",
+                "color": "gray",
+                "description": "Indication that a unit is proceeding to a specified location"
+            },
+            {
+                "title": "Suspicious Person",
+                "class": "Incident",
+                "id": "10-65",
+                "color": "orange",
+                "description": "Report of a suspicious person"
+            },
+            {
+                "title": "Provide Cover for Units",
+                "class": "Support",
+                "id": "10-88",
+                "color": "gray",
+                "description": "Request to provide cover specifically for other units"
+            }
+        ]
+    }
+}
