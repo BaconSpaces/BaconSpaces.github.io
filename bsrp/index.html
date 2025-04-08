@@ -1,173 +1,186 @@
-
-Result Size: 945 x 859
-
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://BSRPFreeRoam.github.io/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Postal Codes</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+        }
         .card-header {
-
             border-radius: 15px 15px 0 0 !important;
-
             font-weight: bold;
-
             font-size: 1.2rem;
-
         }
-
         .postal-code {
-
             display: inline-block;
-
             background-color: blue;
-
             border-radius: 8px;
-
             padding: 5px 10px;
-
             margin: 5px;
-
             font-weight: bold;
-
             transition: all 0.2s ease;
-
         }
-
         .postal-code:hover {
-
             background-color: #e1e1e1;
-
+            color:blue;
             transform: scale(1.05);
-
         }
-
         .header-main {
-
             background: linear-gradient(to right, #4b6cb7, #182848);
-
             color: white;
-
             padding: 30px 0;
-
             margin-bottom: 30px;
-
             border-radius: 0 0 20px 20px;
-
         }
-
         .category-icon {
-
             margin-right: 10px;
-
         }
-
         .emergency-services {
-
             border-left: 4px solid #dc3545;
-
         }
-
         .entertainment {
-
             border-left: 4px solid #28a745;
-
         }
-
         .residential {
-
             border-left: 4px solid #007bff;
-
         }
-
         .food {
-
             border-left: 4px solid #fd7e14;
-
         }
-
         .leisure {
-
             border-left: 4px solid #6f42c1;
-
         }
-
         footer {
-
             margin-top: 30px;
-
             padding: 20px 0;
-
             background-color: #343a40;
-
             color: white;
-
             text-align: center;
-
             border-radius: 20px 20px 0 0;
-
         }
-
     </style>
-
 </head>
-
 <body>
-
     <div class="header-main">
-
         <div class="container">
-
             <h1 class="text-center">City Postal Codes Directory</h1>
-
             <p class="text-center mb-0">Quick reference guide for all important locations</p>
-
         </div>
-
     </div>
 
-​
-
     <div class="container py-3">
-
         <div class="row">
-
             <!-- Emergency Services Section -->
-
             <div class="col-12 col-lg-6">
-
                 <div class="card emergency-services mb-4">
-
                     <div class="card-header bg-danger text-white">
-
                         <i class="fas fa-ambulance category-icon"></i>Emergency Services
-
                     </div>
-
                     <div class="card-body">
-
                         <h5><i class="fas fa-shield-alt"></i> Police Stations</h5>
-
                         <div class="mb-3">
-
                             <span class="postal-code">214</span>
-
                             <span class="postal-code">403</span>
-
                             <span class="postal-code">611</span>
-
                             <span class="postal-code">947</span>
-
                             <span class="postal-code">3005</span>
-
                         </div>
-
                         
-
                         <h5><i class="fas fa-hospital"></i> Hospitals</h5>
-
                         <div>
-
                             <span class="postal-code">149</span>
-
                             <span class="postal-code">201</span>
-
                             <span class="postal-code">512</span>
-
+                            <span class="postal-code">178</span>
+                            <span class="postal-code">1029</span>
+                            <span class="postal-code">3011</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card residential">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-home category-icon"></i>Residential Areas
+                    </div>
+                    <div class="card-body">
+                        <h5><i class="fas fa-building"></i> Apartments</h5>
+                        <div>
+                            <span class="postal-code">368</span>
+                            <span class="postal-code">382</span>
+                            <span class="postal-code">501</span>
+                            <span class="postal-code">517</span>
+                            <span class="postal-code">661</span>
+                            <span class="postal-code">699</span>
+                            <span class="postal-code">925</span>
+                            <span class="postal-code">3019</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Entertainment & Food Section -->
+            <div class="col-12 col-lg-6">
+                <div class="card entertainment mb-4">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-film category-icon"></i>Entertainment
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-theater-masks"></i> Sides Comedy Club</h5>
+                            <span class="postal-code">524</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-film"></i> Vinewood Cinema</h5>
+                            <span class="postal-code">575</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-dice"></i> The Diamond Casino & Resort</h5>
+                            <span class="postal-code">400</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card food mb-4">
+                    <div class="card-header bg-warning">
+                        <i class="fas fa-utensils category-icon"></i>Food & Drinks
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-hamburger"></i> BurgerShot</h5>
+                            <span class="postal-code">311</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-coffee"></i> Cat Cafe</h5>
+                            <span class="postal-code">373</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p class="mb-0">© 2025 City Postal Code Directory - For quick reference use only</p>
+        </div>
+    </footer>
+</body>
+</html>
