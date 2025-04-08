@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Link Enhancer</title>
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Discord Link Enhancer" />
+    <meta name="description" content="Transform social media links for better Discord embeds. Fix X, Twitter, TikTok, Instagram, YouTube, Twitch, Reddit, and Threads links with one click." />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Discord Link Enhancer" />
+    <meta property="og:description" content="Transform social media links for better Discord embeds. Fix X, Twitter, TikTok, Instagram, YouTube, Twitch, Reddit, and Threads links with one click." />
+    <meta property="og:image" content="https://i.vgy.me/r3OBLz.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Discord Link Enhancer" />
+    <meta property="twitter:description" content="Transform social media links for better Discord embeds. Fix X, Twitter, TikTok, Instagram, YouTube, Twitch, Reddit, and Threads links with one click." />
+    <meta property="twitter:image" content="https://i.vgy.me/r3OBLz.png" />
+    
+    <link rel="icon" type="image/x-icon" href="https://i.vgy.me/r3OBLz.png">
+    
+    <!-- External CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://thecursedgroup.github.io/joke/dad/noty.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #5865F2;
+            --secondary-color: #2D3136;
+            --success-color: #57F287;
+            --danger-color: #ED4245;
+            --dark-bg: #36393F;
+            --darker-bg: #2F3136;
+            --text-color: #DCDDDE;
+            --highlight: #5865F2;
+        }
+        
+        body {
+            font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            padding: 2rem;
+        }
+        
+        .header {
+            background-color: var(--darker-bg);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            color: white;
+        }
+        
+        .card {
+            background-color: var(--darker-bg);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .services-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .service-item {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .service-item:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .service-text {
+            flex-grow: 1;
+        }
+        
+        .service-from {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .service-to {
+            color: var(--success-color);
+            font-size: 0.9rem;
+        }
+        
+        textarea {
+            background-color: rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-color);
+            resize: vertical;
+            min-height: 120px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3);
+        }
+        
+        .btn {
+            border-radius: 4px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #4752c4;
+            border-color: #4752c4;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #000;
+        }
+        
+        .btn-success:hover {
+            background-color: #46c46e;
+            border-color: #46c46e;
+            color: #000;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #d53b3e;
+            border-color: #d53b3e;
+            transform: translateY(-2px);
+        }
+        
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .result-container {
+            position: relative;
+        }
+        
+        .copy-indicator {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--success-color);
+            color: #000;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .copy-indicator.show {
+            opacity: 1;
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.875rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .stat-item {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        /* Animation for the conversion process */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fa-brands fa-discord"></i>
+                <h1>Discord Link Enhancer</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2><i class="fas fa-magic"></i> Transform Your Links</h2>
+            <p class="lead">Paste any post containing social media links, and we'll automatically convert them to formats that display beautifully in Discord.</p>
+            
+            <div class="services-list">
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">x.com</div>
+                        <div class="service-to">→ fixupx.com</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-twitter" style="color: #74C0FC;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">twitter.com</div>
+                        <div class="service-to">→ fxtwitter.com</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-bluesky" style="color: #74C0FC;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">bsky.app</div>
+                        <div class="service-to">→ bskx.app</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">tiktok.com</div>
+                        <div class="service-to">→ tnktok.com</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-instagram" style="color: #ff0069;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">instagram.com</div>
+                        <div class="service-to">→ ddinstagram.com</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-youtube" style="color: #ff0000;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">youtube.com</div>
+                        <div class="service-to">→ yt.cdn.13373333.one</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-twitch" style="color: #6441a5;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">clips.twitch.tv</div>
+                        <div class="service-to">→ clips.fxtwitch.tv</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-reddit" style="color: #FF4500;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">reddit.com</div>
+                        <div class="service-to">→ redditez.com</div>
+                    </div>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-icon">
+                        <i class="fa-brands fa-threads" style="color: white;"></i>
+                    </div>
+                    <div class="service-text">
+                        <div class="service-from">threads.net</div>
+                        <div class="service-to">→ fixthreads.net</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="tweetInput" class="form-label"><i class="fas fa-paste"></i> Paste your content here:</label>
+                <textarea id="tweetInput" class="form-control" placeholder="Paste your post containing social media links here..."></textarea>
+            </div>
+            
+            <div class="button-group mb-4">
+                <button id="fixButton" class="btn btn-primary" onclick="fixTweet()">
+                    <i class="fas fa-wand-magic-sparkles btn-icon"></i> Convert Links
+                </button>
+                <button id="copyButton" class="btn btn-success" onclick="copyToClipboard()">
+                    <i class="fas fa-copy btn-icon"></i> Copy Result
+                </button>
+                <button id="clearButton" class="btn btn-danger" onclick="clearFields()">
+                    <i class="fas fa-trash-alt btn-icon"></i> Clear
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <label for="result" class="form-label"><i class="fas fa-check-circle"></i> Enhanced result:</label>
+                <textarea id="result" class="form-control" placeholder="Your converted text will appear here" readonly></textarea>
+                <div id="copyIndicator" class="copy-indicator">Copied!</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fas fa-chart-simple"></i> Usage Stats</h3>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="linkCountDisplay">0</div>
+                    <div class="stat-label">Links Converted</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="conversionCountDisplay">0</div>
+                    <div class="stat-label">Total Conversions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="characterCountDisplay">0</div>
+                    <div class="stat-label">Characters Processed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Discord Link Enhancer - Make your social media links display beautifully in Discord</p>
+            <p><small>This tool doesn't store any of your data. All conversions happen directly in your browser.</small></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://thecursedgroup.github.io/joke/dad/noty.js"></script>
+    
+    <script>
+        // Initialize counters from localStorage or set to 0
+        let linkCount = parseInt(localStorage.getItem('linkCount') || 0);
+        let conversionCount = parseInt(localStorage.getItem('conversionCount') || 0);
+        let characterCount = parseInt(localStorage.getItem('characterCount') || 0);
+        
+        // Update the display
+        function updateStats() {
+            document.getElementById('linkCountDisplay').textContent = linkCount;
+            document.getElementById('conversionCountDisplay').textContent = conversionCount;
+            document.getElementById('characterCountDisplay').textContent = characterCount;
+            
+            // Save to localStorage
+            localStorage.setItem('linkCount', linkCount);
+            localStorage.setItem('conversionCount', conversionCount);
+            localStorage.setItem('characterCount', characterCount);
+        }
+        
+        // Initialize stats display
+        updateStats();
+
+        function fixTweet() {
+            const input = document.getElementById('tweetInput').value;
+            const result = document.getElementById('result');
+            const fixButton = document.getElementById('fixButton');
+            
+            // Add animation effect
+            fixButton.classList.add('pulse');
+            setTimeout(() => {
+                fixButton.classList.remove('pulse');
+            }, 500);
+            
+            // Update character count
+            characterCount += input.length;
+            
+            // Track this conversion
+            conversionCount++;
+            
+            // Replace links and count replacements
+            let linkCountBefore = 0;
+            let fixedTweet = input;
+            
+            // Function to replace and count links
+            function replaceAndCount(regex, replacement) {
+                const matches = fixedTweet.match(regex) || [];
+                linkCountBefore += matches.length;
+                return fixedTweet.replace(regex, replacement);
+            }
+            
+            // X/Twitter
+            fixedTweet = replaceAndCount(/https:\/\/x\.com/g, "https://fixupx.com");
+            fixedTweet = replaceAndCount(/https:\/\/twitter\.com/g, "https://fxtwitter.com");
+            
+            // BlueSky
+            fixedTweet = replaceAndCount(/https:\/\/bsky\.app/g, "https://bskx.app");
+            
+            // Instagram
+            fixedTweet = replaceAndCount(/https:\/\/(www\.)?instagram\.com\/([\w\/-]+)/g, "https://ddinstagram.com/$2");
+            
+            // YouTube
+            fixedTweet = replaceAndCount(/https:\/\/(www\.)?youtube\.com\/shorts\/([\w-]+)/g, "https://yt.cdn.13373333.one/shorts/$2");
+            fixedTweet = replaceAndCount(/https:\/\/(www\.)?youtube\.com\/watch\?v=([\w-]+)/g, "https://yt.cdn.13373333.one/watch?v=$2");
+            fixedTweet = replaceAndCount(/https:\/\/youtu\.be\/([\w-]+)/g, "https://yt.cdn.13373333.one/$1");
+            
+            // Twitch
+            fixedTweet = replaceAndCount(/https:\/\/clips\.twitch\.tv\/([\w-]+)/g, "https://clips.fxtwitch.tv/$1");
+            fixedTweet = replaceAndCount(/https:\/\/www\.twitch\.tv\/([\w-]+)\/clip\/([\w-]+)/g, "https://clips.fxtwitch.tv/$2");
+            
+            // Reddit
+            fixedTweet = replaceAndCount(/https:\/\/(www\.)?reddit\.com\/([\w\/-]+)/g, "https://redditez.com/$2");
+            
+            // Threads
+            fixedTweet = replaceAndCount(/https:\/\/(www\.)?threads\.net\/([\w\/-]+)/g, "https://www.fixthreads.net/$2");
+            fixedTweet = replaceAndCount(/https:\/\/(www\.)?threads\.net\/@([\w-]+)\/post\/([\w-]+)/g, "https://www.fixthreads.net/@$2/post/$3");
+            
+            result.value = fixedTweet;
+            
+            // Update the link count
+            linkCount += linkCountBefore;
+            updateStats();
+            
+            // Show notification if links were found
+            if (linkCountBefore > 0) {
+                showSuccessNotification(`Converted ${linkCountBefore} link${linkCountBefore !== 1 ? 's' : ''}!`);
+            } else {
+                showWarningNotification('No links found to convert.');
+            }
+        }
+
+        function copyToClipboard() {
+            const resultText = document.getElementById('result');
+            const copyIndicator = document.getElementById('copyIndicator');
+            
+            // Select and copy the fixed post
+            resultText.select();
+            document.execCommand('copy');
+            
+            // Show the copy indicator
+            copyIndicator.classList.add('show');
+            setTimeout(() => {
+                copyIndicator.classList.remove('show');
+            }, 2000);
+            
+            // Show success notification
+            showSuccessNotification('Copied to clipboard!');
+        }
+
+        function clearFields() {
+            // Clear the input and result fields
+            document.getElementById('tweetInput').value = '';
+            document.getElementById('result').value = '';
+            
+            // Show notification for cleared fields
+            showErrorNotification('All fields have been cleared');
+        }
+
+        // Success notification function
+        function showSuccessNotification(text) {
+            new Notify({
+                status: 'success',
+                title: "Discord Link Enhancer",
+                text: text,
+                autoclose: true,
+                showCloseButton: false,
+                showIcon: true,
+                autotimeout: 3000
+            }).show();
+        }
+        
+        // Warning notification function
+        function showWarningNotification(text) {
+            new Notify({
+                status: 'warning',
+                title: "Discord Link Enhancer",
+                text: text,
+                autoclose: true,
+                showCloseButton: false,
+                showIcon: true,
+                autotimeout: 3000
+            }).show();
+        }
+
+        // Error notification function
+        function showErrorNotification(text) {
+            new Notify({
+                status: 'error',
+                title: "Discord Link Enhancer",
+                text: text,
+                autoclose: true,
+                showCloseButton: false,
+                showIcon: true,
+                autotimeout: 3000
+            }).show();
+        }
+        
+        // Listen for input to enable/disable buttons
+        document.getElementById('tweetInput').addEventListener('input', function() {
+            const fixButton = document.getElementById('fixButton');
+            const clearButton = document.getElementById('clearButton');
+            
+            if (this.value.trim() !== '') {
+                fixButton.disabled = false;
+                clearButton.disabled = false;
+            } else {
+                fixButton.disabled = true;
+                clearButton.disabled = true;
+            }
+        });
+        
+        // Listen for result changes to enable/disable copy button
+        const resultObserver = new MutationObserver(function(mutations) {
+            const copyButton = document.getElementById('copyButton');
+            const resultText = document.getElementById('result');
+            
+            if (resultText.value.trim() !== '') {
+                copyButton.disabled = false;
+            } else {
+                copyButton.disabled = true;
+            }
+        });
+        
+        // Configure and start the observer
+        const resultElement = document.getElementById('result');
+        resultObserver.observe(resultElement, { attributes: true, childList: true, characterData: true });
+    </script>
+</body>
+</html>
