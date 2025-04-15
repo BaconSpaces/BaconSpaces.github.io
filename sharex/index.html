@@ -5,114 +5,376 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareX Settings</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --primary: #6200ea;
+            --primary-glow: #9d4edd;
+            --secondary: #00f2ff;
+            --dark: #121212;
+            --card-bg: #1a1a2e;
+            --success: #00f5d4;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c2cc;
+        }
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
         }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 25% 15%, rgba(98, 0, 234, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 75% 85%, rgba(0, 242, 255, 0.2) 0%, transparent 40%);
+            min-height: 100vh;
+        }
+        
         header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px 0;
+            padding: 3rem 0 2rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
+        
         h1 {
+            font-size: 3rem;
             margin: 0;
-            font-size: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 30px rgba(98, 0, 234, 0.3);
         }
+        
+        .tagline {
+            margin-top: 0.8rem;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .glow-effect {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--primary-glow);
+            filter: blur(80px);
+            opacity: 0.3;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
         }
-        .settings {
-            margin-bottom: 20px;
+        
+        .configs-container {
+            margin: 3rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
         }
-        .settings h2 {
-            margin-top: 0;
-            font-size: 1.5rem;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+        
+        .config-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .setting-item {
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+        
+        .config-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 1;
         }
-        .setting-item span {
-            font-weight: bold;
-            color: #333;
+        
+        .config-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
         }
-        .download-link {
+        
+        .config-header {
+            padding: 2rem 1.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .config-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .config-name {
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
             text-align: center;
-            margin-top: 20px;
         }
-        .download-link a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
+        
+        .config-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        
+        .config-body {
+            padding: 0 1.5rem 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--primary-glow));
+            color: white;
             text-decoration: none;
-            border-radius: 5px;
-            margin: 0 10px;
-            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
         }
-        .download-link a:hover {
-            background-color: #0056b3;
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            box-shadow: 0 0 15px rgba(98, 0, 234, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+        
+        /* Animation for download success */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .downloaded {
+            background: linear-gradient(90deg, var(--success), var(--secondary)) !important;
+            animation: pulse 0.8s ease;
+        }
+        
+        /* Cool features */
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .glow {
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            filter: blur(40px);
+            opacity: 0.15;
+        }
+        
+        .blinking {
+            animation: blinkingText 8s infinite;
+        }
+        
+        @keyframes blinkingText {
+            0% { color: var(--text-primary); }
+            50% { color: var(--secondary); }
+            100% { color: var(--text-primary); }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-
-<header>
-    <h1>ShareX Settings</h1>
-</header>
-
-<div class="container">
-
-
-
-    <!-- Add more settings sections as needed -->
-
-    <div class="download-link">
-        <a href="kappa.lol.sxcu" download>Click here to download the Kappa.lol configuration file</a>
-        <a href="femboy.beauty.sxcu" download>Click here to download the femboy.beauty configuration file</a>
-        <a href="i.supa.codes.sxcu" download>Click here to download the i.supa.codes configuration file</a>
-        <a href="gachi.gay.sxcu" download>Click here to download the gachi.gay configuration file</a>
-        <a href="file-coffee.sxcu" download>Click here to download the file-coffee configuration file</a>
+    <header>
+        <div class="glow-effect"></div>
+        <h1><i class="fas fa-share-alt"></i> SHAREX CONFIG</h1>
+        <p class="tagline">Premium upload destinations for your screenshots</p>
+    </header>
+    
+    <div class="container">
+        <div class="configs-container">
+            <div class="config-card">
+                <span class="glow"></span>
+                <div class="config-header">
+                    <div class="config-icon floating">
+                        <i class="fas fa-laugh-squint"></i>
+                    </div>
+                    <div class="config-name blinking">Kappa.lol</div>
+                </div>
+                <div class="config-body">
+                    <div class="config-description">
+                        Fast and reliable meme sharing platform with instant uploads and direct links.
+                    </div>
+                    <a href="kappa.lol.sxcu" download class="btn download-btn" data-name="kappa.lol">
+                        <i class="fas fa-download"></i> Install Config
+                    </a>
+                </div>
+            </div>
+            
+            <div class="config-card">
+                <span class="glow"></span>
+                <div class="config-header">
+                    <div class="config-icon floating">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="config-name blinking">femboy.beauty</div>
+                </div>
+                <div class="config-body">
+                    <div class="config-description">
+                        Stylish and elegant image hosting with custom URLs and advanced sharing options.
+                    </div>
+                    <a href="femboy.beauty.sxcu" download class="btn download-btn" data-name="femboy.beauty">
+                        <i class="fas fa-download"></i> Install Config
+                    </a>
+                </div>
+            </div>
+            
+            <div class="config-card">
+                <span class="glow"></span>
+                <div class="config-header">
+                    <div class="config-icon floating">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="config-name blinking">i.supa.codes</div>
+                </div>
+                <div class="config-body">
+                    <div class="config-description">
+                        Developer-friendly file sharing with code snippet support and embedding features.
+                    </div>
+                    <a href="i.supa.codes.sxcu" download class="btn download-btn" data-name="i.supa.codes">
+                        <i class="fas fa-download"></i> Install Config
+                    </a>
+                </div>
+            </div>
+            
+            <div class="config-card">
+                <span class="glow"></span>
+                <div class="config-header">
+                    <div class="config-icon floating">
+                        <i class="fas fa-rainbow"></i>
+                    </div>
+                    <div class="config-name blinking">gachi.gay</div>
+                </div>
+                <div class="config-body">
+                    <div class="config-description">
+                        Colorful and expressive image hosting with unique customization options.
+                    </div>
+                    <a href="gachi.gay.sxcu" download class="btn download-btn" data-name="gachi.gay">
+                        <i class="fas fa-download"></i> Install Config
+                    </a>
+                </div>
+            </div>
+            
+            <div class="config-card">
+                <span class="glow"></span>
+                <div class="config-header">
+                    <div class="config-icon floating">
+                        <i class="fas fa-mug-hot"></i>
+                    </div>
+                    <div class="config-name blinking">file-coffee</div>
+                </div>
+                <div class="config-body">
+                    <div class="config-description">
+                        Simple and reliable file hosting with unlimited storage and high bandwidth limits.
+                    </div>
+                    <a href="file-coffee.sxcu" download class="btn download-btn" data-name="file-coffee">
+                        <i class="fas fa-download"></i> Install Config
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-
-</div>
-
-<script>
-    // Populate general settings
-    var generalSettingsDiv = document.getElementById("generalSettings");
-    generalSettingsDiv.innerHTML += `
-        <div class="setting-item">
-            <span>Upload Destination:</span> Your Upload Destination Here
-        </div>
-        <div class="setting-item">
-            <span>Shortcuts:</span> Your Shortcuts Here
-        </div>
-    `;
-
-    // Populate image settings
-    var imageSettingsDiv = document.getElementById("imageSettings");
-    imageSettingsDiv.innerHTML += `
-        <div class="setting-item">
-            <span>Image Format:</span> Your Image Format Here
-        </div>
-        <div class="setting-item">
-            <span>Image Quality:</span> Your Image Quality Here
-        </div>
-    `;
-
-    // Add more settings sections as needed
-</script>
-
+    
+    <footer>
+        <p>©  Bacon_Space</p>
+    </footer>
+    
+    <script>
+        // Add click event to download buttons
+        document.querySelectorAll('.download-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Visual feedback
+                this.innerHTML = '<i class="fas fa-check"></i> Installed!';
+                this.classList.add('downloaded');
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    const serviceName = this.getAttribute('data-name');
+                    this.innerHTML = '<i class="fas fa-download"></i> Install Config';
+                    this.classList.remove('downloaded');
+                }, 3000);
+            });
+        });
+    </script>
 </body>
 </html>
