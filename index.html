@@ -11,23 +11,25 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%);
             color: #fff;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         
         .container {
             max-width: 800px;
+            width: 90%;
             text-align: center;
             position: relative;
             z-index: 1;
-            padding: 20px;
+            padding: 20px 10px;
+            margin: 40px 0;
         }
         
         h1 {
-            font-size: 3rem;
+            font-size: clamp(2rem, 5vw, 3rem);
             margin-bottom: 0.5rem;
             background: linear-gradient(90deg, #ff6b6b, #ffa6a6);
             -webkit-background-clip: text;
@@ -36,7 +38,7 @@
         }
         
         .subtitle {
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
             opacity: 0.8;
             margin-bottom: 2rem;
         }
@@ -45,16 +47,17 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 15px;
-            margin-top: 40px;
+            gap: 12px;
+            margin-top: 30px;
         }
         
         .social-link {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 180px;
-            padding: 15px 20px;
+            width: calc(50% - 16px);
+            max-width: 180px;
+            padding: 15px 10px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             backdrop-filter: blur(5px);
@@ -64,7 +67,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .social-link:hover {
+        .social-link:hover, .social-link:active {
             transform: translateY(-5px);
             background: rgba(255, 255, 255, 0.2);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
@@ -72,17 +75,18 @@
         }
         
         .social-link i {
-            font-size: 24px;
-            margin-right: 10px;
+            font-size: clamp(18px, 4vw, 24px);
+            margin-right: 8px;
         }
         
         .social-link span {
             font-weight: 500;
+            font-size: clamp(14px, 3.5vw, 16px);
         }
 
         .profile-pic {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid rgba(255, 107, 107, 0.7);
@@ -90,7 +94,7 @@
         }
 
         .particles {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -119,14 +123,50 @@
 
         .loading {
             display: inline-block;
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px 10px;
+                margin: 20px 0;
+                width: 95%;
+            }
+            
+            .social-links {
+                gap: 10px;
+            }
+            
+            .social-link {
+                width: calc(50% - 10px);
+                padding: 12px 8px;
+            }
+            
+            .profile-pic {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .loading {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* For extremely small screens */
+        @media (max-width: 350px) {
+            .social-link {
+                width: 100%;
+                max-width: none;
+            }
         }
     </style>
     <!-- Using the latest Font Awesome version -->
@@ -147,11 +187,11 @@
                 <i class="fa-brands fa-x-twitter"></i>
                 <span>Twitter</span>
             </a>
-            <a href="instagram.com/Bacon_Space" class="social-link">
+            <a href="https://instagram.com/Bacon_Space" class="social-link">
                 <i class="fa-brands fa-instagram"></i>
                 <span>Instagram</span>
             </a>
-                        <a href="threads.net/Bacon_Space" class="social-link">
+            <a href="https://threads.net/Bacon_Space" class="social-link">
                 <i class="fa-brands fa-threads"></i>
                 <span>Threads</span>
             </a>
@@ -159,7 +199,7 @@
                 <i class="fa-brands fa-youtube"></i>
                 <span>YouTube</span>
             </a>
-            <a href="bit.ly/Bacon_Space" class="social-link">
+            <a href="https://bit.ly/Bacon_Space" class="social-link">
                 <i class="fa-brands fa-twitch"></i>
                 <span>Twitch</span>
             </a>
@@ -167,7 +207,7 @@
                 <i class="fa-brands fa-discord"></i>
                 <span>Discord</span>
             </a>
-                        <a href="https://www.reddit.com/user/Bacon_Space/" class="social-link">
+            <a href="https://www.reddit.com/user/Bacon_Space/" class="social-link">
                 <i class="fa-brands fa-reddit"></i>
                 <span>Reddit</span>
             </a>
@@ -175,7 +215,7 @@
                 <i class="fa-brands fa-guilded"></i>
                 <span>Guilded</span>
             </a>
-            <a href="github.com/BaconSpaces" class="social-link">
+            <a href="https://github.com/BaconSpaces" class="social-link">
                 <i class="fa-brands fa-github"></i>
                 <span>GitHub</span>
             </a>
@@ -191,16 +231,18 @@
     </div>
 
     <script>
-        // Create floating particles
+        // Create fewer particles on mobile for better performance
         const particlesContainer = document.getElementById('particles');
-        const particleCount = 30;
+        const isMobile = window.innerWidth <= 768;
+        const particleCount = isMobile ? 15 : 30;
         
         for (let i = 0; i < particleCount; i++) {
             const particle = document.createElement('div');
             particle.classList.add('particle');
             
-            // Random size between 5 and 25px
-            const size = Math.random() * 20 + 5;
+            // Smaller particles on mobile
+            const maxSize = isMobile ? 15 : 25;
+            const size = Math.random() * (maxSize - 5) + 5;
             particle.style.width = `${size}px`;
             particle.style.height = `${size}px`;
             
@@ -211,8 +253,8 @@
             // Random opacity
             particle.style.opacity = Math.random() * 0.5 + 0.1;
             
-            // Random animation duration
-            const duration = Math.random() * 20 + 10;
+            // Random animation duration (shorter on mobile)
+            const duration = Math.random() * (isMobile ? 15 : 20) + 10;
             particle.style.animationDuration = `${duration}s`;
             
             // Random animation delay
