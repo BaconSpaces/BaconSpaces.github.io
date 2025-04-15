@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Bacon_Space Social Links</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #ff6b6b, #ffa6a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-link:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .social-link i {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .social-link span {
+            font-weight: 500;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 107, 107, 0.7);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 107, 107, 0.3);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+    <!-- Using the latest Font Awesome version -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div id="profile-container">
+            <div class="loading">Loading...</div>
+        </div>
+        <h1>@Bacon_Space</h1>
+        <div class="subtitle">Connect with me across the internet!</div>
+        
+        <div class="social-links">
+            <a href="https://x.com/Bacon_Space" class="social-link">
+                <i class="fa-brands fa-x-twitter"></i>
+                <span>Twitter</span>
+            </a>
+            <a href="instagram.com/Bacon_Space" class="social-link">
+                <i class="fa-brands fa-instagram"></i>
+                <span>Instagram</span>
+            </a>
+                        <a href="threads.net/Bacon_Space" class="social-link">
+                <i class="fa-brands fa-threads"></i>
+                <span>Threads</span>
+            </a>
+            <a href="https://www.youtube.com/channel/UCbwlLVr4jf1cR0VBrddPUoQ" class="social-link">
+                <i class="fa-brands fa-youtube"></i>
+                <span>YouTube</span>
+            </a>
+            <a href="bit.ly/Bacon_Space" class="social-link">
+                <i class="fa-brands fa-twitch"></i>
+                <span>Twitch</span>
+            </a>
+            <a href="https://discord.gg/9mcMfsYcVC" class="social-link">
+                <i class="fa-brands fa-discord"></i>
+                <span>Discord</span>
+            </a>
+                        <a href="https://www.reddit.com/user/Bacon_Space/" class="social-link">
+                <i class="fa-brands fa-reddit"></i>
+                <span>Reddit</span>
+            </a>
+            <a href="https://www.guilded.gg/BaconSpace/" class="social-link">
+                <i class="fa-brands fa-guilded"></i>
+                <span>Guilded</span>
+            </a>
+            <a href="github.com/BaconSpaces" class="social-link">
+                <i class="fa-brands fa-github"></i>
+                <span>GitHub</span>
+            </a>
+            <a href="https://www.tiktok.com/@bacon_space" class="social-link">
+                <i class="fa-brands fa-tiktok"></i>
+                <span>TikTok</span>
+            </a>
+            <a href="https://bsky.app/profile/baconspaces.bsky.social" class="social-link">
+                <i class="fa-brands fa-bluesky"></i>
+                <span>BlueSky</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random size between 5 and 25px
+            const size = Math.random() * 20 + 5;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random position
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            
+            // Random opacity
+            particle.style.opacity = Math.random() * 0.5 + 0.1;
+            
+            // Random animation duration
+            const duration = Math.random() * 20 + 10;
+            particle.style.animationDuration = `${duration}s`;
+            
+            // Random animation delay
+            particle.style.animationDelay = `${Math.random() * 5}s`;
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // Fetch GitHub user profile
+        const username = 'BaconSpaces'; // Change this to the correct GitHub username
+        const profileContainer = document.getElementById('profile-container');
+
+        fetch(`https://api.github.com/users/${username}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('GitHub user not found');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Create profile image
+                profileContainer.innerHTML = ''; // Clear loading indicator
+                const img = document.createElement('img');
+                img.src = data.avatar_url;
+                img.alt = `${username} profile picture`;
+                img.className = 'profile-pic';
+                profileContainer.appendChild(img);
+            })
+            .catch(error => {
+                console.error('Error fetching GitHub profile:', error);
+                // Fallback to placeholder if GitHub API fails
+                profileContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = "/api/placeholder/150/150";
+                img.alt = "@Bacon_Space";
+                img.className = 'profile-pic';
+                profileContainer.appendChild(img);
+            });
+    </script>
+</body>
+</html>
