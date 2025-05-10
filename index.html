@@ -211,7 +211,7 @@
                 <i class="fa-brands fa-facebook"></i>
                 <span>FaceBook</span>
             </a>
-            <a href="https://tinyurl.com/BaconSpaceDiscord" class="social-link">
+            <a href="https://tinyurl.com/BaconSpaceDiscord" id="discordButton" class="social-link">
                 <i class="fa-brands fa-discord"></i>
                 <span>Discord</span>
             </a>
@@ -259,6 +259,19 @@
     </div>
 
     <script>
+                // Fetch Discord widget data
+        fetch('https://discord.com/api/guilds/1256849825358544947/widget.json')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.instant_invite) {
+                    document.getElementById('discordButton').href = data.instant_invite;
+                    console.log('[Discord Widget API] Discord invite updated to:', data.instant_invite);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching Discord data:', error);
+                // Keep the default invite link if there's an error
+            });
         // Create fewer particles on mobile for better performance
         const particlesContainer = document.getElementById('particles');
         const isMobile = window.innerWidth <= 768;
