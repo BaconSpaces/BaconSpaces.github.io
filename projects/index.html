@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Bacon_Space Project Links</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 20px 10px;
+            margin: 40px 0;
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #ff6b6b, #ffa6a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .subtitle {
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(50% - 16px);
+            max-width: 180px;
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-link:hover, .social-link:active {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .social-link i {
+            font-size: clamp(18px, 4vw, 24px);
+            margin-right: 8px;
+        }
+        
+        .social-link span {
+            font-weight: 500;
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 107, 107, 0.7);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 107, 107, 0.3);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px 10px;
+                margin: 20px 0;
+                width: 95%;
+            }
+            
+            .social-links {
+                gap: 10px;
+            }
+            
+            .social-link {
+                width: calc(50% - 10px);
+                padding: 12px 8px;
+            }
+            
+            .profile-pic {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .loading {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* For extremely small screens */
+        @media (max-width: 350px) {
+            .social-link {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+    <!-- Using the latest Font Awesome version -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div id="profile-container">
+            <div class="loading">Loading...</div>
+        </div>
+        <h1>@Bacon_Space</h1>
+        <div class="subtitle">Connect with me across the internet!</div>
+        
+        <div class="social-links">
+            <a href="hhttps://baconspaces.github.io/ugt/" class="social-link">
+                <i class="fa-brands fa-github"></i>
+                <span>Ultimate Kick Giveaway</span>
+            </a>
+                <a href="https://tinyurl.com/KickStats" class="social-link">
+               <i class="fa-solid fa-chart-simple"></i>
+                <span>KickStats</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+                // Fetch Discord widget data
+        fetch('https://discord.com/api/guilds/1256849825358544947/widget.json')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.instant_invite) {
+                    document.getElementById('discordButton').href = data.instant_invite;
+                    console.log('[Discord Widget API] Discord invite updated to:', data.instant_invite);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching Discord data:', error);
+                // Keep the default invite link if there's an error
+            });
+        // Create fewer particles on mobile for better performance
+        const particlesContainer = document.getElementById('particles');
+        const isMobile = window.innerWidth <= 768;
+        const particleCount = isMobile ? 15 : 30;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Smaller particles on mobile
+            const maxSize = isMobile ? 15 : 25;
+            const size = Math.random() * (maxSize - 5) + 5;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random position
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            
+            // Random opacity
+            particle.style.opacity = Math.random() * 0.5 + 0.1;
+            
+            // Random animation duration (shorter on mobile)
+            const duration = Math.random() * (isMobile ? 15 : 20) + 10;
+            particle.style.animationDuration = `${duration}s`;
+            
+            // Random animation delay
+            particle.style.animationDelay = `${Math.random() * 5}s`;
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // Fetch GitHub user profile
+        const username = 'BaconSpaces'; // Change this to the correct GitHub username
+        const profileContainer = document.getElementById('profile-container');
+
+        fetch(`https://api.github.com/users/${username}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('GitHub user not found');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Create profile image
+                profileContainer.innerHTML = ''; // Clear loading indicator
+                const img = document.createElement('img');
+                img.src = data.avatar_url;
+                img.alt = `${username} profile picture`;
+                img.className = 'profile-pic';
+                profileContainer.appendChild(img);
+            })
+            .catch(error => {
+                console.error('Error fetching GitHub profile:', error);
+                // Fallback to placeholder if GitHub API fails
+                profileContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = "/api/placeholder/150/150";
+                img.alt = "@Bacon_Space";
+                img.className = 'profile-pic';
+                profileContainer.appendChild(img);
+            });
+    </script>
+</body>
+</html>
