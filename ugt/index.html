@@ -3,690 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kickaway - Kick Giveaway Tool</title>
+
+    <title>UGT - Kick Giveaway Tool</title>
     <meta name="description" content="An open-source, client-side giveaway tool for Kick.com">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-bg: #0a0a0f;
-            --secondary-bg: #1a1a2e;
-            --accent-bg: #16213e;
-            --card-bg: rgba(26, 26, 46, 0.8);
-            --primary-text: #ffffff;
-            --secondary-text: #b8b8c8;
-            --accent-color: #00ff88;
-            --accent-hover: #00cc6a;
-            --danger-color: #ff4757;
-            --warning-color: #ffa502;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --glow-color: rgba(0, 255, 136, 0.3);
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-gradient: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--primary-bg);
-            color: var(--primary-text);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .screen {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* Login Screen */
-        #login-screen {
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: var(--gradient);
-            position: relative;
-            overflow: hidden;
-        }
-
-        #login-screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            animation: gridMove 20s linear infinite;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(10px, 10px); }
-        }
-
-        #login-screen h1 {
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
-            to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 60px rgba(0, 255, 136, 0.3); }
-        }
-
-        #login-screen p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            width: 100%;
-            max-width: 400px;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        #channel-input {
-            padding: 1rem;
-            font-size: 1.1rem;
-            border: 2px solid transparent;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--primary-text);
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        #channel-input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px var(--glow-color);
-            transform: translateY(-2px);
-        }
-
-        #channel-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .btn {
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: var(--accent-color);
-            color: var(--primary-bg);
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
-        }
-
-        /* Main Screen */
-        #main-screen {
-            display: none;
-            background: var(--primary-bg);
-        }
-
-        header {
-            background: var(--card-bg);
-            padding: 1rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(20px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .channel-info {
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .channel-info strong {
-            color: var(--accent-color);
-            font-weight: 700;
-        }
-
-        .header-menu-container {
-            position: relative;
-        }
-
-        .icon-button {
-            background: none;
-            border: none;
-            color: var(--primary-text);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .icon-button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(90deg);
-        }
-
-        .header-menu-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            padding: 1rem;
-            min-width: 200px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(20px);
-            display: none;
-        }
-
-        .main-content {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .panel {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .panel h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .settings-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        label {
-            font-weight: 600;
-            color: var(--secondary-text);
-        }
-
-        input, select {
-            padding: 0.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--primary-text);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px var(--glow-color);
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .checkbox-wrapper input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--accent-color);
-        }
-
-        .slider-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        input[type="range"] {
-            flex: 1;
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 3px;
-            outline: none;
-            appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--glow-color);
-        }
-
-        .btn-start {
-            background: var(--gradient);
-            color: var(--primary-text);
-            margin-top: 1rem;
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-start:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-        }
-
-        .status-message {
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 1rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .status-waiting {
-            background: rgba(255, 165, 2, 0.1);
-            color: var(--warning-color);
-            border: 1px solid var(--warning-color);
-        }
-
-        .status-active {
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--accent-color);
-            border: 1px solid var(--accent-color);
-        }
-
-        .participant-list, .winners-list {
-            list-style: none;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 0;
-        }
-
-        .participant-item, .winner-item {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border-left: 3px solid var(--accent-color);
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .winner-item {
-            border-left-color: var(--warning-color);
-            background: rgba(255, 165, 2, 0.1);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--primary-text);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: var(--danger-color);
-            color: var(--primary-text);
-        }
-
-        .btn-danger:hover {
-            background: #ff3838;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.4);
-        }
-
-        .count-badge {
-            background: var(--accent-color);
-            color: var(--primary-bg);
-            padding: 0.25rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        #claim-section {
-            background: rgba(255, 165, 2, 0.1);
-            border: 1px solid var(--warning-color);
-            border-radius: 15px;
-            padding: 1rem;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        footer {
-            background: var(--secondary-bg);
-            padding: 2rem;
-            text-align: center;
-            border-top: 1px solid var(--border-color);
-            margin-top: auto;
-        }
-
-        footer p {
-            color: var(--secondary-text);
-            margin-bottom: 0.5rem;
-        }
-
-        footer a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .modal-instance {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 3rem;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(20px);
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .winner-animation-box {
-            background: var(--gradient);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            font-size: 2rem;
-            font-weight: 700;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                padding: 1rem;
-            }
-
-            .main-content {
-                padding: 1rem;
-            }
-
-            #login-screen h1 {
-                font-size: 2.5rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--secondary-bg);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-hover);
-        }
-    </style>
+    <!-- kickaway v5 -->
+    <meta property="og:title" content="UGT - Kick Giveaway Tool">
+    <meta property="og:description" content="An open-source, client-side giveaway tool for Kick.com">
+    <meta property="og:image" content="https://www.github.com/BaconSpaces.png">
+    <meta property="og:url" content="https://www.BaconSpaces.github.io/ugt/">
+    <meta property="og:type" content="website">
+
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="https://r2.fivemanage.com/image/bkKw71GufLr1.png" type="image/png" sizes="any">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <div id="app-wrapper">
-        <div id="app-container">
+        
+        <div id="app-container" data-nosnippet>
             <div id="login-screen" class="screen">
-                <h1>kickaway.co</h1>
-                <p>Enter the Kick channel for the giveaway</p>
-                <div class="login-form">
-                    <input type="text" id="channel-input" placeholder="E.g., xqc">
-                    <button id="connect-button" class="btn btn-primary">Connect</button>
-                </div>
+                <h1 data-lang-key="loginTitle">UGT</h1>
+                <p data-lang-key="loginPrompt">Enter the Kick channel for the giveaway</p>
+                <input type="text" id="channel-input" data-lang-key-placeholder="loginPlaceholder" placeholder="E.g., xqc">
+                <button id="connect-button" data-lang-key="connectButton">Connect</button>
             </div>
 
-            <div id="main-screen" class="screen">
+            <div id="main-screen" class="screen" style="display: none;">
                 <header>
                     <div class="channel-info">
-                        <span>Connected to:</span> <strong id="connected-channel-name"></strong>
+                        <span data-lang-key="connectedTo">Connected to:</span> <strong id="connected-channel-name"></strong>
                     </div>
-                    <div class="header-menu-container">
-                        <button id="header-menu-toggle" class="icon-button">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                            </svg>
+                    <div id="header-menu-container" class="header-menu-container">
+                        <button id="header-menu-toggle" class="icon-button" data-lang-key-aria-label="settingsMenuAria">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         </button>
                         <div id="header-menu-dropdown" class="header-menu-dropdown">
-                            <button id="change-channel-button" class="btn btn-secondary">Change Channel</button>
-                            <button id="clear-all-data-button" class="btn btn-danger">Clear All Data</button>
+                            <div id="language-switcher">
+                                
+                            </div>
+                            <button id="change-channel-button" class="small-button" data-lang-key="changeChannel">Change Channel</button>
+                            <button id="clear-all-data-button" class="small-button danger-button" data-lang-key="clearAllData">Clear All Data</button>
                         </div>
                     </div>
                 </header>
 
                 <div class="main-content">
-                    <div class="panel settings-panel">
-                        <h2>⚙️ Settings</h2>
-                        
-                        <div class="form-group">
-                            <label for="keyword-input">Keyword (optional):</label>
-                            <input type="text" id="keyword-input" placeholder="e.g., !giveaway">
-                        </div>
+                    <div class="settings-panel">
+                        <h2 data-lang-key="settingsTitle">Settings</h2>
+                        <label for="keyword-input" data-lang-key="keywordLabel">Keyword (optional):</label>
+                        <input type="text" id="keyword-input" placeholder="">
 
-                        <div class="form-group">
-                            <label for="winner-count-input">Number of Winners:</label>
-                            <input type="number" id="winner-count-input" value="1" min="1" max="10">
-                        </div>
+                        <label for="winner-count-input" data-lang-key="winnerCountLabel">Number of Winners:</label>
+                        <input type="number" id="winner-count-input" value="1" min="1" max="10">
                         
                         <div class="checkbox-wrapper">
-                            <input type="checkbox" id="sub-only-checkbox">
-                            <label for="sub-only-checkbox">Subscribers only</label>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="sub-multiplier-slider">
-                                Subscriber Multiplier: <span id="sub-multiplier-value" class="count-badge">1</span>x
+                             <label for="sub-only-checkbox">
+                                <input type="checkbox" id="sub-only-checkbox">
+                                <span data-lang-key="subOnlyLabel">Subscribers only</span>
                             </label>
-                            <input type="range" id="sub-multiplier-slider" min="1" max="10" value="1">
                         </div>
+
+                        <label for="sub-multiplier-slider">
+                            <span data-lang-key="subMultiplierLabel">Subscriber Multiplier:</span>
+                            <span id="sub-multiplier-value">1</span>x
+                        </label>
+                        <input type="range" id="sub-multiplier-slider" min="1" max="10" value="1">
                         
                         <div class="checkbox-wrapper">
-                            <input type="checkbox" id="winner-claim-checkbox">
-                            <label for="winner-claim-checkbox">Winner confirmation (for single winner)</label>
+                            <label for="winner-claim-checkbox">
+                                <input type="checkbox" id="winner-claim-checkbox">
+                                <span data-lang-key="winnerClaimLabel">Winner confirmation (for single winner)</span>
+                            </label>
                         </div>
 
-                        <div class="form-group">
-                            <label for="claim-duration-input">Confirmation Time (seconds):</label>
-                            <input type="number" id="claim-duration-input" value="30" min="10">
-                        </div>
+                        <label for="claim-duration-input" data-lang-key="claimDurationLabel">Confirmation Time (seconds):</label>
+                        <input type="number" id="claim-duration-input" value="30" min="10">
 
-                        <div class="form-group">
-                            <label for="animation-select">Giveaway Animation:</label>
-                            <select id="animation-select">
-                                <option value="wheel" selected>🎯 Wheel</option>
-                                <option value="slot-machine">🎰 Classic</option>
-                                <option value="char-scramble">🔀 Character Scramble</option>
-                            </select>
-                        </div>
+                        <label for="animation-select" data-lang-key="animationLabel">Giveaway Animation:</label>
+                        <select id="animation-select">
+                            <option value="wheel" selected data-lang-key="animationWheel">Wheel</option>
+                            <option value="slot-machine" data-lang-key="animationClassic">Classic</option>
+                            <option value="char-scramble" data-lang-key="animationScramble">Character Scramble</option>                            
+                        </select>
                         
-                        <button id="start-giveaway-button" class="btn btn-start">Start Giveaway</button>
-                        <div id="status-message" class="status-message status-waiting">Press "Start" to connect to the chat.</div>
+                        <button id="start-giveaway-button" data-lang-key="startGiveawayButton">Start Giveaway</button>
+                        <p id="status-message" class="status-waiting" data-lang-key="statusWaiting">Press "Start" to connect to the chat.</p>
                     </div>
 
-                    <div class="panel giveaway-panel">
-                        <h2>👥 Participants <span id="participant-count" class="count-badge">0</span></h2>
-                        <ul id="participant-list" class="participant-list"></ul>
+                    <div class="giveaway-panel">
+                        <h2><span data-lang-key="participantsTitle">Participants</span> (<span id="participant-count">0</span>)</h2>
+                        <ul id="participant-list"></ul>
 
                         <div id="claim-section">
-                            <h3>⏰ Awaiting Confirmation: <span id="claim-winner-name"></span></h3>
+                            <h3 data-lang-key="claimTitle">Awaiting Confirmation: <span id="claim-winner-name"></span></h3>
                             <p id="claim-countdown"></p>
                             <ul id="claim-chat-log"></ul>
-                            <button id="claim-confirm-button" class="btn btn-secondary">OK</button>
+                            <button id="claim-confirm-button" class="small-button" data-lang-key="okButton">OK</button>
                         </div>
                         
                         <div class="action-buttons">
-                            <button id="draw-button" class="btn btn-primary" disabled>🎲 Draw Winner</button>
-                            <button id="reset-button" class="btn btn-secondary">🔄 Reset</button>
+                            <button id="draw-button" disabled data-lang-key="drawButton">Draw Winner</button>
+                            <button id="reset-button" data-lang-key="resetButton">Reset</button>
                         </div>
                     </div>
 
-                    <div class="panel winners-panel">
-                        <h2>🏆 Winners <span id="winners-count" class="count-badge">0</span></h2>
-                        <ul id="winners-list" class="winners-list"></ul>
+                    <div class="winners-panel">
+                        <h2><span data-lang-key="winnersTitle">Winners</span> (<span id="winners-count">0</span>)</h2>
+                        <ul id="winners-list"></ul>
                     </div>
                 </div>
             </div>
         </div>
 
+        
         <footer>
-            <p>This tool was created by an independent developer and has no official affiliation with Kick.com</p>
-            <p>Any consequences arising from its use are the sole responsibility of the user.</p>
-            <p>Kickaway works entirely client-side; giveaway data lives only in your browser's local storage.</p>
-            <p>This site collects anonymous statistics.</p>
-            <p>
-                <a href="https://github.com/kleanins/kickaway" target="_blank" rel="noopener noreferrer">
-                    View on GitHub
-                </a>
-            </p>
+            <p data-lang-key="footerDisclaimer1">This tool was created by an independent developer and has no official affiliation with Kick.com</p>
+            <div data-nosnippet>
+                <p data-lang-key="footerDisclaimer2">Any consequences arising from its use are the sole responsibility of the user.</p>
+                <p class="cookie-note" data-lang-key="footerDisclaimer3">UGT works entirely client-side; giveaway data lives only in your browser’s local storage.</p>
+                <p class="cookie-note" data-lang-key="footerDisclaimer4">This site collects anonymous statistics.</p>
+                <p class="cookie-note">
+                    <a href="https://github.com/BaconSpaces.github.io/ugt/"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                       github
+                    </a>
+                </p>
+            </div>
         </footer>
     </div>
 
@@ -695,16 +143,14 @@
     <div id="modal-template" style="display: none;">
         <div class="modal-instance">
             <div class="modal-content">
-                <p class="winner-title-text">🎉 Drawing Winner...</p>
-                <div class="winner-animation-box">
-                    <span id="winner-display">🎯</span>
-                </div>
-                <button class="modal-confirm-button btn btn-primary">OK</button>
+                <p class="winner-title-text" data-lang-key="modalDrawing">Drawing...</p>
+                <div class="winner-animation-box"></div>
+                <button class="modal-confirm-button small-button" data-lang-key="okButton">OK</button>
             </div>
         </div>
     </div>
 
-   
     <script src="script.js"></script>
+    <script src="/_vercel/insights/script.js" defer></script>
 </body>
 </html>
