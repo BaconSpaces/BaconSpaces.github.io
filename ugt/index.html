@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Giveaway Tool</title>
+    <meta name="description" content="A universal giveaway tool for Twitch and Kick">
+    <meta property="og:title" content="Universal Giveaway Tool">
+    <meta property="og:description" content="A universal giveaway tool for Twitch and Kick">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .platform-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .platform-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .platform-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .platform-btn.active {
+            background: #9146ff;
+            color: white;
+        }
+
+        .platform-btn.kick.active {
+            background: #53fc18;
+            color: black;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #9146ff;
+            box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            transform: scale(1.2);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #9146ff, #772ce8);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(145, 70, 255, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+        .btn.danger {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+        }
+
+        .btn.danger:hover {
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .btn.success {
+            background: linear-gradient(45deg, #2ed573, #20bf6b);
+        }
+
+        .btn.success:hover {
+            box-shadow: 0 10px 20px rgba(46, 213, 115, 0.3);
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status.waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.connected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(21, 87, 36, 0.1), transparent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .participants-section {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .participants-list {
+            list-style: none;
+        }
+
+        .participants-list li {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .participants-list li.subscriber {
+            background: linear-gradient(45deg, #9146ff, #772ce8);
+            color: white;
+        }
+
+        .participants-list li.vip {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252);
+            color: white;
+        }
+
+        .participants-list li.mod {
+            background: linear-gradient(45deg, #2ed573, #20bf6b);
+            color: white;
+        }
+
+        .winners-section {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .winners-list {
+            list-style: none;
+        }
+
+        .winners-list li {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #2ed573, #20bf6b);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .winner-animation {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #9146ff;
+            margin: 20px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .twitch-color {
+            color: #9146ff;
+        }
+
+        .kick-color {
+            color: #53fc18;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .export-btn {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            margin-top: 10px;
+        }
+
+        .export-btn:hover {
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .platform-selector {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .winner-animation {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎉 Universal Giveaway Tool</div>
+            <div class="platform-selector">
+                <button class="platform-btn active" id="twitch-btn">📺 Twitch</button>
+                <button class="platform-btn kick" id="kick-btn">⚡ Kick</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" id="total-participants">0</span>
+                <span>Participants</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="total-winners">0</span>
+                <span>Winners</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="total-entries">0</span>
+                <span>Entries</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="connection-status">❌</span>
+                <span>Connected</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>⚙️ Settings</h2>
+                
+                <div class="input-group">
+                    <label for="channel-input">Channel Name:</label>
+                    <input type="text" id="channel-input" placeholder="Enter channel name">
+                </div>
+
+                <div class="input-group">
+                    <label for="keyword-input">Keyword (optional):</label>
+                    <input type="text" id="keyword-input" placeholder="Enter keyword for entry (leave empty for any message)">
+                </div>
+
+                <div class="input-group">
+                    <label for="winner-count">Number of Winners:</label>
+                    <input type="number" id="winner-count" min="1" max="10" value="1">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="sub-only">
+                    <label for="sub-only">Subscribers Only</label>
+                </div>
+
+                <div class="input-group">
+                    <label for="sub-multiplier">Subscriber Multiplier:</label>
+                    <input type="number" id="sub-multiplier" min="1" max="10" value="1">
+                </div>
+
+                <div class="input-group">
+                    <label for="min-follow-time">Minimum Follow Time (minutes):</label>
+                    <input type="number" id="min-follow-time" min="0" value="0">
+                </div>
+
+                <div class="input-group">
+                    <label for="animation-type">Animation Type:</label>
+                    <select id="animation-type">
+                        <option value="classic">Classic Spinner</option>
+                        <option value="wheel">Wheel of Fortune</option>
+                        <option value="scramble">Character Scramble</option>
+                        <option value="typewriter">Typewriter Effect</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="connect-btn">🔗 Connect to Chat</button>
+            </div>
+
+            <div class="card">
+                <h2>🎮 Giveaway Control</h2>
+                
+                <div class="status waiting" id="status">
+                    Ready to connect to chat
+                </div>
+
+                <div class="participants-section">
+                    <h3>Participants (<span id="participant-count">0</span>)</h3>
+                    <div id="participants-filter" style="margin-bottom: 10px;">
+                        <select id="participant-filter-select" style="width: 100%; padding: 8px; border-radius: 5px;">
+                            <option value="all">All Participants</option>
+                            <option value="subscribers">Subscribers Only</option>
+                            <option value="vips">VIPs Only</option>
+                            <option value="mods">Moderators Only</option>
+                        </select>
+                    </div>
+                    <ul class="participants-list" id="participants-list"></ul>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn success" id="draw-btn" disabled>🎲 Draw Winner</button>
+                    <button class="btn danger" id="reset-btn">🔄 Reset</button>
+                </div>
+
+                <div class="export-section">
+                    <button class="btn export-btn" id="export-btn">📊 Export Results</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 30px;">
+            <h2>🏆 Winners (<span id="winner-count-display">0</span>)</h2>
+            <div class="winners-section">
+                <ul class="winners-list" id="winners-list"></ul>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn danger" id="clear-winners-btn">🗑️ Clear Winners</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="winner-modal">
+        <div class="modal-content">
+            <h2>🎉 Winner! 🎉</h2>
+            <div class="winner-animation" id="winner-animation">Drawing...</div>
+            <button class="btn" id="modal-ok-btn">✅ OK</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
