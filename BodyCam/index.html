@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BodyCam Tool</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+        <meta property="og:title" content="BodyCam Tool">
+    <meta property="og:description" content="Configure your bodycam overlay for streaming and roleplay">
+    <meta property="og:image" content="https://r2.fivemanage.com/image/pVebyw036nKs.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BodyCam Tool">
+    <meta name="twitter:description" content="Configure your bodycam overlay for streaming and roleplay">
+    <meta name="twitter:image" content="https://r2.fivemanage.com/image/pVebyw036nKs.png">
+    <link rel="icon" type="image/png" href="https://r2.fivemanage.com/image/pVebyw036nKs.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0f172a; font-family: 'Rajdhani', sans-serif; height: 100vh; width: 100vw; overflow-x: hidden; }
+        .hidden { display: none !important; }
+
+        #view-config {
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); padding: 20px;
+        }
+        .config-card {
+            background: rgba(15, 23, 42, 0.95); border: 1px solid #00ff41; padding: 2.5rem;
+            width: 100%; max-width: 650px; border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.15); backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-out; position: relative;
+        }
+        .config-header { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(0, 255, 65, 0.3); padding-bottom: 1rem; }
+        .config-header h1 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 2rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .config-header p { color: #00ff41; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { display: block; color: #94a3b8; margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid #334155;
+            color: white; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; border-radius: 6px; transition: border-color 0.3s;
+        }
+        .form-group select { cursor: pointer; }
+        .form-group option { background: #0f172a; color: white; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #00ff41; box-shadow: 0 0 15px rgba(0, 255, 65, 0.1); }
+        .actions { margin-top: 2rem; display: flex; gap: 1rem; flex-direction: column; }
+        .btn { padding: 15px; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; text-transform: uppercase; font-weight: bold; font-size: 1rem; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-primary { background: #00ff41; color: #000; box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
+        .btn-primary:hover { background: #00cc33; box-shadow: 0 0 30px rgba(0, 255, 65, 0.4); transform: translateY(-2px); }
+        .btn-secondary { background: transparent; border: 1px solid #00ff41; color: #00ff41; }
+        .btn-secondary:hover { background: rgba(0, 255, 65, 0.1); }
+        .preview-link { margin-top: 1rem; padding: 1rem; background: #000; border-radius: 6px; color: #64748b; font-family: monospace; font-size: 0.8rem; word-break: break-all; border: 1px solid #1e293b; }
+        .copy-feedback { text-align: center; color: #00ff41; font-size: 0.9rem; margin-top: 10px; min-height: 20px; opacity: 0; transition: opacity 0.3s; }
+        .watermark { text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0, 255, 65, 0.1); color: rgba(148, 163, 184, 0.4); font-size: 0.7rem; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase; user-select: none; }
+
+        #view-overlay { height: 100vh; width: 100vw; overflow: hidden; background: transparent; }
+        .top-right-container {
+            position: fixed; top: 1vw; right: 1vw;
+            background: linear-gradient(135deg, rgba(0, 20, 40, 0.95), rgba(0, 40, 60, 0.85));
+            backdrop-filter: blur(10px); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 0.8vw;
+            padding: 1vw 1.3vw; box-shadow: 0 0 1.5vw rgba(0, 255, 65, 0.2), inset 0 0 1vw rgba(0, 255, 65, 0.05);
+            animation: containerGlow 3s ease-in-out infinite; min-width: 18vw; max-width: 25vw;
+        }
+        @keyframes containerGlow { 0%, 100% { box-shadow: 0 0 1.5vw rgba(0, 255, 65, 0.2), inset 0 0 1vw rgba(0, 255, 65, 0.05); } 50% { box-shadow: 0 0 2vw rgba(0, 255, 65, 0.4), inset 0 0 1.5vw rgba(0, 255, 65, 0.1); } }
+        .logo-section { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8vw; padding-bottom: 0.8vw; border-bottom: 1px solid rgba(0, 255, 65, 0.3); }
+        .logo-icon { width: 3.6vw; height: 3.6vw; background: linear-gradient(135deg, #0084ff, #ffffff); border-radius: 0.5vw; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 1vw rgba(0, 255, 65, 0.5); animation: iconPulse 2s ease-in-out infinite; overflow: hidden; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes iconPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .rec-status { text-align: right; flex: 1; padding-left: 1vw; }
+        .rec-badge { font-family: 'Orbitron', monospace; font-size: 0.9vw; font-weight: 700; letter-spacing: 0.1vw; color: #ff0033; text-shadow: 0 0 0.5vw #ff0033, 0 0 1vw #ff0033; display: flex; align-items: center; justify-content: flex-end; margin-bottom: 0.3vw; }
+        .rec-dot { width: 0.6vw; height: 0.6vw; background: #ff0033; border-radius: 50%; margin-left: 0.5vw; box-shadow: 0 0 0.5vw #ff0033, 0 0 1vw #ff0033; animation: recBlink 1s ease-in-out infinite; }
+        @keyframes recBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .brand { font-family: 'Orbitron', monospace; font-size: 0.6vw; font-weight: 500; letter-spacing: 0.05vw; color: #ffffffb3; }
+        .info-section { margin-top: 0.8vw; }
+        .info-row { display: flex; align-items: center; margin: 0.4vw 0; font-size: 0.8vw; font-weight: 500; letter-spacing: 0.03vw; color: #00ff41; text-shadow: 0 0 0.25vw rgba(0, 255, 65, 0.5); }
+        .info-row i { width: 1.3vw; margin-right: 0.5vw; color: #00cc33; }
+        .datetime-section { margin-top: 0.8vw; padding-top: 0.8vw; border-top: 1px solid rgba(0, 255, 65, 0.3); display: flex; justify-content: space-between; align-items: center; }
+        .datetime { font-family: 'Orbitron', monospace; font-size: 0.8vw; font-weight: 700; letter-spacing: 0.05vw; color: #00ff41; text-shadow: 0 0 0.4vw rgba(0, 255, 65, 0.6); }
+        .glitch { position: relative; animation: glitchText 5s infinite; }
+        @keyframes glitchText { 0%, 98% { transform: translate(0); } 99% { transform: translate(-2px, 2px); } 100% { transform: translate(2px, -2px); } }
+        body.overlay-mode { background: transparent; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div id="view-config" class="hidden">
+        <div class="config-card">
+            <div class="config-header">
+                <h1><i class="fas fa-camera-retro"></i> Bodycam Setup</h1>
+                <p>Configure your overlay parameters</p>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Player Name</label>
+                    <input type="text" id="input-player" placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Call Sign</label>
+                    <input type="text" id="input-callsign" placeholder="e.g. [1-A-10]">
+                </div>
+                <div class="form-group">
+                    <label>Department Preset</label>
+                    <select id="select-preset" onchange="applyPreset()">
+                        <option value="custom">Custom / Manual</option>
+                        <option value="police">Police (LSPD/SAHP)</option>
+                        <option value="ems">EMS / Medical</option>
+                        <option value="doj">DOJ (Justice)</option>
+                        <option value="doc">DOC (Corrections)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Department Name</label>
+                    <select id="select-agency" onchange="onAgencyChange()">
+                        <option value="Los Santos Police Department">LSPD - Los Santos Police Department</option>
+                        <option value="San Andreas Highway Patrol">SAHP - San Andreas Highway Patrol</option>
+                        <option value="Blaine County Sheriff's Office">BCSO - Blaine County Sheriff's Office</option>
+                        <option value="Emergency Medical Services">EMS - Emergency Medical Services</option>
+                        <option value="Department of Justice">DOJ - Department of Justice</option>
+                        <option value="Department of Corrections">DOC - Department of Corrections</option>
+                        <option value="custom">Custom (Enter Below)</option>
+                    </select>
+                </div>
+                <div class="form-group full-width hidden" id="custom-agency-group">
+                    <label>Custom Department Name</label>
+                    <input type="text" id="input-agency-custom" placeholder="Enter custom department name">
+                </div>
+                <div class="form-group full-width">
+                    <label>Job Title / Rank</label>
+                    <input type="text" id="input-job" placeholder="e.g. Sergeant / Paramedic / Officer">
+                </div>
+                <div class="form-group">
+                    <label>Server Name / Brand</label>
+                    <input type="text" id="input-brand" placeholder="e.g. FrostByte RP">
+                </div>
+                <div class="form-group">
+                    <label>Logo URL</label>
+                    <input type="text" id="input-logo" placeholder="https://..." oninput="document.getElementById('select-preset').value='custom'">
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="launchOverlay()"><i class="fas fa-external-link-alt"></i> Launch Overlay</button>
+                <button class="btn btn-secondary" onclick="copyLinkParams()"><i class="fas fa-link"></i> Copy OBS Browser Source Link</button>
+            </div>
+            <div id="generated-link" class="preview-link hidden"></div>
+            <div class="copy-feedback" id="feedbackMsg">Link copied to clipboard! Ready for OBS.</div>
+            <div class="watermark">&copy; <span id="footer-year"></span> - Bacon_Space</div>
+        </div>
+    </div>
+
+    <div id="view-overlay" class="hidden">
+        <div class="top-right-container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <img id="display-logo" src="" alt="Logo" onerror="this.style.display='none'; this.parentElement.style.background='#333';">
+                </div>
+                <div class="rec-status">
+                    <div class="rec-badge"><span>REC</span><div class="rec-dot"></div></div>
+                    <div class="brand" id="display-brand">LOADING...</div>
+                </div>
+            </div>
+            <div class="info-section">
+                <div class="info-row glitch"><i class="fas fa-user"></i><span id="display-player">LOADING...</span></div>
+                <div class="info-row"><i class="fas fa-hashtag"></i><span id="display-callsign">...</span></div>
+                <div class="info-row"><i class="fas fa-shield-alt"></i><span id="display-agency">LOADING...</span></div>
+                <div class="info-row"><i class="fas fa-id-badge"></i><span id="display-job">LOADING...</span></div>
+            </div>
+            <div class="datetime-section">
+                <div class="datetime" id="date-span">00-XXX-0000</div>
+                <div class="datetime" id="time-span">00:00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+        const defaults = { player: "Sparky King", agency: "Emergency Medical Services", job: "Advanced Paramedic", callsign: "[M-1]", brand: "FrostByte RolePlay", logo: "https://r2.fivemanage.com/image/JiaEVkMtyuTs.png" };
+        const logoPresets = { police: "https://r2.fivemanage.com/image/CDt91O3NyxbV.png", ems: "https://r2.fivemanage.com/image/JiaEVkMtyuTs.png", doj: "https://r2.fivemanage.com/image/dGwUuMX7ZPHa.png", doc: "https://r2.fivemanage.com/image/k4L9qbhZUaWE.png" };
+        const agencyToPreset = { "Los Santos Police Department": "police", "San Andreas Highway Patrol": "police", "Blaine County Sheriff's Office": "police", "Emergency Medical Services": "ems", "Department of Justice": "doj", "Department of Corrections": "doc" };
+
+        function init() {
+            document.getElementById('footer-year').textContent = new Date().getFullYear();
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('overlay')) { showOverlayMode(params); } else { showConfigMode(); }
+        }
+
+        function onAgencyChange() {
+            const sel = document.getElementById('select-agency');
+            const customGroup = document.getElementById('custom-agency-group');
+            if (sel.value === 'custom') { customGroup.classList.remove('hidden'); }
+            else { customGroup.classList.add('hidden'); if (agencyToPreset[sel.value]) { document.getElementById('select-preset').value = agencyToPreset[sel.value]; applyPreset(); } }
+        }
+
+        function showConfigMode() {
+            document.getElementById('view-config').classList.remove('hidden');
+            document.getElementById('view-overlay').classList.add('hidden');
+            document.body.classList.remove('overlay-mode');
+            document.getElementById('input-player').value = localStorage.getItem('bodycam_player') || defaults.player;
+            document.getElementById('input-job').value = localStorage.getItem('bodycam_job') || defaults.job;
+            document.getElementById('input-callsign').value = localStorage.getItem('bodycam_callsign') || defaults.callsign;
+            document.getElementById('input-brand').value = localStorage.getItem('bodycam_brand') || defaults.brand;
+            const savedLogo = localStorage.getItem('bodycam_logo') || defaults.logo;
+            document.getElementById('input-logo').value = savedLogo;
+            const savedAgency = localStorage.getItem('bodycam_agency') || defaults.agency;
+            const agencySelect = document.getElementById('select-agency');
+            let found = false;
+            for (let opt of agencySelect.options) { if (opt.value === savedAgency) { agencySelect.value = savedAgency; found = true; break; } }
+            if (!found) { agencySelect.value = 'custom'; document.getElementById('custom-agency-group').classList.remove('hidden'); document.getElementById('input-agency-custom').value = savedAgency; }
+            const presetSelect = document.getElementById('select-preset');
+            let foundPreset = 'custom';
+            for (const [key, url] of Object.entries(logoPresets)) { if (savedLogo === url) foundPreset = key; }
+            presetSelect.value = foundPreset;
+        }
+
+        function applyPreset() {
+            const type = document.getElementById('select-preset').value;
+            if (logoPresets[type]) { document.getElementById('input-logo').value = logoPresets[type]; }
+        }
+
+        function getAgencyValue() {
+            const sel = document.getElementById('select-agency');
+            if (sel.value === 'custom') { return document.getElementById('input-agency-custom').value || defaults.agency; }
+            return sel.value;
+        }
+
+        function saveSettings() {
+            const p = document.getElementById('input-player').value || defaults.player;
+            const a = getAgencyValue();
+            const j = document.getElementById('input-job').value || defaults.job;
+            const c = document.getElementById('input-callsign').value || defaults.callsign;
+            const b = document.getElementById('input-brand').value || defaults.brand;
+            const l = document.getElementById('input-logo').value || defaults.logo;
+            localStorage.setItem('bodycam_player', p); localStorage.setItem('bodycam_agency', a); localStorage.setItem('bodycam_job', j);
+            localStorage.setItem('bodycam_callsign', c); localStorage.setItem('bodycam_brand', b); localStorage.setItem('bodycam_logo', l);
+            return { p, a, j, c, b, l };
+        }
+
+        function generateUrl() {
+            const vals = saveSettings();
+            const url = new URL(window.location.href.split('?')[0]);
+            url.searchParams.set('overlay', 'true'); url.searchParams.set('player', vals.p); url.searchParams.set('agency', vals.a);
+            url.searchParams.set('job', vals.j); url.searchParams.set('callsign', vals.c); url.searchParams.set('brand', vals.b); url.searchParams.set('logo', vals.l);
+            return url.toString();
+        }
+
+        function launchOverlay() { window.location.href = generateUrl(); }
+
+        function copyLinkParams() {
+            const urlString = generateUrl();
+            const linkBox = document.getElementById('generated-link');
+            linkBox.textContent = urlString; linkBox.classList.remove('hidden');
+            navigator.clipboard.writeText(urlString).then(() => {
+                const msg = document.getElementById('feedbackMsg'); msg.style.opacity = '1'; setTimeout(() => { msg.style.opacity = '0'; }, 3000);
+            }).catch(err => console.error('Copy failed', err));
+        }
+
+        function showOverlayMode(params) {
+            document.getElementById('view-config').classList.add('hidden');
+            document.getElementById('view-overlay').classList.remove('hidden');
+            document.body.classList.add('overlay-mode');
+            const getVal = (key, storageKey, defaultVal) => { if (params.has(key)) return params.get(key); return localStorage.getItem(storageKey) || defaultVal; };
+            const p = getVal('player', 'bodycam_player', defaults.player);
+            const a = getVal('agency', 'bodycam_agency', defaults.agency);
+            const j = getVal('job', 'bodycam_job', defaults.job);
+            const c = getVal('callsign', 'bodycam_callsign', defaults.callsign);
+            const b = getVal('brand', 'bodycam_brand', defaults.brand);
+            const l = getVal('logo', 'bodycam_logo', defaults.logo);
+            document.getElementById('display-player').textContent = p;
+            document.getElementById('display-agency').textContent = a;
+            document.getElementById('display-job').textContent = j;
+            document.getElementById('display-callsign').textContent = c;
+            document.getElementById('display-brand').textContent = b;
+            const img = document.getElementById('display-logo'); img.style.display = 'block'; img.src = l;
+            clock();
+        }
+
+        function getLocalTime() {
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const localTimeStr = new Date().toLocaleString("en-US", { timeZone: userTimezone });
+            const localDate = new Date(localTimeStr);
+            return { hours: localDate.getHours(), minutes: localDate.getMinutes(), seconds: localDate.getSeconds(), fullDate: localDate };
+        }
+
+        function clock() { var d = getLocalTime(); updateTime(d); updateDate(d); setTimeout(clock, 100); }
+        function updateDate(dt) { const dateObj = dt.fullDate; const day = ("0" + dateObj.getDate()).slice(-2); const month = monthNames[dateObj.getMonth()]; const year = dateObj.getFullYear(); document.getElementById('date-span').textContent = month + '-' + day + '-' + year; }
+        function updateTime(dt) { let h = dt.hours; const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; const hStr = ("0" + h).slice(-2); const m = ("0" + dt.minutes).slice(-2); const s = ("0" + dt.seconds).slice(-2); document.getElementById('time-span').textContent = hStr + ":" + m + ":" + s + " " + ampm; }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
