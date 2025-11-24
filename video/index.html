@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Video.js Player</title>
+    
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <!-- Fantasy Theme -->
+    <link href="https://unpkg.com/@videojs/themes@1/dist/fantasy/index.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #e50914;
+            --bg: #141414;
+            --surface: #262626;
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--surface);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Upload Area Styling */
+        .upload-area {
+            border: 2px dashed #444;
+            background-color: var(--surface);
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: #333;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #888;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Video Player Container */
+        .video-container {
+            width: 100%;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            display: none; /* Hidden until video is loaded */
+            aspect-ratio: 16/9;
+        }
+
+        /* Override some Video.js styles for better fit */
+        .video-js {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .video-js .vjs-big-play-button {
+            background-color: rgba(229, 9, 20, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            margin-left: -1em;
+            top: 50%;
+            left: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Watermark Styling */
+        .vjs-watermark {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: auto;
+            opacity: 0.7;
+            z-index: 5; /* Above video, below controls */
+            pointer-events: none; /* Allows clicking through the image */
+            transition: opacity 0.3s;
+        }
+
+        /* Subtitle Controls */
+        .controls-bar {
+            background-color: var(--surface);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333;
+        }
+
+        .btn-sub {
+            background-color: #333;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            border: 1px solid #444;
+            transition: background 0.2s;
+        }
+
+        .btn-sub:hover {
+            background-color: #444;
+            border-color: #666;
+        }
+
+        #current-file-name {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        #sub-status {
+            font-size: 0.85rem;
+            color: #888;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Local Video Viewer</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- File Upload Zone -->
+        <div class="upload-area" id="drop-zone">
+            <input type="file" id="file-input" accept="video/mp4,video/webm,video/ogg,video/x-matroska" />
+            <div class="upload-icon">📂</div>
+            <h3>Click or Drag & Drop Video Here</h3>
+            <p class="file-info">Supports MP4, WebM, OGG (MKV dependent on browser)</p>
+        </div>
+
+        <!-- Video Player Section -->
+        <div class="video-container" id="video-wrapper">
+            <video
+                id="my-video"
+                class="video-js vjs-theme-fantasy vjs-big-play-centered"
+                controls
+                preload="auto"
+                data-setup="{}"
+            >
+                <p class="vjs-no-js">
+                    To view this video please enable JavaScript, and consider upgrading to a
+                    web browser that supports HTML5 video
+                </p>
+            </video>
+            
+            <!-- Info & Subtitle Controls -->
+            <div class="controls-bar">
+                <div>
+                    Playing: <span id="current-file-name">No file selected</span>
+                </div>
+                <div>
+                    <label for="sub-input" class="btn-sub">
+                        📝 Add Subtitles (.vtt, .srt)
+                    </label>
+                    <span id="sub-status"></span>
+                    <input type="file" id="sub-input" accept=".vtt,.srt" style="display:none;">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Video.js JS -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('file-input');
+            const subInput = document.getElementById('sub-input');
+            const videoWrapper = document.getElementById('video-wrapper');
+            const fileNameDisplay = document.getElementById('current-file-name');
+            const subStatus = document.getElementById('sub-status');
+            let player = videojs('my-video');
+
+            // --- Add Watermark ---
+            player.ready(() => {
+                const watermark = document.createElement('img');
+                watermark.src = 'https://github.com/Bacon_Space.png';
+                watermark.className = 'vjs-watermark';
+                watermark.alt = 'Watermark';
+                // Hide if image fails to load
+                watermark.onerror = () => { watermark.style.display = 'none'; };
+                // Append to the player element so it shows in fullscreen
+                player.el().appendChild(watermark);
+            });
+
+            // Video File Handler
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) loadVideo(file);
+            });
+
+            // Subtitle File Handler
+            subInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) loadSubtitle(file);
+            });
+
+            function loadVideo(file) {
+                const fileURL = URL.createObjectURL(file);
+                const fileType = file.type;
+
+                videoWrapper.style.display = 'block';
+                fileNameDisplay.textContent = file.name;
+                subStatus.textContent = ""; // Reset sub status on new video
+
+                player.src({ type: fileType, src: fileURL });
+                
+                // Remove old tracks if any
+                const oldTracks = player.remoteTextTracks();
+                let i = oldTracks.length;
+                while (i--) {
+                    player.removeRemoteTextTrack(oldTracks[i]);
+                }
+
+                player.load();
+                player.play().catch(err => console.log("Auto-play blocked"));
+                
+                videoWrapper.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function loadSubtitle(file) {
+                const fileName = file.name.toLowerCase();
+                
+                if (fileName.endsWith('.srt')) {
+                    // Convert SRT to VTT on the fly
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const srtContent = e.target.result;
+                        const vttContent = srtToVtt(srtContent);
+                        const blob = new Blob([vttContent], { type: 'text/vtt' });
+                        const vttUrl = URL.createObjectURL(blob);
+                        addTrackToPlayer(vttUrl, file.name);
+                    };
+                    reader.readAsText(file);
+                } else {
+                    // Assume VTT or compatible
+                    const vttUrl = URL.createObjectURL(file);
+                    addTrackToPlayer(vttUrl, file.name);
+                }
+            }
+
+            function addTrackToPlayer(url, name) {
+                // Add the track
+                const track = player.addRemoteTextTrack({
+                    kind: 'subtitles',
+                    src: url,
+                    srclang: 'en',
+                    label: name,
+                    default: true
+                }, false);
+
+                // Force it to show
+                setTimeout(() => {
+                    const tracks = player.textTracks();
+                    for (let i = 0; i < tracks.length; i++) {
+                        if (tracks[i].kind === 'subtitles') {
+                            tracks[i].mode = 'showing';
+                        }
+                    }
+                }, 100);
+
+                subStatus.textContent = `✅ Loaded: ${name}`;
+                subStatus.style.color = "#4caf50";
+            }
+
+            // Simple SRT to WebVTT converter function
+            function srtToVtt(srtText) {
+                // 1. Add header
+                let vtt = "WEBVTT\n\n";
+                // 2. Replace comma in timestamps with dots (00:00:00,000 -> 00:00:00.000)
+                vtt += srtText.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+                return vtt;
+            }
+
+            player.on('dispose', () => {
+                if (player.currentSrc()) URL.revokeObjectURL(player.currentSrc());
+            });
+        });
+    </script>
+</body>
+</html>
