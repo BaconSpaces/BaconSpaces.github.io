@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Snake Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #fff;
+            font: 100%/1.5 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .background-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -2;
+            backdrop-filter: blur(20px);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .header {
+            font-size: 56px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,107,107,0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,107,107,0.3); }
+            50% { text-shadow: 0 0 50px rgba(255,255,255,0.8), 0 0 100px rgba(255,107,107,0.6); }
+        }
+
+        .info {
+            display: flex;
+            gap: 40px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .score-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 100%);
+            padding: 15px 35px;
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .score-box:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31,38,135,0.5);
+        }
+
+        .score-number {
+            font-size: 32px;
+            display: block;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.6);
+            animation: scoreGlow 0.5s ease-out;
+        }
+
+        @keyframes scoreGlow {
+            0% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .stage {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%);
+            border: 4px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 0 30px rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            animation: stageBounce 3s ease-in-out infinite;
+        }
+
+        @keyframes stageBounce {
+            0%, 100% { box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 0 30px rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 25px 70px rgba(0,0,0,0.5), inset 0 0 40px rgba(255,255,255,0.15); }
+        }
+
+        .tile {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+        }
+
+        .snake-tile {
+            position: absolute;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            border-radius: 3px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            transition: all 100ms ease;
+        }
+
+        .snake-tile.head {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 0 30px rgba(255,215,0,0.8), 0 8px 20px rgba(0,0,0,0.3);
+            border-radius: 2px;
+            animation: headGlow 0.6s ease-in-out infinite;
+        }
+
+        @keyframes headGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.8), 0 8px 20px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 0 50px rgba(255,215,0,1), 0 8px 20px rgba(0,0,0,0.3); }
+        }
+
+        .food-tile {
+            position: absolute;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(255,107,107,0.8), 0 0 40px rgba(255,142,114,0.4);
+            animation: foodPulse 0.6s ease-in-out infinite;
+        }
+
+        @keyframes foodPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(255,107,107,0.8), 0 0 40px rgba(255,142,114,0.4); }
+            50% { transform: scale(1.15); box-shadow: 0 0 40px rgba(255,107,107,1), 0 0 60px rgba(255,142,114,0.6); }
+        }
+
+        .status {
+            font-size: 16px;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .game-over-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .game-over-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+            border: 3px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            animation: modalSlide 0.4s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.6);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .modal-content p {
+            font-size: 24px;
+            margin: 15px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .modal-content .score-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .modal-content .score-value {
+            font-size: 36px;
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255,215,0,0.8);
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #000;
+            box-shadow: 0 8px 20px rgba(255,215,0,0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255,215,0,0.6);
+        }
+
+        .restart-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                font-size: 36px;
+            }
+            .info {
+                gap: 20px;
+                font-size: 14px;
+            }
+            .score-number {
+                font-size: 24px;
+            }
+            .modal-content {
+                padding: 30px;
+            }
+            .modal-content h1 {
+                font-size: 32px;
+            }
+            .modal-content p {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">🐍 SNAKE NEXUS</div>
+        <div class="info">
+            <div class="score-box">
+                Score
+                <span class="score-number" id="score">0</span>
+            </div>
+            <div class="score-box">
+                Best
+                <span class="score-number" id="best">0</span>
+            </div>
+        </div>
+        <div class="stage" id="stage"></div>
+        <div class="status">⌨️ Use Arrow Keys or WASD to move</div>
+    </div>
+
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <h1>⚡ GAME OVER ⚡</h1>
+            <div class="score-label">Your Score</div>
+            <div class="score-value" id="finalScore">0</div>
+            <div class="score-label">Best Score</div>
+            <div class="score-value" id="finalBest">0</div>
+            <button class="restart-btn" onclick="game.restart()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 5 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.background = `hsla(${Math.random() * 60 + 20}, 100%, 60%, ${Math.random() * 0.5 + 0.2})`;
+                particle.style.borderRadius = '50%';
+                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        const game = {
+            cols: 28,
+            rows: 16,
+            tileWidth: 0,
+            tileHeight: 0,
+            score: 0,
+            best: parseInt(localStorage.getItem('snakeBest')) || 0,
+            gameRunning: true,
+            
+            snake: {
+                tiles: [],
+                dir: 'e',
+                nextDir: 'e',
+                moveCounter: 0,
+                moveDelay: 7
+            },
+
+            food: {
+                x: 0,
+                y: 0,
+                element: null
+            },
+
+            grid: [],
+            stage: null,
+
+            updateScore() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('best').textContent = this.best;
+            },
+
+            init() {
+                this.stage = document.getElementById('stage');
+                this.best = parseInt(localStorage.getItem('snakeBest')) || 0;
+                this.updateScore();
+                this.resizeCanvas();
+                this.createGrid();
+                this.createSnake();
+                this.spawnFood();
+                this.bindEvents();
+                createParticles();
+                requestAnimationFrame(() => this.gameLoop());
+            },
+
+            resizeCanvas() {
+                const padding = 40;
+                const maxWidth = window.innerWidth - padding;
+                const maxHeight = window.innerHeight - padding - 200;
+                
+                const ratio = this.cols / this.rows;
+                let width, height;
+
+                if (maxWidth / maxHeight > ratio) {
+                    height = maxHeight;
+                    width = height * ratio;
+                } else {
+                    width = maxWidth;
+                    height = width / ratio;
+                }
+
+                this.stage.style.width = width + 'px';
+                this.stage.style.height = height + 'px';
+                this.tileWidth = width / this.cols;
+                this.tileHeight = height / this.rows;
+            },
+
+            createGrid() {
+                this.grid = Array(this.cols).fill(null).map(() => Array(this.rows).fill('empty'));
+            },
+
+            createSnake() {
+                this.stage.innerHTML = '';
+                this.snake.tiles = [];
+                
+                for (let i = 4; i >= 0; i--) {
+                    const tile = {
+                        x: 8 + i,
+                        y: 8,
+                        element: document.createElement('div')
+                    };
+                    tile.element.className = 'snake-tile';
+                    if (i === 0) tile.element.classList.add('head');
+                    this.stage.appendChild(tile.element);
+                    this.snake.tiles.push(tile);
+                    this.grid[tile.x][tile.y] = 'snake';
+                }
+                this.snake.dir = 'e';
+                this.snake.nextDir = 'e';
+            },
+
+            spawnFood() {
+                const empty = [];
+                for (let x = 0; x < this.cols; x++) {
+                    for (let y = 0; y < this.rows; y++) {
+                        if (this.grid[x][y] === 'empty') {
+                            empty.push({ x, y });
+                        }
+                    }
+                }
+                
+                if (empty.length > 0) {
+                    const { x, y } = empty[Math.floor(Math.random() * empty.length)];
+                    this.food.x = x;
+                    this.food.y = y;
+                    this.grid[x][y] = 'food';
+                    
+                    if (!this.food.element) {
+                        this.food.element = document.createElement('div');
+                        this.food.element.className = 'food-tile';
+                        this.stage.appendChild(this.food.element);
+                    }
+                    this.renderFood();
+                }
+            },
+
+            renderFood() {
+                this.food.element.style.left = (this.food.x * this.tileWidth) + 'px';
+                this.food.element.style.top = (this.food.y * this.tileHeight) + 'px';
+                this.food.element.style.width = this.tileWidth + 'px';
+                this.food.element.style.height = this.tileHeight + 'px';
+            },
+
+            renderSnake() {
+                this.snake.tiles.forEach((tile, i) => {
+                    tile.element.style.left = (tile.x * this.tileWidth) + 'px';
+                    tile.element.style.top = (tile.y * this.tileHeight) + 'px';
+                    tile.element.style.width = this.tileWidth + 'px';
+                    tile.element.style.height = this.tileHeight + 'px';
+                });
+            },
+
+            update() {
+                this.snake.moveCounter++;
+                if (this.snake.moveCounter < this.snake.moveDelay) return;
+                
+                this.snake.moveCounter = 0;
+                this.snake.dir = this.snake.nextDir;
+
+                const head = this.snake.tiles[0];
+                let newX = head.x;
+                let newY = head.y;
+
+                if (this.snake.dir === 'n') newY--;
+                if (this.snake.dir === 's') newY++;
+                if (this.snake.dir === 'e') newX++;
+                if (this.snake.dir === 'w') newX--;
+
+                newX = (newX + this.cols) % this.cols;
+                newY = (newY + this.rows) % this.rows;
+
+                if (this.grid[newX][newY] === 'snake') {
+                    this.gameOver();
+                    return;
+                }
+
+                const newHead = {
+                    x: newX,
+                    y: newY,
+                    element: document.createElement('div')
+                };
+                newHead.element.className = 'snake-tile head';
+                this.stage.appendChild(newHead.element);
+                this.snake.tiles.unshift(newHead);
+
+                if (newX === this.food.x && newY === this.food.y) {
+                    this.score += 10;
+                    this.updateScore();
+                    this.grid[newX][newY] = 'snake';
+                    this.spawnFood();
+                } else {
+                    const tail = this.snake.tiles.pop();
+                    this.stage.removeChild(tail.element);
+                    this.grid[tail.x][tail.y] = 'empty';
+                    this.grid[newX][newY] = 'snake';
+                }
+            },
+
+            gameOver() {
+                this.gameRunning = false;
+                if (this.score > this.best) {
+                    this.best = this.score;
+                    localStorage.setItem('snakeBest', this.best);
+                }
+                
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('finalBest').textContent = this.best;
+                document.getElementById('gameOverModal').classList.add('show');
+            },
+
+            restart() {
+                document.getElementById('gameOverModal').classList.remove('show');
+                this.score = 0;
+                this.gameRunning = true;
+                this.createSnake();
+                this.createGrid();
+                this.spawnFood();
+                this.updateScore();
+            },
+
+            gameLoop() {
+                if (this.gameRunning) {
+                    this.update();
+                    this.renderSnake();
+                    this.renderFood();
+                }
+                requestAnimationFrame(() => this.gameLoop());
+            },
+
+            bindEvents() {
+                const dirMap = {
+                    38: 'n', 87: 'n',
+                    40: 's', 83: 's',
+                    37: 'w', 65: 'w',
+                    39: 'e', 68: 'e'
+                };
+
+                window.addEventListener('keydown', (e) => {
+                    const dir = dirMap[e.keyCode];
+                    if (dir) {
+                        e.preventDefault();
+                        if ((this.snake.dir === 'n' && dir !== 's') ||
+                            (this.snake.dir === 's' && dir !== 'n') ||
+                            (this.snake.dir === 'e' && dir !== 'w') ||
+                            (this.snake.dir === 'w' && dir !== 'e')) {
+                            this.snake.nextDir = dir;
+                        }
+                    }
+                });
+
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+        };
+
+        game.init();
+    </script>
+</body>
+</html>
