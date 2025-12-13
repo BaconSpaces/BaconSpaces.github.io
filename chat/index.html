@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bacon_Space - Live Stream</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .platform-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .platform-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .twitch-btn {
+            background: #9146FF;
+            color: white;
+        }
+
+        .twitch-btn:hover {
+            background: #772ce8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+
+        .kick-btn {
+            background: #53FC18;
+            color: black;
+        }
+
+        .kick-btn:hover {
+            background: #45d914;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+
+        .platform-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+        }
+
+        .fa-kick {
+            position: relative;
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            font-size: 2rem;
+            background: url('https://r2.fivemanage.com/image/GG4uI0wuIqNL.png') no-repeat center center;
+            background-size: contain;
+            text-indent: -9999px;
+            overflow: hidden;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1800px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stream-container {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .embed-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .chat-embed {
+            flex: 1;
+            min-height: 700px;
+            border: none;
+        }
+
+        .stream-info {
+            padding: 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .stream-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stream-info p {
+            color: #666;
+        }
+
+        .link-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .external-link {
+            padding: 10px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .twitch-link {
+            background: #9146FF;
+            color: white;
+        }
+
+        .twitch-link:hover {
+            background: #772ce8;
+        }
+
+        .kick-link {
+            background: #53FC18;
+            color: black;
+        }
+
+        .kick-link:hover {
+            background: #45d914;
+        }
+
+        .chat-header {
+            background: #9146FF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .chat-container {
+                width: 100%;
+                min-height: 500px;
+            }
+
+            .chat-embed {
+                min-height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .platform-btn {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
+
+            .chat-embed {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🥓 Bacon_Space Live 🥓</h1>
+        <p>Both chats side by side</p>
+    </div>
+
+    <div class="main-container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fa-brands fa-twitch"></i> Twitch Chat
+            </div>
+            <iframe
+                class="chat-embed"
+                src="https://www.twitch.tv/popout/bacon_space/chat?popout=">
+            </iframe>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header" style="background: #53FC18; color: black;">
+                <i class="fa-kick">Kick</i> Kick Chat
+            </div>
+            <iframe
+                class="chat-embed"
+                src="https://kick.com/popout/bacon_space/chat">
+            </iframe>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <div class="link-buttons">
+            <a href="https://twitch.tv/bacon_space" target="_blank" class="external-link twitch-link">
+                <i class="fa-brands fa-twitch"></i> Open in Twitch
+            </a>
+            <a href="https://kick.com/bacon_space" target="_blank" class="external-link kick-link">
+                <i class="fa-kick">Kick</i> Open in Kick
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-detect domain on load
+        window.addEventListener('load', function() {
+            // Both chats are already loaded in the HTML
+            console.log('Both chats loaded');
+        });
+    </script>
+</body>
+</html>
