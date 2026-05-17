@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Bacon_Space</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;700;900&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+    <style>
+        :root {
+            --red: #ff4d4d;
+            --red-dim: rgba(255, 77, 77, 0.18);
+            --red-glow: rgba(255, 77, 77, 0.35);
+            --surface: rgba(255, 255, 255, 0.04);
+            --surface-hover: rgba(255, 255, 255, 0.09);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 77, 77, 0.5);
+            --text: #f0f0f0;
+            --text-dim: rgba(240, 240, 240, 0.55);
+            --bg: #0d0d0f;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+        }
+
+        /* --- Static grid background --- */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,77,77,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,77,77,0.04) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Slow radial ambient blob — no flash, just mood --- */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(255,77,77,0.07) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift {
+            from { transform: translate(0, 0); }
+            to   { transform: translate(30vw, 20vh); }
+        }
+
+        /* Respect system accessibility preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+
+        /* ===== Layout ===== */
+        .page {
+            position: relative;
+            z-index: 1;
+            width: min(520px, 94vw);
+            padding: 56px 0 72px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        /* ===== Avatar ===== */
+        .avatar-ring {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin-bottom: 22px;
+        }
+
+        .avatar-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(var(--red), #ff9a3c, var(--red), #cc0000, var(--red));
+            animation: spin 12s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .avatar-ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: var(--bg);
+            z-index: 1;
+        }
+
+        .avatar-ring img,
+        .avatar-ring .avatar-fallback {
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            width: calc(100% - 8px);
+            height: calc(100% - 8px);
+            object-fit: cover;
+            z-index: 2;
+        }
+
+        .avatar-fallback {
+            background: rgba(255,77,77,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--red);
+        }
+
+        /* ===== Header ===== */
+        .handle {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 7vw, 2.8rem);
+            letter-spacing: -0.02em;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .handle span {
+            color: var(--red);
+        }
+
+        .tagline {
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            color: var(--text-dim);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+
+        /* ===== Divider ===== */
+        .divider {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+
+        .divider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--red);
+            box-shadow: 0 0 8px var(--red-glow);
+        }
+
+        /* ===== Grid ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* ===== Card ===== */
+        .card {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 14px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle shimmer line — appears only on hover, no flash */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::after { left: 160%; }
+
+        .card:hover, .card:focus-visible {
+            background: var(--surface-hover);
+            border-color: var(--border-hover);
+            box-shadow: 0 0 18px rgba(255,77,77,0.12), 0 4px 16px rgba(0,0,0,0.35);
+            transform: translateY(-3px);
+            outline: none;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: var(--red-dim);
+            color: var(--red);
+            font-size: 15px;
+            transition: background 0.25s ease;
+        }
+
+        .card:hover .card-icon {
+            background: rgba(255,77,77,0.28);
+        }
+
+        /* Custom image icons */
+        .icon-img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .card-label {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            font-size: clamp(13px, 3.5vw, 15px);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            margin-top: 40px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        /* ===== Staggered entrance animation (single pass, no repeat) ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar-ring  { animation: fadeUp 0.6s ease both; }
+        .handle       { animation: fadeUp 0.6s 0.1s ease both; }
+        .tagline      { animation: fadeUp 0.6s 0.18s ease both; }
+        .divider      { animation: fadeUp 0.6s 0.24s ease both; }
+
+        .card { animation: fadeUp 0.5s ease both; }
+        .card:nth-child(1)  { animation-delay: 0.28s; }
+        .card:nth-child(2)  { animation-delay: 0.33s; }
+        .card:nth-child(3)  { animation-delay: 0.38s; }
+        .card:nth-child(4)  { animation-delay: 0.43s; }
+        .card:nth-child(5)  { animation-delay: 0.48s; }
+        .card:nth-child(6)  { animation-delay: 0.53s; }
+        .card:nth-child(7)  { animation-delay: 0.58s; }
+        .card:nth-child(8)  { animation-delay: 0.63s; }
+        .card:nth-child(9)  { animation-delay: 0.68s; }
+        .card:nth-child(10) { animation-delay: 0.73s; }
+        .card:nth-child(11) { animation-delay: 0.78s; }
+        .card:nth-child(12) { animation-delay: 0.83s; }
+        .card:nth-child(13) { animation-delay: 0.88s; }
+        .card:nth-child(14) { animation-delay: 0.93s; }
+        .card:nth-child(15) { animation-delay: 0.98s; }
+        .card:nth-child(16) { animation-delay: 1.03s; }
+        .card:nth-child(17) { animation-delay: 1.08s; }
+        .card:nth-child(18) { animation-delay: 1.13s; }
+        .card:nth-child(19) { animation-delay: 1.18s; }
+        .card:nth-child(20) { animation-delay: 1.23s; }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 400px) {
+            .grid { grid-template-columns: 1fr; }
+            .card { padding: 13px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Avatar -->
+    <div class="avatar-ring" id="avatarRing">
+        <div class="avatar-fallback" id="avatarFallback">
+            <i class="fa-solid fa-user"></i>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <h1 class="handle"><span>@</span>Bacon_Space</h1>
+    <p class="tagline">Connect across the internet</p>
+
+    <!-- Divider -->
+    <div class="divider"><div class="divider-dot"></div></div>
+
+    <!-- Links grid -->
+    <div class="grid">
+
+        <a href="https://tfst.github.io/" class="card">
+            <div class="card-icon">
+                <img class="icon-img" src="https://r2.fivemanage.com/image/VcXnxsNTOXwj.png" alt="">
+            </div>
+            <span class="card-label">TeamFST</span>
+        </a>
+
+        <a href="https://medal.tv/u/Bacon_Space/" class="card">
+            <div class="card-icon">
+                <img class="icon-img" src="https://r2.fivemanage.com/image/wT2t6j4mmGlL.png" alt="">
+            </div>
+            <span class="card-label">Medal</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconSpaceX" class="card">
+            <div class="card-icon"><i class="fa-brands fa-x-twitter"></i></div>
+            <span class="card-label">Twitter / X</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconInsta" class="card">
+            <div class="card-icon"><i class="fa-brands fa-instagram"></i></div>
+            <span class="card-label">Instagram</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconThreads" class="card">
+            <div class="card-icon"><i class="fa-brands fa-threads"></i></div>
+            <span class="card-label">Threads</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconSpaceYT" class="card">
+            <div class="card-icon"><i class="fa-brands fa-youtube"></i></div>
+            <span class="card-label">YouTube</span>
+        </a>
+
+        <a href="https://bit.ly/Bacon_Space" class="card">
+            <div class="card-icon"><i class="fa-brands fa-twitch"></i></div>
+            <span class="card-label">Twitch</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconsKick" class="card">
+            <div class="card-icon">
+                <img class="icon-img" src="https://r2.fivemanage.com/image/GG4uI0wuIqNL.png" alt="">
+            </div>
+            <span class="card-label">Kick.com</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconSpaceFB" class="card">
+            <div class="card-icon"><i class="fa-brands fa-facebook"></i></div>
+            <span class="card-label">Facebook</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconSpaceDiscord" id="discordButton" class="card">
+            <div class="card-icon"><i class="fa-brands fa-discord"></i></div>
+            <span class="card-label">Discord</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconsReddit" class="card">
+            <div class="card-icon"><i class="fa-brands fa-reddit"></i></div>
+            <span class="card-label">Reddit</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconGitHub" class="card">
+            <div class="card-icon"><i class="fa-brands fa-github"></i></div>
+            <span class="card-label">GitHub</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconsGitlab" class="card">
+            <div class="card-icon"><i class="fa-brands fa-gitlab"></i></div>
+            <span class="card-label">GitLab</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconInsta" class="card">
+            <div class="card-icon"><i class="fa-brands fa-tiktok"></i></div>
+            <span class="card-label">TikTok</span>
+        </a>
+
+        <a href="https://tinyurl.com/BSRPSKY" class="card">
+            <div class="card-icon"><i class="fa-brands fa-bluesky"></i></div>
+            <span class="card-label">BlueSky</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconSteam" class="card">
+            <div class="card-icon"><i class="fa-brands fa-steam"></i></div>
+            <span class="card-label">Steam</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconSpaceBlogs" class="card">
+            <div class="card-icon"><i class="fa-brands fa-wordpress-simple"></i></div>
+            <span class="card-label">WordPress</span>
+        </a>
+
+        <a href="https://tinyurl.com/BaconMastodon" class="card">
+            <div class="card-icon"><i class="fa-brands fa-mastodon"></i></div>
+            <span class="card-label">Mastodon</span>
+        </a>
+
+        <a href="https://tinyurl.com/KickStats" class="card">
+            <div class="card-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <span class="card-label">KickStats</span>
+        </a>
+
+        <a href="https://baconspaces.github.io/BodyCam/" class="card">
+            <div class="card-icon"><i class="fa-solid fa-camera"></i></div>
+            <span class="card-label">BodyCam</span>
+        </a>
+
+    </div><!-- /grid -->
+
+    <p class="footer">© <span id="year"></span> Bacon_Space</p>
+
+</div><!-- /page -->
+
+<script>
+    // Auto-update year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Discord widget — live invite link
+    fetch('https://discord.com/api/guilds/1256849825358544947/widget.json')
+        .then(r => r.json())
+        .then(data => {
+            if (data?.instant_invite) {
+                document.getElementById('discordButton').href = data.instant_invite;
+            }
+        })
+        .catch(() => {});
+
+    // GitHub avatar
+    fetch('https://api.github.com/users/BaconSpaces')
+        .then(r => { if (!r.ok) throw 0; return r.json(); })
+        .then(data => {
+            const ring = document.getElementById('avatarRing');
+            const img = document.createElement('img');
+            img.src = data.avatar_url;
+            img.alt = '@Bacon_Space avatar';
+            img.loading = 'lazy';
+            ring.innerHTML = ''; // clear fallback
+            // re-add ::before/::after pseudo-elements live via actual DOM img
+            ring.appendChild(img);
+        })
+        .catch(() => {}); // keep fallback icon on error
+</script>
+</body>
+</html>
