@@ -3,273 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@Bacon_Space Project Links</title>
+    <title>@Bacon_Space Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;700;900&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
     <style>
+        :root {
+            --red: #ff4d4d;
+            --red-dim: rgba(255, 77, 77, 0.18);
+            --red-glow: rgba(255, 77, 77, 0.35);
+            --surface: rgba(255, 255, 255, 0.04);
+            --surface-hover: rgba(255, 255, 255, 0.09);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 77, 77, 0.5);
+            --text: #f0f0f0;
+            --text-dim: rgba(240, 240, 240, 0.55);
+            --bg: #0d0d0f;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%);
-            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 800px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-            padding: 20px 10px;
-            margin: 40px 0;
-        }
-        
-        h1 {
-            font-size: clamp(2rem, 5vw, 3rem);
-            margin-bottom: 0.5rem;
-            background: linear-gradient(90deg, #ff6b6b, #ffa6a6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 15px rgba(255, 107, 107, 0.3);
-        }
-        
-        .subtitle {
-            font-size: clamp(0.9rem, 3vw, 1.2rem);
-            opacity: 0.8;
-            margin-bottom: 2rem;
-        }
-        
-        .social-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 30px;
-        }
-        
-        .social-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: calc(50% - 16px);
-            max-width: 180px;
-            padding: 15px 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .social-link:hover, .social-link:active {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .social-link i {
-            font-size: clamp(18px, 4vw, 24px);
-            margin-right: 8px;
-        }
-        
-        .social-link span {
-            font-weight: 500;
-            font-size: clamp(14px, 3.5vw, 16px);
-        }
 
-        .profile-pic {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid rgba(255, 107, 107, 0.7);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .particles {
+        /* --- Static grid background --- */
+        body::before {
+            content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,77,77,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,77,77,0.04) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
             z-index: 0;
         }
 
-        .particle {
+        /* --- Slow radial ambient blob --- */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(255,77,77,0.07) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift {
+            from { transform: translate(0, 0); }
+            to   { transform: translate(30vw, 20vh); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+
+        /* ===== Layout ===== */
+        .page {
+            position: relative;
+            z-index: 1;
+            width: min(520px, 94vw);
+            padding: 56px 0 72px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ===== Avatar ===== */
+        .avatar-ring {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin-bottom: 22px;
+        }
+
+        .avatar-ring::before {
+            content: '';
             position: absolute;
+            inset: -4px;
             border-radius: 50%;
-            background: rgba(255, 107, 107, 0.3);
-            animation: float 15s infinite linear;
+            background: conic-gradient(var(--red), #ff9a3c, var(--red), #cc0000, var(--red));
+            animation: spin 12s linear infinite;
         }
 
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-1000px) rotate(720deg);
-                opacity: 0;
-            }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .avatar-ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: var(--bg);
+            z-index: 1;
         }
 
-        .loading {
-            display: inline-block;
-            width: 120px;
-            height: 120px;
+        .avatar-ring img,
+        .avatar-ring .avatar-fallback {
+            position: absolute;
+            inset: 4px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            width: calc(100% - 8px);
+            height: calc(100% - 8px);
+            object-fit: cover;
+            z-index: 2;
+        }
+
+        .avatar-fallback {
+            background: rgba(255,77,77,0.12);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 2rem;
+            color: var(--red);
         }
 
-        /* Mobile-specific styles */
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px 10px;
-                margin: 20px 0;
-                width: 95%;
-            }
-            
-            .social-links {
-                gap: 10px;
-            }
-            
-            .social-link {
-                width: calc(50% - 10px);
-                padding: 12px 8px;
-            }
-            
-            .profile-pic {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .loading {
-                width: 100px;
-                height: 100px;
-            }
+        /* ===== Header ===== */
+        .handle {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 7vw, 2.8rem);
+            letter-spacing: -0.02em;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 6px;
         }
 
-        /* For extremely small screens */
-        @media (max-width: 350px) {
-            .social-link {
-                width: 100%;
-                max-width: none;
-            }
+        .handle span { color: var(--red); }
+
+        .tagline {
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            color: var(--text-dim);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+
+        /* ===== Divider ===== */
+        .divider {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+
+        .divider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--red);
+            box-shadow: 0 0 8px var(--red-glow);
+        }
+
+        /* ===== Grid ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* Last row centred */
+        .grid-last-row {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .grid-last-row .card {
+            flex: 0 0 calc(33.333% - 7px);
+        }
+
+        /* ===== Card ===== */
+        .card {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 14px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::after { left: 160%; }
+
+        .card:hover, .card:focus-visible {
+            background: var(--surface-hover);
+            border-color: var(--border-hover);
+            box-shadow: 0 0 18px rgba(255,77,77,0.12), 0 4px 16px rgba(0,0,0,0.35);
+            transform: translateY(-3px);
+            outline: none;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: var(--red-dim);
+            color: var(--red);
+            font-size: 15px;
+            transition: background 0.25s ease;
+        }
+
+        .card:hover .card-icon { background: rgba(255,77,77,0.28); }
+
+        .card-label {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            font-size: clamp(13px, 3.5vw, 15px);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            margin-top: 40px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        /* ===== Entrance animations ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar-ring { animation: fadeUp 0.6s ease both; }
+        .handle      { animation: fadeUp 0.6s 0.1s ease both; }
+        .tagline     { animation: fadeUp 0.6s 0.18s ease both; }
+        .divider     { animation: fadeUp 0.6s 0.24s ease both; }
+        .card        { animation: fadeUp 0.5s ease both; }
+        .card:nth-child(1) { animation-delay: 0.28s; }
+        .card:nth-child(2) { animation-delay: 0.33s; }
+        .card:nth-child(3) { animation-delay: 0.38s; }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 540px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+            .grid-last-row .card { flex: 0 0 calc(50% - 5px); }
+        }
+        @media (max-width: 360px) {
+            .grid { grid-template-columns: 1fr; }
+            .grid-last-row { flex-direction: column; }
+            .grid-last-row .card { flex: unset; width: 100%; }
+            .card { padding: 13px 16px; }
         }
     </style>
-    <!-- Using the latest Font Awesome version -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    
-    <div class="container">
-        <div id="profile-container">
-            <div class="loading">Loading...</div>
-        </div>
-        <h1>@Bacon_Space</h1>
-        <div class="subtitle">Connect with me across the internet!</div>
-        
-        <div class="social-links">
-            <a href="hhttps://baconspaces.github.io/ugt/" class="social-link">
-                <i class="fa-brands fa-github"></i>
-                <span>Ultimate Kick Giveaway</span>
-            </a>
-                <a href="https://tinyurl.com/KickStats" class="social-link">
-               <i class="fa-solid fa-chart-simple"></i>
-                <span>KickStats</span>
-            </a>
+<div class="page">
+
+    <!-- Avatar -->
+    <div class="avatar-ring" id="avatarRing">
+        <div class="avatar-fallback">
+            <i class="fa-solid fa-user"></i>
         </div>
     </div>
 
-    <script>
-                // Fetch Discord widget data
-        fetch('https://discord.com/api/guilds/1256849825358544947/widget.json')
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.instant_invite) {
-                    document.getElementById('discordButton').href = data.instant_invite;
-                    console.log('[Discord Widget API] Discord invite updated to:', data.instant_invite);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching Discord data:', error);
-                // Keep the default invite link if there's an error
-            });
-        // Create fewer particles on mobile for better performance
-        const particlesContainer = document.getElementById('particles');
-        const isMobile = window.innerWidth <= 768;
-        const particleCount = isMobile ? 15 : 30;
-        
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            
-            // Smaller particles on mobile
-            const maxSize = isMobile ? 15 : 25;
-            const size = Math.random() * (maxSize - 5) + 5;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            
-            // Random position
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
-            
-            // Random opacity
-            particle.style.opacity = Math.random() * 0.5 + 0.1;
-            
-            // Random animation duration (shorter on mobile)
-            const duration = Math.random() * (isMobile ? 15 : 20) + 10;
-            particle.style.animationDuration = `${duration}s`;
-            
-            // Random animation delay
-            particle.style.animationDelay = `${Math.random() * 5}s`;
-            
-            particlesContainer.appendChild(particle);
-        }
+    <!-- Header -->
+    <h1 class="handle"><span>@</span>Bacon_Space</h1>
+    <p class="tagline">Projects &amp; Tools</p>
 
-        // Fetch GitHub user profile
-        const username = 'BaconSpaces'; // Change this to the correct GitHub username
-        const profileContainer = document.getElementById('profile-container');
+    <!-- Divider -->
+    <div class="divider"><div class="divider-dot"></div></div>
 
-        fetch(`https://api.github.com/users/${username}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('GitHub user not found');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Create profile image
-                profileContainer.innerHTML = ''; // Clear loading indicator
-                const img = document.createElement('img');
-                img.src = data.avatar_url;
-                img.alt = `${username} profile picture`;
-                img.className = 'profile-pic';
-                profileContainer.appendChild(img);
-            })
-            .catch(error => {
-                console.error('Error fetching GitHub profile:', error);
-                // Fallback to placeholder if GitHub API fails
-                profileContainer.innerHTML = '';
-                const img = document.createElement('img');
-                img.src = "/api/placeholder/150/150";
-                img.alt = "@Bacon_Space";
-                img.className = 'profile-pic';
-                profileContainer.appendChild(img);
-            });
-    </script>
+    <!-- Links — only 2, so centred in last-row wrapper -->
+    <div class="grid">
+        <div class="grid-last-row">
+
+            <a href="https://baconspaces.github.io/ugt/" class="card">
+                <div class="card-icon"><i class="fa-brands fa-github"></i></div>
+                <span class="card-label">Ultimate Kick Giveaway</span>
+            </a>
+
+            <a href="https://tinyurl.com/KickStats" class="card">
+                <div class="card-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                <span class="card-label">KickStats</span>
+            </a>
+
+        </div>
+    </div>
+
+    <p class="footer">© <span id="year"></span> Bacon_Space</p>
+
+</div>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // GitHub avatar
+    fetch('https://api.github.com/users/BaconSpaces')
+        .then(r => { if (!r.ok) throw 0; return r.json(); })
+        .then(data => {
+            const ring = document.getElementById('avatarRing');
+            const img = document.createElement('img');
+            img.src = data.avatar_url;
+            img.alt = '@Bacon_Space avatar';
+            img.loading = 'lazy';
+            ring.innerHTML = '';
+            ring.appendChild(img);
+        })
+        .catch(() => {});
+</script>
 </body>
 </html>
