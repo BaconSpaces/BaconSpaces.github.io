@@ -185,9 +185,21 @@
         /* ===== Grid ===== */
         .grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             width: 100%;
+        }
+
+        /* Last row — span full width and centre the orphan cards */
+        .grid-last-row {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .grid-last-row .card {
+            flex: 0 0 calc(33.333% - 7px);
         }
 
         /* ===== Card ===== */
@@ -307,8 +319,14 @@
         .card:nth-child(20) { animation-delay: 1.23s; }
 
         /* ===== Mobile ===== */
-        @media (max-width: 400px) {
+        @media (max-width: 540px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+            .grid-last-row .card { flex: 0 0 calc(50% - 5px); }
+        }
+        @media (max-width: 360px) {
             .grid { grid-template-columns: 1fr; }
+            .grid-last-row { flex-direction: column; }
+            .grid-last-row .card { flex: unset; width: 100%; }
             .card { padding: 13px 16px; }
         }
     </style>
@@ -429,6 +447,7 @@
             <span class="card-label">Mastodon</span>
         </a>
 
+        <div class="grid-last-row">
         <a href="https://tinyurl.com/KickStats" class="card">
             <div class="card-icon"><i class="fa-solid fa-chart-simple"></i></div>
             <span class="card-label">KickStats</span>
@@ -438,6 +457,7 @@
             <div class="card-icon"><i class="fa-solid fa-camera"></i></div>
             <span class="card-label">BodyCam</span>
         </a>
+        </div>
 
     </div><!-- /grid -->
 
