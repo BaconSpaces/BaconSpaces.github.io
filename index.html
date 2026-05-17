@@ -202,6 +202,11 @@
             flex: 0 0 calc(33.333% - 7px);
         }
 
+        /* Centre a single orphan card in the last row */
+        .card:last-child:nth-child(3n+1) {
+            grid-column: 2;
+        }
+
         /* ===== Card ===== */
         .card {
             display: flex;
@@ -370,11 +375,6 @@
             <span class="card-label">Twitter / X</span>
         </a>
 
-        <a href="https://tinyurl.com/BaconInsta" class="card">
-            <div class="card-icon"><i class="fa-brands fa-instagram"></i></div>
-            <span class="card-label">Instagram</span>
-        </a>
-
         <a href="https://tinyurl.com/BaconThreads" class="card">
             <div class="card-icon"><i class="fa-brands fa-threads"></i></div>
             <span class="card-label">Threads</span>
@@ -397,11 +397,6 @@
             <span class="card-label">Kick.com</span>
         </a>
 
-        <a href="https://tinyurl.com/BaconSpaceFB" class="card">
-            <div class="card-icon"><i class="fa-brands fa-facebook"></i></div>
-            <span class="card-label">Facebook</span>
-        </a>
-
         <a href="https://tinyurl.com/BaconSpaceDiscord" id="discordButton" class="card">
             <div class="card-icon"><i class="fa-brands fa-discord"></i></div>
             <span class="card-label">Discord</span>
@@ -415,11 +410,6 @@
         <a href="https://tinyurl.com/BaconGitHub" class="card">
             <div class="card-icon"><i class="fa-brands fa-github"></i></div>
             <span class="card-label">GitHub</span>
-        </a>
-
-        <a href="https://tinyurl.com/BaconsGitlab" class="card">
-            <div class="card-icon"><i class="fa-brands fa-gitlab"></i></div>
-            <span class="card-label">GitLab</span>
         </a>
 
         <a href="https://tinyurl.com/BaconInsta" class="card">
@@ -437,17 +427,6 @@
             <span class="card-label">Steam</span>
         </a>
 
-        <a href="https://tinyurl.com/BaconSpaceBlogs" class="card">
-            <div class="card-icon"><i class="fa-brands fa-wordpress-simple"></i></div>
-            <span class="card-label">WordPress</span>
-        </a>
-
-        <a href="https://tinyurl.com/BaconMastodon" class="card">
-            <div class="card-icon"><i class="fa-brands fa-mastodon"></i></div>
-            <span class="card-label">Mastodon</span>
-        </a>
-
-        <div class="grid-last-row">
         <a href="https://tinyurl.com/KickStats" class="card">
             <div class="card-icon"><i class="fa-solid fa-chart-simple"></i></div>
             <span class="card-label">KickStats</span>
@@ -457,7 +436,6 @@
             <div class="card-icon"><i class="fa-solid fa-camera"></i></div>
             <span class="card-label">BodyCam</span>
         </a>
-        </div>
 
     </div><!-- /grid -->
 
