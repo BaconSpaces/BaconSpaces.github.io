@@ -1,0 +1,2823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkzWorld</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; color: #fff; }
+  #canvas { display: block; position: absolute; top: 0; left: 0; }
+
+  /* ===== MENU SYSTEM ===== */
+  .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 100; }
+  .screen.active { display: flex; }
+
+  /* MAIN MENU */
+  #mainMenu {
+    background: linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f1a 100%);
+    flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  }
+  .menu-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(0,150,255,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(0,255,180,0.05) 0%, transparent 50%);
+  }
+  .menu-grid {
+    position: absolute; inset: 0; opacity: 0.04;
+    background-image: linear-gradient(rgba(0,180,255,1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,180,255,1) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .logo-container { position: relative; z-index: 2; text-align: center; margin-bottom: 50px; }
+  .logo-title {
+    font-size: 88px; font-weight: 900; letter-spacing: -2px; line-height: 1;
+    background: linear-gradient(135deg, #00d4ff 0%, #00ff9d 40%, #00aaff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    text-shadow: none; filter: drop-shadow(0 0 40px rgba(0,200,255,0.5));
+    animation: logoPulse 3s ease-in-out infinite;
+  }
+  .logo-sub { font-size: 16px; letter-spacing: 8px; color: rgba(0,200,255,0.6); margin-top: 8px; text-transform: uppercase; }
+  @keyframes logoPulse { 0%,100%{filter:drop-shadow(0 0 30px rgba(0,200,255,0.4))} 50%{filter:drop-shadow(0 0 60px rgba(0,200,255,0.8))} }
+
+  .menu-buttons { display: flex; flex-direction: column; gap: 14px; z-index: 2; }
+  .menu-btn {
+    width: 300px; padding: 16px 32px; font-size: 15px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; cursor: pointer; border: none; position: relative; overflow: hidden;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(0,200,255,0.25);
+    color: rgba(255,255,255,0.85); transition: all 0.3s; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+  .menu-btn:hover { background: rgba(0,200,255,0.15); border-color: rgba(0,200,255,0.8); color: #fff; transform: scale(1.03); box-shadow: 0 0 20px rgba(0,200,255,0.3); }
+  .menu-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent); transform:translateX(-100%); transition:transform 0.5s; }
+  .menu-btn:hover::before { transform:translateX(100%); }
+
+  .menu-version { position: absolute; bottom: 20px; right: 24px; font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 2px; z-index: 2; }
+
+  /* CHARACTER SELECT */
+  #charSelect { background: #080c12; flex-direction: column; align-items: center; justify-content: center; gap: 30px; }
+  .select-title { font-size: 36px; font-weight: 900; letter-spacing: 4px; color: #00d4ff; text-transform: uppercase; }
+  .char-cards { display: flex; gap: 20px; }
+  .char-card {
+    width: 180px; padding: 24px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer; text-align: center; transition: all 0.3s; clip-path: polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+  }
+  .char-card:hover, .char-card.selected { background: rgba(0,200,255,0.12); border-color: #00d4ff; box-shadow: 0 0 20px rgba(0,200,255,0.2); }
+  .char-avatar { font-size: 56px; margin-bottom: 12px; }
+  .char-name { font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #00d4ff; }
+  .char-desc { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 6px; line-height: 1.5; }
+  .color-swatches { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+  .swatch { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+  .swatch.active, .swatch:hover { border-color: #fff; transform: scale(1.2); }
+
+  /* JOB SELECT */
+  #jobSelect { background: #080c12; flex-direction: column; align-items: center; justify-content: center; gap: 30px; }
+  .mode-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
+  .mode-card {
+    width: 200px; padding: 28px 20px; background: rgba(255,255,255,0.03); cursor: pointer;
+    text-align: center; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.08);
+    clip-path: polygon(0 0,calc(100%-20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100%-20px));
+    position: relative; overflow: hidden;
+  }
+  .mode-card .mode-icon { font-size: 48px; margin-bottom: 14px; }
+  .mode-card .mode-name { font-size: 16px; font-weight: 800; letter-spacing: 2px; margin-bottom: 8px; }
+  .mode-card .mode-desc { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+  .mode-card[data-mode="civilian"] { border-color: rgba(0,200,255,0.2); }
+  .mode-card[data-mode="civilian"]:hover { background: rgba(0,200,255,0.1); border-color: #00d4ff; box-shadow: 0 0 30px rgba(0,200,255,0.2); }
+  .mode-card[data-mode="civilian"] .mode-name { color: #00d4ff; }
+  .mode-card[data-mode="police"] { border-color: rgba(50,100,255,0.2); }
+  .mode-card[data-mode="police"]:hover { background: rgba(50,100,255,0.1); border-color: #3264ff; box-shadow: 0 0 30px rgba(50,100,255,0.2); }
+  .mode-card[data-mode="police"] .mode-name { color: #5080ff; }
+  .mode-card[data-mode="ems"] { border-color: rgba(255,50,80,0.2); }
+  .mode-card[data-mode="ems"]:hover { background: rgba(255,50,80,0.1); border-color: #ff3250; box-shadow: 0 0 30px rgba(255,50,80,0.2); }
+  .mode-card[data-mode="ems"] .mode-name { color: #ff3250; }
+  .mode-card[data-mode="admin"] { border-color: rgba(255,180,0,0.2); }
+  .mode-card[data-mode="admin"]:hover { background: rgba(255,180,0,0.1); border-color: #ffb400; box-shadow: 0 0 30px rgba(255,180,0,0.2); }
+  .mode-card[data-mode="admin"] .mode-name { color: #ffb400; }
+
+  /* ===== HUD ===== */
+  #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; display: none; }
+  #hud.active { display: block; }
+
+  /* Health & Stats bars */
+  #statsPanel { position: absolute; bottom: 28px; left: 28px; display: flex; flex-direction: column; gap: 8px; }
+  .stat-bar { display: flex; align-items: center; gap: 10px; }
+  .stat-icon { font-size: 14px; width: 20px; text-align: center; }
+  .stat-track { width: 180px; height: 6px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); }
+  .stat-fill { height: 100%; transition: width 0.3s; }
+  .stat-fill.health { background: linear-gradient(90deg, #ff3250, #ff6070); }
+  .stat-fill.armor { background: linear-gradient(90deg, #00d4ff, #0090ff); }
+  .stat-fill.stamina { background: linear-gradient(90deg, #00ff9d, #00cc80); }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.6); width: 28px; font-family: monospace; font-weight: 700; }
+
+  /* Money / XP */
+  #moneyPanel { position: absolute; top: 20px; right: 24px; text-align: right; }
+  .money-amount { font-size: 28px; font-weight: 900; color: #00ff9d; letter-spacing: 1px; text-shadow: 0 0 20px rgba(0,255,130,0.5); }
+  .money-label { font-size: 10px; letter-spacing: 3px; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+  .xp-bar-wrap { margin-top: 8px; }
+  .xp-level { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 3px; }
+  .xp-track { width: 140px; height: 3px; background: rgba(255,255,255,0.1); margin-left: auto; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, #ffb400, #ff6400); transition: width 0.5s; }
+
+  /* Minimap */
+  #minimap {
+    position: absolute; top: 20px; left: 20px; width: 170px; height: 170px;
+    border: 2px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.75);
+    overflow: hidden; border-radius: 4px;
+  }
+  #minimapCanvas { width: 100%; height: 100%; }
+  .minimap-compass { position: absolute; bottom: 4px; right: 6px; font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 700; }
+
+  /* Mode badge */
+  #modeBadge {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    padding: 6px 20px; font-size: 11px; letter-spacing: 4px; font-weight: 700; text-transform: uppercase;
+    background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  }
+
+  /* Speed indicator */
+  #speedometer {
+    position: absolute; bottom: 28px; right: 24px; text-align: center;
+    background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.1); padding: 12px 18px; border-radius: 4px;
+  }
+  .speed-val { font-size: 32px; font-weight: 900; color: #fff; font-family: monospace; }
+  .speed-unit { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 2px; }
+
+  /* Notifications */
+  #notifContainer { position: absolute; top: 20px; right: 200px; display: flex; flex-direction: column; gap: 8px; max-width: 280px; }
+  .notif {
+    padding: 10px 16px; background: rgba(0,0,0,0.85); border-left: 3px solid #00d4ff;
+    font-size: 12px; animation: notifSlide 0.3s ease; border-radius: 0 4px 4px 0;
+    line-height: 1.5;
+  }
+  .notif.success { border-color: #00ff9d; }
+  .notif.warning { border-color: #ffb400; }
+  .notif.danger { border-color: #ff3250; }
+  .notif.police { border-color: #5080ff; }
+  .notif.ems { border-color: #ff3250; }
+  @keyframes notifSlide { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+
+  /* Wanted Stars */
+  #wantedPanel { position: absolute; top: 200px; right: 24px; display: flex; gap: 4px; }
+  .star { font-size: 20px; color: rgba(255,255,255,0.15); transition: all 0.3s; }
+  .star.active { color: #ffb400; text-shadow: 0 0 10px #ffb400; }
+
+  /* Interaction prompt */
+  #interactPrompt {
+    position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px;
+    font-size: 13px; letter-spacing: 1px; text-align: center; display: none; border-radius: 4px;
+  }
+  #interactPrompt .key { display: inline-block; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 3px; font-weight: 700; margin: 0 4px; }
+
+  /* Vehicle HUD */
+  #vehicleHUD { position: absolute; bottom: 28px; right: 24px; display: none; }
+  #vehicleHUD.visible { display: block; }
+
+  /* Controls hint */
+  #controlsHint {
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 2px; text-align: center; pointer-events: none;
+  }
+
+  /* ===== MENUS IN-GAME ===== */
+  .ingame-menu {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(5,10,18,0.97); border: 1px solid rgba(0,200,255,0.2);
+    width: 500px; max-height: 80vh; overflow-y: auto; z-index: 200; display: none;
+    pointer-events: all;
+  }
+  .ingame-menu.open { display: block; }
+  .ingame-header { padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+  .ingame-header h2 { font-size: 16px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #00d4ff; }
+  .close-btn { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 20px; cursor: pointer; }
+  .close-btn:hover { color: #ff3250; }
+  .ingame-body { padding: 20px 24px; }
+
+  /* Shop */
+  .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .shop-item-info .item-name { font-size: 13px; font-weight: 700; }
+  .shop-item-info .item-desc { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .shop-item-price { color: #00ff9d; font-weight: 700; font-size: 13px; margin-right: 12px; }
+  .buy-btn { padding: 6px 14px; background: rgba(0,200,255,0.15); border: 1px solid rgba(0,200,255,0.4); color: #00d4ff; font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
+  .buy-btn:hover { background: rgba(0,200,255,0.3); }
+
+  /* Inventory */
+  .inv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .inv-slot { aspect-ratio: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .inv-slot:hover { background: rgba(0,200,255,0.1); border-color: rgba(0,200,255,0.4); }
+  .inv-slot .inv-label { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 4px; text-align: center; }
+  .inv-slot .inv-qty { position: absolute; top: 4px; right: 6px; font-size: 10px; color: #00ff9d; font-weight: 700; }
+
+  /* Admin Panel */
+  #adminPanel { width: 600px; }
+  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .admin-btn { 
+    padding: 10px; background: rgba(255,180,0,0.08); border: 1px solid rgba(255,180,0,0.2); color: rgba(255,255,255,0.8); 
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; 
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .admin-btn::before {
+    content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%); transition: transform 0.5s;
+  }
+  .admin-btn:hover {
+    background: rgba(255,180,0,0.25); border-color: rgba(255,180,0,0.8); transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255,180,0,0.3); color: #fff;
+  }
+  .admin-btn:hover::before { transform: translateX(100%); }
+  .admin-btn:active { transform: translateY(0); box-shadow: 0 2px 10px rgba(255,180,0,0.2); }
+  .admin-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .admin-input { flex: 1; padding: 8px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 12px; transition: all 0.2s; }
+  .admin-input:focus { outline: none; border-color: #ffb400; background: rgba(255,180,0,0.08); box-shadow: 0 0 10px rgba(255,180,0,0.2); }
+  .admin-apply { padding: 8px 16px; background: rgba(255,180,0,0.2); border: 1px solid #ffb400; color: #ffb400; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+  .admin-apply:hover { background: rgba(255,180,0,0.4); box-shadow: 0 0 15px rgba(255,180,0,0.3); }
+  .admin-apply:active { transform: scale(0.98); }
+
+  /* Command console */
+  #cmdConsole { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 500px; display: none; pointer-events: all; z-index: 300; }
+  #cmdConsole.open { display: block; }
+  #cmdInput { width: 100%; padding: 10px 16px; background: rgba(5,10,18,0.97); border: 1px solid rgba(255,180,0,0.5); color: #ffb400; font-size: 14px; font-family: monospace; letter-spacing: 1px; }
+  #cmdInput:focus { outline: none; border-color: #ffb400; }
+
+  /* Dispatch panel */
+  #dispatchPanel {
+    position: absolute; bottom: 200px; right: 24px; width: 240px; background: rgba(5,10,18,0.9);
+    border: 1px solid rgba(50,100,255,0.3); display: none; pointer-events: all;
+  }
+  #dispatchPanel.visible { display: block; }
+  .dispatch-header { padding: 8px 12px; background: rgba(50,100,255,0.15); font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #5080ff; text-transform: uppercase; }
+  .dispatch-call { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 11px; line-height: 1.5; cursor: pointer; transition: background 0.2s; }
+  .dispatch-call:hover { background: rgba(50,100,255,0.1); }
+  .dispatch-call .call-type { color: #5080ff; font-weight: 700; }
+  .dispatch-call .call-loc { color: rgba(255,255,255,0.4); font-size: 10px; }
+
+  /* Pause menu */
+  #pauseMenu { background: rgba(0,0,0,0.92); flex-direction: column; align-items: center; justify-content: center; gap: 16px; backdrop-filter: blur(8px); }
+  #pauseMenu h1 { font-size: 48px; font-weight: 900; color: #00d4ff; letter-spacing: 6px; margin-bottom: 20px; }
+
+  /* Loading screen */
+  #loadScreen { background: #050810; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+  .load-title { font-size: 72px; font-weight: 900; background: linear-gradient(135deg,#00d4ff,#00ff9d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .load-bar-wrap { width: 400px; height: 3px; background: rgba(255,255,255,0.1); }
+  .load-bar { height: 100%; background: linear-gradient(90deg,#00d4ff,#00ff9d); width: 0%; transition: width 0.1s; }
+  .load-status { font-size: 11px; letter-spacing: 3px; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+  .load-tip { font-size: 12px; color: rgba(255,255,255,0.2); max-width: 400px; text-align: center; line-height: 1.7; }
+
+  /* Achievements */
+  .achievement-toast {
+    position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,180,0,0.1); border: 1px solid rgba(255,180,0,0.4); padding: 12px 24px;
+    display: flex; align-items: center; gap: 14px; z-index: 400; pointer-events: none;
+    animation: achSlide 0.4s ease;
+  }
+  @keyframes achSlide { from{transform:translateX(-50%) translateY(60px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+  .ach-icon { font-size: 28px; }
+  .ach-text .ach-label { font-size: 10px; letter-spacing: 3px; color: #ffb400; text-transform: uppercase; }
+  .ach-text .ach-name { font-size: 14px; font-weight: 700; color: #fff; }
+
+  /* Settings */
+  #settingsMenu { flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); }
+  .settings-box { background: rgba(5,10,18,0.98); border: 1px solid rgba(0,200,255,0.2); width: 460px; padding: 32px; }
+  .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .setting-label { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .toggle-btn { width: 44px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 11px; cursor: pointer; position: relative; transition: background 0.2s; }
+  .toggle-btn.on { background: rgba(0,200,255,0.5); }
+  .toggle-btn::after { content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; background:#fff; border-radius:50%; transition:left 0.2s; }
+  .toggle-btn.on::after { left:25px; }
+  input[type=range] { -webkit-appearance:none; width:120px; height:4px; background:rgba(255,255,255,0.1); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; background:#00d4ff; border-radius:50%; cursor:pointer; }
+
+  /* Job board */
+  .job-entry { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+  .job-entry:hover { background: rgba(0,200,255,0.08); border-color: rgba(0,200,255,0.3); }
+  .job-name { font-size: 13px; font-weight: 700; color: #00d4ff; }
+  .job-pay { font-size: 12px; color: #00ff9d; }
+  .job-desc { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+
+  /* Arrest UI */
+  #arrestPanel {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(5,10,18,0.97); border: 2px solid rgba(50,100,255,0.5); padding: 32px 48px; text-align: center; display: none; z-index: 300; pointer-events: all;
+  }
+  #arrestPanel.visible { display: block; }
+  .arrest-title { font-size: 24px; font-weight: 900; color: #5080ff; letter-spacing: 4px; margin-bottom: 16px; }
+  .arrest-charge { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; line-height: 1.8; }
+  .arrest-btns { display: flex; gap: 12px; justify-content: center; }
+  .arrest-btn { padding: 10px 24px; font-size: 12px; font-weight: 700; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; }
+  .arrest-accept { background: rgba(50,100,255,0.2); border: 1px solid #5080ff; color: #5080ff; }
+  .arrest-accept:hover { background: rgba(50,100,255,0.4); }
+  .arrest-deny { background: rgba(255,50,80,0.2); border: 1px solid #ff3250; color: #ff3250; }
+  .arrest-deny:hover { background: rgba(255,50,80,0.4); }
+
+  /* Injury / Medical */
+  .injury-indicator { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; display: none; z-index: 250; }
+  .injury-indicator.visible { display: block; }
+  .injury-icon { font-size: 64px; animation: pulse 1s infinite; }
+  .injury-text { font-size: 16px; color: #ff3250; font-weight: 700; margin-top: 12px; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+  /* Screen vignette on damage */
+  #damageVignette {
+    position: absolute; inset: 0; pointer-events: none; z-index: 60;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(255,30,50,0) 100%);
+    transition: background 0.3s;
+  }
+  #damageVignette.hit { background: radial-gradient(ellipse at center, transparent 40%, rgba(255,30,50,0.5) 100%); }
+
+  /* Bleeding effect */
+  #bleedOverlay {
+    position: absolute; inset: 0; pointer-events: none; z-index: 59;
+    background: rgba(150,0,0,0); transition: background 1s; display: none;
+  }
+  #bleedOverlay.active { display: block; background: rgba(150,0,0,0.15); animation: bleedFlash 2s infinite; }
+  @keyframes bleedFlash { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+
+  /* Weather overlay */
+  #rainOverlay { position: absolute; inset: 0; pointer-events: none; z-index: 55; display: none; }
+  #fogOverlay { position: absolute; inset: 0; pointer-events: none; background: rgba(180,190,210,0); z-index: 54; transition: background 2s; }
+
+  canvas.rain-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Banking */
+  .bank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,255,130,0.03); border: 1px solid rgba(0,255,130,0.08); margin-bottom: 8px; }
+  .bank-label { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .bank-val { font-size: 14px; font-weight: 700; color: #00ff9d; }
+  .bank-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .bank-btn { flex: 1; padding: 10px; background: rgba(0,255,130,0.08); border: 1px solid rgba(0,255,130,0.3); color: #00ff9d; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .bank-btn:hover { background: rgba(0,255,130,0.2); }
+
+  scrollbar-width: thin;
+  .ingame-menu::-webkit-scrollbar { width: 4px; }
+  .ingame-menu::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.3); }
+</style>
+</head>
+<body>
+
+<!-- CANVAS -->
+<canvas id="canvas"></canvas>
+
+<!-- RAIN OVERLAY -->
+<div id="rainOverlay"><canvas class="rain-canvas" id="rainCanvas"></canvas></div>
+<div id="fogOverlay"></div>
+<div id="damageVignette"></div>
+<div id="bleedOverlay"></div>
+
+<!-- ===== SCREENS ===== -->
+
+<!-- MAIN MENU -->
+<div id="mainMenu" class="screen active">
+  <div class="menu-bg"></div>
+  <div class="menu-grid"></div>
+  <div class="logo-container">
+    <div class="logo-title">SparkzWorld</div>
+    <div class="logo-sub">Open World Roleplay</div>
+  </div>
+  <div class="menu-buttons">
+    <button class="menu-btn" onclick="showScreen('charSelect')">▶ Play</button>
+    <button class="menu-btn" onclick="showScreen('settingsMenu')">⚙ Settings</button>
+    <button class="menu-btn" onclick="loadGame()">↺ Load Game</button>
+  </div>
+  <div class="menu-version">v1.0.0 — ALPHA</div>
+</div>
+
+<!-- LOADING SCREEN -->
+<div id="loadScreen" class="screen">
+  <div class="load-title">SparkzWorld</div>
+  <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+  <div class="load-status" id="loadStatus">Initializing world...</div>
+  <div class="load-tip" id="loadTip">Tip: Press E to interact with NPCs and vehicles. Use /tp to teleport as an admin.</div>
+</div>
+
+<!-- CHARACTER SELECT -->
+<div id="charSelect" class="screen">
+  <div class="select-title">Choose Your Character</div>
+  <div class="char-cards">
+    <div class="char-card selected" onclick="selectChar(this,'male1')" data-char="male1">
+      <div class="char-avatar">👨</div>
+      <div class="char-name">ALEX</div>
+      <div class="char-desc">Street-smart hustler looking for a new start in the city.</div>
+      <div class="color-swatches">
+        <div class="swatch active" style="background:#1a1a1a" onclick="setCharColor('#1a1a1a',event)"></div>
+        <div class="swatch" style="background:#4a3728" onclick="setCharColor('#4a3728',event)"></div>
+        <div class="swatch" style="background:#d4a574" onclick="setCharColor('#d4a574',event)"></div>
+      </div>
+    </div>
+    <div class="char-card" onclick="selectChar(this,'female1')" data-char="female1">
+      <div class="char-avatar">👩</div>
+      <div class="char-name">MAYA</div>
+      <div class="char-desc">Former lawyer who knows the system better than anyone.</div>
+      <div class="color-swatches">
+        <div class="swatch active" style="background:#8B4513" onclick="setCharColor('#8B4513',event)"></div>
+        <div class="swatch" style="background:#FFD700" onclick="setCharColor('#FFD700',event)"></div>
+        <div class="swatch" style="background:#000" onclick="setCharColor('#000',event)"></div>
+      </div>
+    </div>
+    <div class="char-card" onclick="selectChar(this,'male2')" data-char="male2">
+      <div class="char-avatar">🧔</div>
+      <div class="char-name">DANTE</div>
+      <div class="char-desc">Ex-military, disciplined, and ready for anything.</div>
+      <div class="color-swatches">
+        <div class="swatch active" style="background:#2c4a2c" onclick="setCharColor('#2c4a2c',event)"></div>
+        <div class="swatch" style="background:#8B8000" onclick="setCharColor('#8B8000',event)"></div>
+        <div class="swatch" style="background:#333" onclick="setCharColor('#333',event)"></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;margin-top:10px;">
+    <button class="menu-btn" onclick="showScreen('mainMenu')">← Back</button>
+    <button class="menu-btn" onclick="showScreen('jobSelect')">Continue →</button>
+  </div>
+</div>
+
+<!-- JOB / MODE SELECT -->
+<div id="jobSelect" class="screen">
+  <div class="select-title">Choose Your Role</div>
+  <div class="mode-cards">
+    <div class="mode-card" data-mode="civilian" onclick="startGame('civilian')">
+      <div class="mode-icon">🏙️</div>
+      <div class="mode-name">Civilian</div>
+      <div class="mode-desc">Live the city life. Buy cars, own property, find jobs, and make your fortune.</div>
+    </div>
+    <div class="mode-card" data-mode="police" onclick="startGame('police')">
+      <div class="mode-icon">🚔</div>
+      <div class="mode-name">Police</div>
+      <div class="mode-desc">Serve and protect. Patrol the streets, respond to callouts, and enforce the law.</div>
+    </div>
+    <div class="mode-card" data-mode="ems" onclick="startGame('ems')">
+      <div class="mode-icon">🚑</div>
+      <div class="mode-name">EMS</div>
+      <div class="mode-desc">Save lives. Respond to medical emergencies and revive injured civilians.</div>
+    </div>
+    <div class="mode-card" data-mode="admin" onclick="startGame('admin')">
+      <div class="mode-icon">⚡</div>
+      <div class="mode-name">Admin</div>
+      <div class="mode-desc">Full control. Spawn vehicles, control time and weather, manage the world.</div>
+    </div>
+  </div>
+  <button class="menu-btn" onclick="showScreen('charSelect')" style="margin-top:10px">← Back</button>
+</div>
+
+<!-- SETTINGS MENU -->
+<div id="settingsMenu" class="screen">
+  <div class="settings-box">
+    <h2 style="font-size:20px;font-weight:900;letter-spacing:4px;color:#00d4ff;margin-bottom:24px;text-transform:uppercase">Settings</h2>
+    <div class="setting-row">
+      <div class="setting-label">Shadows</div>
+      <div class="toggle-btn on" onclick="toggleSetting(this,'shadows')"></div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Post-processing</div>
+      <div class="toggle-btn on" onclick="toggleSetting(this,'postfx')"></div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Dynamic Weather</div>
+      <div class="toggle-btn on" onclick="toggleSetting(this,'weather')"></div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">NPC Density</div>
+      <input type="range" min="0" max="100" value="70" oninput="setSetting('npcDensity',this.value)">
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Draw Distance</div>
+      <input type="range" min="100" max="500" value="300" oninput="setSetting('drawDist',this.value)">
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Music Volume</div>
+      <input type="range" min="0" max="100" value="50" oninput="setSetting('music',this.value)">
+    </div>
+    <div style="margin-top:24px;display:flex;gap:12px">
+      <button class="menu-btn" onclick="showScreen(prevScreen||'mainMenu')" style="width:200px">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE MENU -->
+<div id="pauseMenu" class="screen">
+  <h1>PAUSED</h1>
+  <button class="menu-btn" onclick="resumeGame()">▶ Resume</button>
+  <button class="menu-btn" onclick="openInventory()">🎒 Inventory</button>
+  <button class="menu-btn" onclick="showScreen('settingsMenu');prevScreen='pauseMenu'">⚙ Settings</button>
+  <button class="menu-btn" onclick="saveGame()">💾 Save Game</button>
+  <button class="menu-btn" onclick="showScreen('mainMenu');stopGame()">🏠 Main Menu</button>
+</div>
+
+<!-- ===== HUD ===== -->
+<div id="hud">
+  <!-- Minimap -->
+  <div id="minimap">
+    <canvas id="minimapCanvas" width="170" height="170"></canvas>
+    <div class="minimap-compass" id="compassLabel">N</div>
+  </div>
+
+  <!-- Mode Badge -->
+  <div id="modeBadge">⚡ Civilian Mode</div>
+
+  <!-- Stats -->
+  <div id="statsPanel">
+    <div class="stat-bar">
+      <div class="stat-icon">❤</div>
+      <div class="stat-track"><div class="stat-fill health" id="healthBar" style="width:100%"></div></div>
+      <div class="stat-label" id="healthVal">100</div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-icon">🛡</div>
+      <div class="stat-track"><div class="stat-fill armor" id="armorBar" style="width:0%"></div></div>
+      <div class="stat-label" id="armorVal">0</div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-track"><div class="stat-fill stamina" id="staminaBar" style="width:100%"></div></div>
+      <div class="stat-label" id="staminaVal">100</div>
+    </div>
+  </div>
+
+  <!-- Money -->
+  <div id="moneyPanel">
+    <div class="money-label">Bank Balance</div>
+    <div class="money-amount" id="moneyDisplay">$5,000</div>
+    <div class="xp-bar-wrap">
+      <div class="xp-level" id="xpLevel">Level 1 · 0 / 100 XP</div>
+      <div class="xp-track"><div class="xp-fill" id="xpBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Wanted Stars -->
+  <div id="wantedPanel">
+    <div class="star" id="s1">★</div>
+    <div class="star" id="s2">★</div>
+    <div class="star" id="s3">★</div>
+    <div class="star" id="s4">★</div>
+    <div class="star" id="s5">★</div>
+  </div>
+
+  <!-- Speedometer -->
+  <div id="speedometer">
+    <div class="speed-val" id="speedVal">0</div>
+    <div class="speed-unit">MPH</div>
+  </div>
+
+  <!-- Notifications -->
+  <div id="notifContainer"></div>
+
+  <!-- Interaction Prompt -->
+  <div id="interactPrompt"></div>
+
+  <!-- Controls Hint -->
+  <div id="controlsHint">WASD MOVE · SHIFT SPRINT · SPACE JUMP · C CROUCH · E INTERACT · ESC PAUSE · TAB INVENTORY · / COMMAND</div>
+
+  <!-- Dispatch Panel (Police/EMS) -->
+  <div id="dispatchPanel">
+    <div class="dispatch-header">📡 Active Calls</div>
+    <div id="dispatchList"></div>
+  </div>
+
+  <!-- Arrest UI -->
+  <div id="arrestPanel">
+    <div class="arrest-title">🚔 YOU ARE BEING ARRESTED</div>
+    <div class="arrest-charge" id="arrestCharges">Charges: Resisting Arrest</div>
+    <div class="arrest-btns">
+      <button class="arrest-btn arrest-accept" onclick="acceptArrest()">Accept Arrest</button>
+      <button class="arrest-btn arrest-deny" onclick="denyArrest()">Resist (Wanted +1)</button>
+    </div>
+  </div>
+
+  <!-- Injury UI -->
+  <div class="injury-indicator" id="injuryPanel">
+    <div class="injury-icon">🩸</div>
+    <div class="injury-text">INJURED — Awaiting EMS</div>
+  </div>
+</div>
+
+<!-- ===== IN-GAME MENUS ===== -->
+
+<!-- Inventory -->
+<div class="ingame-menu" id="inventoryMenu">
+  <div class="ingame-header">
+    <h2>🎒 Inventory</h2>
+    <button class="close-btn" onclick="closeMenu('inventoryMenu')">✕</button>
+  </div>
+  <div class="ingame-body">
+    <div class="inv-grid" id="invGrid"></div>
+  </div>
+</div>
+
+<!-- Shop -->
+<div class="ingame-menu" id="shopMenu">
+  <div class="ingame-header">
+    <h2>🛒 Shop</h2>
+    <button class="close-btn" onclick="closeMenu('shopMenu')">✕</button>
+  </div>
+  <div class="ingame-body" id="shopBody"></div>
+</div>
+
+<!-- Job Board -->
+<div class="ingame-menu" id="jobMenu">
+  <div class="ingame-header">
+    <h2>💼 Job Board</h2>
+    <button class="close-btn" onclick="closeMenu('jobMenu')">✕</button>
+  </div>
+  <div class="ingame-body" id="jobBody"></div>
+</div>
+
+<!-- Banking -->
+<div class="ingame-menu" id="bankMenu">
+  <div class="ingame-header">
+    <h2>🏦 SparkzBank</h2>
+    <button class="close-btn" onclick="closeMenu('bankMenu')">✕</button>
+  </div>
+  <div class="ingame-body">
+    <div class="bank-row"><div class="bank-label">Cash on Hand</div><div class="bank-val" id="bankCash">$0</div></div>
+    <div class="bank-row"><div class="bank-label">Bank Balance</div><div class="bank-val" id="bankBalance">$0</div></div>
+    <div class="bank-row"><div class="bank-label">Total Wealth</div><div class="bank-val" id="bankTotal">$0</div></div>
+    <div class="bank-actions">
+      <button class="bank-btn" onclick="bankDeposit()">Deposit Cash</button>
+      <button class="bank-btn" onclick="bankWithdraw()">Withdraw $500</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="ingame-menu" id="adminPanelMenu" style="width:600px">
+  <div class="ingame-header">
+    <h2>⚡ Admin Panel</h2>
+    <button class="close-btn" onclick="closeMenu('adminPanelMenu')">✕</button>
+  </div>
+  <div class="ingame-body">
+    <div class="admin-grid">
+      <button class="admin-btn" onclick="adminCmd('godmode')">⚡ God Mode</button>
+      <button class="admin-btn" onclick="adminCmd('noclip')">👻 No Clip</button>
+      <button class="admin-btn" onclick="adminCmd('fly')">✈ Fly Mode</button>
+      <button class="admin-btn" onclick="adminCmd('heal')">❤ Heal All</button>
+      <button class="admin-btn" onclick="adminCmd('speedboost')">🚀 Speed Boost</button>
+      <button class="admin-btn" onclick="adminCmd('particles')">✨ Particles</button>
+      <button class="admin-btn" onclick="adminCmd('clear')">🗑 Clear Entities</button>
+      <button class="admin-btn" onclick="adminCmd('money')">💰 Give Money</button>
+      <button class="admin-btn" onclick="adminCmd('spawnNPC')">🚶 Spawn NPC</button>
+      <button class="admin-btn" onclick="adminCmd('cleanup')">🧹 Clean Up</button>
+      <button class="admin-btn" onclick="adminCmd('slowmo')">🐢 Slow Motion</button>
+      <button class="admin-btn" onclick="adminCmd('freeze')">❄️ Freeze Time</button>
+    </div>
+    <div class="admin-input-row">
+      <span style="font-size:12px;color:rgba(255,255,255,0.5);padding-top:8px">Spawn Vehicle:</span>
+      <select id="adminVehSelect" class="admin-input">
+        <option value="civilian">Civilian Car</option>
+        <option value="police">Police Cruiser</option>
+        <option value="ambulance">Ambulance</option>
+        <option value="sport">Sports Car</option>
+      </select>
+      <button class="admin-apply" onclick="adminSpawnVehicle()">Spawn</button>
+    </div>
+    <div class="admin-input-row">
+      <span style="font-size:12px;color:rgba(255,255,255,0.5);padding-top:8px">Time:</span>
+      <input type="range" min="0" max="24" step="0.5" value="12" id="timeSlider" oninput="adminSetTime(this.value)" class="admin-input" style="padding:4px">
+      <span id="timeLabel" style="font-size:12px;color:#ffb400;padding:8px 6px">12:00</span>
+    </div>
+    <div class="admin-input-row">
+      <span style="font-size:12px;color:rgba(255,255,255,0.5);padding-top:8px">Weather:</span>
+      <select id="weatherSelect" class="admin-input" onchange="adminSetWeather(this.value)">
+        <option value="sunny">☀ Sunny</option>
+        <option value="rain">🌧 Rain</option>
+        <option value="fog">🌫 Fog</option>
+        <option value="storm">⛈ Storm</option>
+      </select>
+    </div>
+    <div class="admin-input-row">
+      <span style="font-size:12px;color:rgba(255,255,255,0.5);padding-top:8px">TP to:</span>
+      <input type="text" placeholder="x,z coords" id="tpInput" class="admin-input">
+      <button class="admin-apply" onclick="adminTeleport()">Go</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command Console -->
+<div id="cmdConsole">
+  <input type="text" id="cmdInput" placeholder="/ Enter command (e.g. /tp 0 0, /car, /god, /weather rain)" onkeydown="handleCmd(event)">
+</div>
+
+<!-- ===== THREE.JS CDN ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ============================================================
+// SPARKZWORLD — Full Game Engine
+// ============================================================
+
+// ===== GLOBAL STATE =====
+const GS = {
+  mode: 'civilian',
+  char: { type: 'male1', color: '#1a1a1a' },
+  player: { health: 100, armor: 0, stamina: 100, money: 5000, bank: 0, cash: 5000 },
+  xp: 0, level: 1,
+  wantedLevel: 0,
+  inVehicle: false, currentVehicle: null,
+  isJumping: false, isCrouching: false, isSprinting: false, isInjured: false,
+  godMode: false, noclip: false, flyMode: false, slowmo: false, timeFrozen: false,
+  weather: 'sunny',
+  gameTime: 12,
+  paused: false, playing: false,
+  settings: { shadows: true, postfx: true, weather: true, npcDensity: 70, drawDist: 300, music: 50 },
+  inventory: [], ownedVehicles: [], ownedHouses: [],
+  achievements: [], activeJob: null,
+  keys: {}, mouseX: 0, mouseY: 0, lastX: 0, lastY: 0,
+  achievements_list: [
+    {id:'first_steps',name:'First Steps',desc:'Take your first steps',icon:'👟'},
+    {id:'first_job',name:'Working 9-5',desc:'Complete your first job',icon:'💼'},
+    {id:'rich',name:'Money Bags',desc:'Earn $50,000',icon:'💰'},
+    {id:'level5',name:'Rising Star',desc:'Reach Level 5',icon:'⭐'},
+    {id:'first_arrest',name:'Law Enforcer',desc:'Make your first arrest',icon:'🚔'},
+    {id:'first_revive',name:'Lifesaver',desc:'Revive your first patient',icon:'❤️'},
+  ]
+};
+
+let prevScreen = 'mainMenu';
+let selectedChar = 'male1';
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+function selectChar(el, char) {
+  document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedChar = char;
+  GS.char.type = char;
+}
+function setCharColor(color, e) {
+  e.stopPropagation();
+  GS.char.color = color;
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  e.target.classList.add('active');
+}
+
+// ============================================================
+// GAME STARTUP
+// ============================================================
+function startGame(mode) {
+  GS.mode = mode;
+  showScreen('loadScreen');
+  const tips = [
+    'Press E near vehicles to enter them.',
+    'Use TAB to open your inventory.',
+    'Press / to open the command console.',
+    'Sprinting drains stamina — rest to recover.',
+    'Police can use /arrest to handcuff suspects.',
+    'EMS responders can revive injured NPCs with E.',
+    'Buy properties to earn passive income.',
+    'Complete jobs to earn XP and level up.',
+  ];
+  document.getElementById('loadTip').textContent = 'Tip: ' + tips[Math.floor(Math.random()*tips.length)];
+  let progress = 0;
+  const statuses = ['Initializing world...','Loading assets...','Building city...','Spawning vehicles...','Starting systems...','Ready!'];
+  let si = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 18 + 5;
+    if (progress > 100) progress = 100;
+    document.getElementById('loadBar').style.width = progress + '%';
+    if (si < statuses.length - 1 && progress > (si+1)*16) {
+      document.getElementById('loadStatus').textContent = statuses[++si];
+    }
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(launchGame, 600);
+    }
+  }, 120);
+}
+
+function launchGame() {
+  showScreen('');
+  document.getElementById('hud').classList.add('active');
+  GS.playing = true;
+  applyMode(GS.mode);
+  initThreeJS();
+  setupInventory();
+  updateHUD();
+  notify('Welcome to SparkzWorld!','success');
+  notify('Press E to interact · TAB for inventory · ESC to pause','');
+  if (GS.mode === 'police') {
+    notify('🚔 Police Dispatch activated — check your callouts!','police');
+    document.getElementById('dispatchPanel').classList.add('visible');
+    startDispatch();
+  }
+  if (GS.mode === 'ems') {
+    notify('🚑 EMS Dispatch active — respond to medical calls!','ems');
+    document.getElementById('dispatchPanel').classList.add('visible');
+    startDispatch();
+  }
+  if (GS.mode === 'admin') {
+    notify('⚡ Admin Mode — All permissions granted.','warning');
+    GS.godMode = true;
+    openAdmin();
+  }
+  checkAchievement('first_steps');
+  autoSave();
+}
+
+function applyMode(mode) {
+  const badges = { civilian:'🏙️ Civilian Mode', police:'🚔 Police Mode', ems:'🚑 EMS Mode', admin:'⚡ Admin Mode' };
+  const colors = { civilian:'#00d4ff', police:'#5080ff', ems:'#ff3250', admin:'#ffb400' };
+  const badge = document.getElementById('modeBadge');
+  badge.textContent = badges[mode] || '🏙️ Civilian Mode';
+  badge.style.borderColor = colors[mode] || '#00d4ff';
+  badge.style.color = colors[mode] || '#00d4ff';
+}
+
+function stopGame() {
+  GS.playing = false;
+  document.getElementById('hud').classList.remove('active');
+  document.querySelectorAll('.ingame-menu').forEach(m => m.classList.remove('open'));
+  document.getElementById('dispatchPanel').classList.remove('visible');
+  stopDispatch();
+}
+
+// ============================================================
+// THREE.JS WORLD
+// ============================================================
+let renderer, scene, camera, clock;
+let playerMesh, playerGroup;
+let sunLight, ambientLight, hemiLight;
+let vehicles = [], npcs = [], buildings = [], trees = [];
+let roadLines = [];
+let sky, skyUniforms;
+let cameraAngleX = 0, cameraAngleY = 0.4;
+let cameraDistance = 14;
+let animFrameId;
+let minimapCtx;
+
+const tmpVec3 = new THREE.Vector3();
+
+function initThreeJS() {
+  const canvas = document.getElementById('canvas');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = GS.settings.shadows;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x87ceeb, 80, 400);
+
+  clock = new THREE.Clock();
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 10, 20);
+
+  // Lighting
+  ambientLight = new THREE.AmbientLight(0x404060, 0.3);
+  scene.add(ambientLight);
+
+  hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x2d4a1e, 0.7);
+  scene.add(hemiLight);
+
+  sunLight = new THREE.DirectionalLight(0xfff8e0, 2.0);
+  sunLight.position.set(80, 120, 60);
+  sunLight.castShadow = true;
+  sunLight.shadow.mapSize.width = 2048;
+  sunLight.shadow.mapSize.height = 2048;
+  sunLight.shadow.camera.near = 0.5;
+  sunLight.shadow.camera.far = 600;
+  sunLight.shadow.camera.left = -150;
+  sunLight.shadow.camera.right = 150;
+  sunLight.shadow.camera.top = 150;
+  sunLight.shadow.camera.bottom = -150;
+  sunLight.shadow.bias = -0.001;
+  scene.add(sunLight);
+
+  buildWorld();
+  buildPlayer();
+  spawnVehicles();
+  spawnNPCs();
+  setupSky();
+  setupControls();
+  setupMinimap();
+
+  // Rain canvas
+  const rc = document.getElementById('rainCanvas');
+  rc.width = window.innerWidth; rc.height = window.innerHeight;
+  window.rainCtx = rc.getContext('2d');
+
+  animate();
+  window.addEventListener('resize', onResize);
+}
+
+// ===== SKY =====
+function setupSky() {
+  // Simple gradient sky sphere
+  const skyGeo = new THREE.SphereGeometry(800, 32, 32);
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms: {
+      topColor: { value: new THREE.Color(0x0077ff) },
+      bottomColor: { value: new THREE.Color(0xc8d8ff) },
+      offset: { value: 33 },
+      exponent: { value: 0.6 }
+    },
+    vertexShader: `
+      varying vec3 vWorldPosition;
+      void main(){ vec4 worldPosition=modelMatrix*vec4(position,1.0); vWorldPosition=worldPosition.xyz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }
+    `,
+    fragmentShader: `
+      uniform vec3 topColor; uniform vec3 bottomColor; uniform float offset; uniform float exponent;
+      varying vec3 vWorldPosition;
+      void main(){ float h=normalize(vWorldPosition+offset).y; gl_FragColor=vec4(mix(bottomColor,topColor,max(pow(max(h,0.0),exponent),0.0)),1.0); }
+    `
+  });
+  skyUniforms = skyMat.uniforms;
+  sky = new THREE.Mesh(skyGeo, skyMat);
+  scene.add(sky);
+
+  // Stars (small points, hidden during day)
+  const starsGeo = new THREE.BufferGeometry();
+  const starVerts = [];
+  for (let i = 0; i < 3000; i++) {
+    const r = 750;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(Math.random() * 2 - 1);
+    starVerts.push(r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+  }
+  starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3));
+  window.starField = new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 1.5, transparent: true, opacity: 0 }));
+  scene.add(window.starField);
+
+  // Sun sphere
+  const sunGeo = new THREE.SphereGeometry(8, 16, 16);
+  const sunMat = new THREE.MeshBasicMaterial({ color: 0xfffae0 });
+  window.sunMesh = new THREE.Mesh(sunGeo, sunMat);
+  scene.add(window.sunMesh);
+}
+
+// ===== WORLD BUILDING =====
+function buildWorld() {
+  // Ground
+  const groundGeo = new THREE.PlaneGeometry(800, 800, 1, 1);
+  const groundMat = new THREE.MeshLambertMaterial({ color: 0x2d5a27 });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Road network
+  buildRoads();
+  // Buildings
+  buildBuildings();
+  // Trees / Parks
+  buildTrees();
+  // Street lamps
+  buildLamps();
+  // Landmarks
+  buildLandmarks();
+}
+
+function buildRoads() {
+  const roadMat = new THREE.MeshLambertMaterial({ color: 0x222228 });
+  const lineMat = new THREE.MeshLambertMaterial({ color: 0xffee00 });
+  const whiteMat = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+
+  // Main cross roads
+  const roads = [
+    { x: 0, z: 0, w: 800, d: 16, rot: 0 },
+    { x: 0, z: 0, w: 800, d: 16, rot: Math.PI/2 },
+    { x: 80, z: 0, w: 800, d: 12, rot: Math.PI/2 },
+    { x: -80, z: 0, w: 800, d: 12, rot: Math.PI/2 },
+    { x: 0, z: 80, w: 800, d: 12, rot: 0 },
+    { x: 0, z: -80, w: 800, d: 12, rot: 0 },
+    { x: 0, z: 160, w: 500, d: 10, rot: 0 },
+    { x: 0, z: -160, w: 500, d: 10, rot: 0 },
+    { x: 160, z: 0, w: 500, d: 10, rot: Math.PI/2 },
+    { x: -160, z: 0, w: 500, d: 10, rot: Math.PI/2 },
+  ];
+
+  roads.forEach(r => {
+    const geo = new THREE.BoxGeometry(r.w, 0.1, r.d);
+    const mesh = new THREE.Mesh(geo, roadMat);
+    mesh.rotation.y = r.rot;
+    mesh.position.set(r.x, 0.05, r.z);
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+
+    // Lane markings
+    for (let i = -r.w/2+30; i < r.w/2; i += 30) {
+      const lg = new THREE.BoxGeometry(14, 0.12, 0.4);
+      const lm = new THREE.Mesh(lg, whiteMat);
+      if (r.rot === 0) { lm.position.set(r.x+i, 0.06, r.z); }
+      else { lm.rotation.y = Math.PI/2; lm.position.set(r.x, 0.06, r.z+i); }
+      scene.add(lm);
+    }
+  });
+
+  // Sidewalks
+  const sidewalkMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+  const swPositions = [
+    [0, 0, 800, 4, 0, 10], [0, 0, 800, 4, 0, -10],
+    [0, 0, 4, 800, 10, 0], [0, 0, 4, 800, -10, 0],
+  ];
+  swPositions.forEach(([x,z,w,d,ox,oz]) => {
+    const sg = new THREE.BoxGeometry(w, 0.15, d);
+    const sm = new THREE.Mesh(sg, sidewalkMat);
+    sm.position.set(x+ox, 0.07, z+oz);
+    sm.receiveShadow = true;
+    scene.add(sm);
+  });
+}
+
+function buildBuildings() {
+  const buildingConfigs = [
+    // [x, z, w, d, h, color]
+    [25, 25, 18, 18, 60, 0x3a4a5a],
+    [55, 25, 14, 16, 45, 0x4a3a5a],
+    [25, 55, 16, 14, 80, 0x2a3a4a],
+    [55, 55, 20, 20, 35, 0x3a4a3a],
+    [-25, 25, 18, 18, 50, 0x4a4a3a],
+    [-55, 25, 14, 16, 70, 0x3a2a4a],
+    [-25, 55, 16, 14, 40, 0x3a3a4a],
+    [-55, 55, 20, 20, 55, 0x2a4a3a],
+    [25, -25, 18, 18, 65, 0x4a3a3a],
+    [55, -25, 14, 16, 38, 0x3a4a5a],
+    [25, -55, 16, 14, 72, 0x2a3a5a],
+    [55, -55, 20, 20, 42, 0x4a4a4a],
+    [-25, -25, 18, 18, 58, 0x3a5a4a],
+    [-55, -25, 14, 16, 33, 0x4a3a4a],
+    [-25, -55, 16, 14, 68, 0x3a4a4a],
+    [-55, -55, 20, 20, 48, 0x2a4a5a],
+    [100, 100, 30, 25, 100, 0x1a2a3a],
+    [-100, 100, 28, 22, 85, 0x2a1a3a],
+    [100, -100, 24, 28, 90, 0x3a2a1a],
+    [-100, -100, 26, 24, 95, 0x1a3a2a],
+    [170, 50, 20, 20, 40, 0x4a3a2a],
+    [-170, 50, 18, 22, 50, 0x2a4a3a],
+    [170, -50, 22, 18, 35, 0x3a2a4a],
+    [-170, -50, 20, 20, 60, 0x4a4a2a],
+    [0, 170, 35, 25, 30, 0x3a4a2a],
+    [0, -170, 30, 30, 45, 0x2a3a4a],
+  ];
+
+  buildingConfigs.forEach(([x,z,w,d,h,c]) => {
+    // Main building
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const mat = new THREE.MeshLambertMaterial({ color: c });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, h/2, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    buildings.push(mesh);
+
+    // Windows
+    const winMat = new THREE.MeshBasicMaterial({ color: 0xffffaa, transparent: true, opacity: 0.7 });
+    for (let iy = 4; iy < h-4; iy += 5) {
+      for (let ix = -w/2+2; ix < w/2-2; ix += 4) {
+        if (Math.random() > 0.3) {
+          const wg = new THREE.BoxGeometry(1.5, 2, 0.1);
+          const wm = new THREE.Mesh(wg, winMat);
+          wm.position.set(x+ix, iy, z+d/2+0.1);
+          scene.add(wm);
+        }
+      }
+    }
+
+    // Rooftop details
+    const roofGeo = new THREE.BoxGeometry(w*0.3, 4, d*0.3);
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
+    const roof = new THREE.Mesh(roofGeo, roofMat);
+    roof.position.set(x, h+2, z);
+    scene.add(roof);
+  });
+}
+
+function buildTrees() {
+  const treePositions = [];
+  for (let i = 0; i < 80; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = 15 + Math.random() * 200;
+    // Avoid roads
+    const tx = Math.cos(angle) * r;
+    const tz = Math.sin(angle) * r;
+    if (Math.abs(tx) > 12 || Math.abs(tz) > 12) {
+      treePositions.push([tx + (Math.random()-0.5)*10, tz + (Math.random()-0.5)*10]);
+    }
+  }
+
+  // Park area
+  for (let i = 0; i < 20; i++) {
+    treePositions.push([110 + Math.random()*30, 110 + Math.random()*30]);
+    treePositions.push([-110 - Math.random()*30, 110 + Math.random()*30]);
+  }
+
+  const trunkMat = new THREE.MeshLambertMaterial({ color: 0x5c3a1e });
+  const leafMats = [
+    new THREE.MeshLambertMaterial({ color: 0x2d5a27 }),
+    new THREE.MeshLambertMaterial({ color: 0x3a7a30 }),
+    new THREE.MeshLambertMaterial({ color: 0x228b22 }),
+  ];
+
+  treePositions.forEach(([x,z]) => {
+    const h = 4 + Math.random() * 6;
+    const tg = new THREE.CylinderGeometry(0.3, 0.5, h, 8);
+    const tm = new THREE.Mesh(tg, trunkMat);
+    tm.position.set(x, h/2, z);
+    tm.castShadow = true;
+    scene.add(tm);
+
+    const leafH = 3 + Math.random() * 4;
+    const lg = new THREE.ConeGeometry(2.5, leafH, 8);
+    const lm = new THREE.Mesh(lg, leafMats[Math.floor(Math.random()*3)]);
+    lm.position.set(x, h + leafH/2, z);
+    lm.castShadow = true;
+    scene.add(lm);
+    trees.push(lm);
+  });
+
+  // Park grass
+  const parkMat = new THREE.MeshLambertMaterial({ color: 0x3a8a30 });
+  [
+    [110, 110], [-110, 110]
+  ].forEach(([px,pz]) => {
+    const pg = new THREE.PlaneGeometry(50, 50);
+    const pm = new THREE.Mesh(pg, parkMat);
+    pm.rotation.x = -Math.PI/2;
+    pm.position.set(px, 0.06, pz);
+    scene.add(pm);
+  });
+}
+
+function buildLamps() {
+  const poleM = new THREE.MeshLambertMaterial({ color: 0x888888 });
+  const lightM = new THREE.MeshBasicMaterial({ color: 0xffffcc });
+  const lampPositions = [
+    [10,0,0],[0,0,10],[-10,0,0],[0,0,-10],
+    [90,0,0],[0,0,90],[-90,0,0],[0,0,-90],
+    [90,0,80],[90,0,-80],[-90,0,80],[-90,0,-80],
+    [170,0,0],[-170,0,0],[0,0,170],[0,0,-170],
+  ];
+  lampPositions.forEach(([x,,z]) => {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.2,7,8), poleM);
+    pole.position.set(x,3.5,z);
+    scene.add(pole);
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.4,8,8), lightM);
+    bulb.position.set(x,7.2,z);
+    scene.add(bulb);
+    // Point light
+    const pl = new THREE.PointLight(0xffffcc, 0.8, 25);
+    pl.position.set(x,7,z);
+    scene.add(pl);
+  });
+}
+
+function buildLandmarks() {
+  // City Hall — prominent building with columns
+  const hallMat = new THREE.MeshLambertMaterial({ color: 0xd4c9b0 });
+  const hall = new THREE.Mesh(new THREE.BoxGeometry(40, 25, 30), hallMat);
+  hall.position.set(0, 12.5, 220);
+  hall.castShadow = true;
+  scene.add(hall);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(8,16,16), hallMat);
+  dome.position.set(0, 29, 220);
+  scene.add(dome);
+  // Columns
+  for (let i=-3;i<=3;i++) {
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(1,1.2,25,12), hallMat);
+    col.position.set(i*6, 12.5, 235);
+    scene.add(col);
+  }
+
+  // Police station
+  const policeMat = new THREE.MeshLambertMaterial({ color: 0x3a4a6a });
+  const ps = new THREE.Mesh(new THREE.BoxGeometry(28,18,22), policeMat);
+  ps.position.set(-200, 9, 0);
+  ps.castShadow = true;
+  scene.add(ps);
+  // Sign
+  const signGeo = new THREE.BoxGeometry(20, 3, 0.5);
+  const signMat = new THREE.MeshBasicMaterial({ color: 0x5080ff });
+  const sign = new THREE.Mesh(signGeo, signMat);
+  sign.position.set(-200, 18, 11);
+  scene.add(sign);
+
+  // Hospital
+  const hosMat = new THREE.MeshLambertMaterial({ color: 0xeaeaea });
+  const hos = new THREE.Mesh(new THREE.BoxGeometry(32,22,28), hosMat);
+  hos.position.set(200, 11, 0);
+  hos.castShadow = true;
+  scene.add(hos);
+  const crossMat = new THREE.MeshBasicMaterial({ color: 0xff3250 });
+  const crossH = new THREE.Mesh(new THREE.BoxGeometry(8,2.5,0.5), crossMat);
+  crossH.position.set(200, 22, 14);
+  scene.add(crossH);
+  const crossV = new THREE.Mesh(new THREE.BoxGeometry(2.5,8,0.5), crossMat);
+  crossV.position.set(200, 22, 14);
+  scene.add(crossV);
+
+  // Bank
+  const bankMat = new THREE.MeshLambertMaterial({ color: 0xb8a080 });
+  const bank = new THREE.Mesh(new THREE.BoxGeometry(25,20,20), bankMat);
+  bank.position.set(0, 10, -220);
+  bank.castShadow = true;
+  scene.add(bank);
+
+  // Gas station
+  const gasMat = new THREE.MeshLambertMaterial({ color: 0xdddd00 });
+  const gas = new THREE.Mesh(new THREE.BoxGeometry(16,6,12), gasMat);
+  gas.position.set(120, 3, -120);
+  scene.add(gas);
+  const canopy = new THREE.Mesh(new THREE.BoxGeometry(24,0.5,18), new THREE.MeshLambertMaterial({ color: 0xcc0000 }));
+  canopy.position.set(120,6.5,-120);
+  scene.add(canopy);
+
+  // Water tower
+  const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,20,8), new THREE.MeshLambertMaterial({color:0x888888}));
+  tower.position.set(-200, 10, -200);
+  scene.add(tower);
+  const tank = new THREE.Mesh(new THREE.CylinderGeometry(5,5,8,16), new THREE.MeshLambertMaterial({color:0x6688aa}));
+  tank.position.set(-200, 24, -200);
+  scene.add(tank);
+}
+
+// ===== PLAYER =====
+function buildPlayer() {
+  playerGroup = new THREE.Group();
+  scene.add(playerGroup);
+
+  // Body
+  const bodyColor = GS.char.color;
+  const bodyGeo = new THREE.BoxGeometry(1, 1.8, 0.5);
+  const bodyMat = new THREE.MeshLambertMaterial({ color: bodyColor });
+  playerMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  playerMesh.position.y = 0.9;
+  playerMesh.castShadow = true;
+  playerGroup.add(playerMesh);
+
+  // Head
+  const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+  const skinColors = { male1: 0xf0c080, female1: 0xf4a460, male2: 0x8b6914 };
+  const headMat = new THREE.MeshLambertMaterial({ color: skinColors[GS.char.type] || 0xf0c080 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 2.2;
+  head.castShadow = true;
+  playerGroup.add(head);
+
+  // Arms
+  const armGeo = new THREE.BoxGeometry(0.3, 1.2, 0.3);
+  [-0.65, 0.65].forEach(xo => {
+    const arm = new THREE.Mesh(armGeo, bodyMat);
+    arm.position.set(xo, 0.9, 0);
+    arm.castShadow = true;
+    playerGroup.add(arm);
+  });
+
+  // Legs
+  const legGeo = new THREE.BoxGeometry(0.4, 1.0, 0.4);
+  const legMat = new THREE.MeshLambertMaterial({ color: 0x224488 });
+  [-0.25, 0.25].forEach(xo => {
+    const leg = new THREE.Mesh(legGeo, legMat);
+    leg.position.set(xo, -0.15, 0);
+    leg.castShadow = true;
+    playerGroup.add(leg);
+  });
+
+  // Mode-specific accessories
+  if (GS.mode === 'police') {
+    const capGeo = new THREE.CylinderGeometry(0.45, 0.5, 0.3, 12);
+    const capMat = new THREE.MeshLambertMaterial({ color: 0x3355aa });
+    const cap = new THREE.Mesh(capGeo, capMat);
+    cap.position.y = 2.65;
+    playerGroup.add(cap);
+    playerMesh.material.color.set(0x3355aa);
+  } else if (GS.mode === 'ems') {
+    playerMesh.material.color.set(0xffffff);
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.3, 0.52), new THREE.MeshLambertMaterial({color: 0xff3250}));
+    stripe.position.set(0, 0.9, 0);
+    playerGroup.add(stripe);
+  } else if (GS.mode === 'admin') {
+    playerMesh.material.color.set(0xffb400);
+  }
+
+  playerGroup.position.set(0, 0, 0);
+}
+
+// ===== VEHICLES =====
+const vehicleData = {
+  civilian: { color: [0x3a8fcc, 0xcc3a3a, 0x3acc6a, 0x888888, 0xccaa3a][Math.floor(Math.random()*5)], speed: 28, label: 'Civilian Car' },
+  police: { color: 0x3355aa, speed: 35, label: 'Police Cruiser' },
+  ambulance: { color: 0xffffff, speed: 30, label: 'Ambulance' },
+  sport: { color: 0xff2255, speed: 50, label: 'Sports Car' },
+};
+
+function createVehicle(type, x, z, rot = 0, isAI = false) {
+  const data = vehicleData[type] || vehicleData.civilian;
+  const group = new THREE.Group();
+
+  // Body
+  const bodyGeo = new THREE.BoxGeometry(4, 1.4, 8);
+  const bodyMat = new THREE.MeshLambertMaterial({ color: data.color });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 1;
+  body.castShadow = true;
+  group.add(body);
+
+  // Roof
+  const roofGeo = new THREE.BoxGeometry(3.2, 1.0, 4);
+  const roofMat = new THREE.MeshLambertMaterial({ color: data.color });
+  const roof = new THREE.Mesh(roofGeo, roofMat);
+  roof.position.set(0, 2.1, -0.3);
+  group.add(roof);
+
+  // Windshields
+  const glassM = new THREE.MeshLambertMaterial({ color: 0x88aacc, transparent: true, opacity: 0.6 });
+  const fwg = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.9, 0.1), glassM);
+  fwg.position.set(0, 1.95, 1.7);
+  group.add(fwg);
+  const rwg = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.9, 0.1), glassM);
+  rwg.position.set(0, 1.95, -2.3);
+  group.add(rwg);
+
+  // Wheels
+  const wheelGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.4, 16);
+  const wheelMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+  const rimMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
+  const wPos = [[-2.1,0.55,2.8],[2.1,0.55,2.8],[-2.1,0.55,-2.8],[2.1,0.55,-2.8]];
+  wPos.forEach(([wx,wy,wz]) => {
+    const w = new THREE.Mesh(wheelGeo, wheelMat);
+    w.rotation.z = Math.PI/2;
+    w.position.set(wx,wy,wz);
+    group.add(w);
+    const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.41,8), rimMat);
+    rim.rotation.z = Math.PI/2;
+    rim.position.set(wx,wy,wz);
+    group.add(rim);
+  });
+
+  // Headlights
+  const headMat = new THREE.MeshBasicMaterial({ color: 0xffffee });
+  const tailMat = new THREE.MeshBasicMaterial({ color: 0xff2200 });
+  [[-1.2,1.1,4.05],[1.2,1.1,4.05]].forEach(([lx,ly,lz]) => {
+    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.4,0.1), headMat);
+    hl.position.set(lx,ly,lz);
+    group.add(hl);
+  });
+  [[-1.2,1.1,-4.05],[1.2,1.1,-4.05]].forEach(([lx,ly,lz]) => {
+    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.4,0.1), tailMat);
+    tl.position.set(lx,ly,lz);
+    group.add(tl);
+  });
+
+  // Police lightbar
+  if (type === 'police') {
+    const lbMat = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    const lb = new THREE.Mesh(new THREE.BoxGeometry(2.5,0.3,0.8), lbMat);
+    lb.position.set(0, 2.72, -0.3);
+    group.add(lb);
+    group.userData.lightbar = lb;
+  }
+
+  // Ambulance markings
+  if (type === 'ambulance') {
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(4.1,0.3,8.1), new THREE.MeshBasicMaterial({color:0xff3250}));
+    stripe.position.set(0,1.2,0);
+    group.add(stripe);
+  }
+
+  group.position.set(x, 0, z);
+  group.rotation.y = rot;
+  group.userData = {
+    type, speed: data.speed, label: data.label,
+    velocity: 0, steer: 0, isAI, aiTarget: null,
+    occupied: false, health: 100,
+    lightOn: false, sirenOn: false,
+    wheels: wPos.map((_,i) => group.children[4+i*2]),
+    ...group.userData
+  };
+  scene.add(group);
+  vehicles.push(group);
+  return group;
+}
+
+function spawnVehicles() {
+  const spawnConfigs = [
+    ['civilian', 14, 0, 0], ['civilian', -14, 0, Math.PI],
+    ['civilian', 0, 0, 30, Math.PI/2], ['civilian', 0, 0, -30, Math.PI/2],
+    ['civilian', 14, 0, 80, 0], ['civilian', -14, 0, -80, Math.PI],
+    ['police', -200, 0, 5, 0], ['police', -200, 0, -5, Math.PI],
+    ['ambulance', 200, 0, 5, 0], ['ambulance', 200, 0, -5, Math.PI],
+    ['sport', 14, 0, 100, 0], ['civilian', 0, 0, 100, 0],
+    ['civilian', 0, 0, 150, Math.PI/2], ['civilian', 80, 0, 50, Math.PI/2],
+  ];
+  spawnConfigs.forEach(([type, x, _, z, rot]) => createVehicle(type, x, z, rot||0, true));
+}
+
+// ===== NPCs =====
+function createNPC(x, z) {
+  const group = new THREE.Group();
+  const skinC = [0xf0c080, 0xd4845a, 0x8b5e3c, 0xfad6a5, 0xc68642][Math.floor(Math.random()*5)];
+  const clothC = Math.random() * 0xffffff;
+
+  const bm = new THREE.MeshLambertMaterial({ color: clothC });
+  const hm = new THREE.MeshLambertMaterial({ color: skinC });
+  const lm = new THREE.MeshLambertMaterial({ color: Math.random() > 0.5 ? 0x224488 : 0x222222 });
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.7,1.4,0.4), bm);
+  body.position.y = 0.7; body.castShadow = true; group.add(body);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.55,0.55,0.55), hm);
+  head.position.y = 1.7; head.castShadow = true; group.add(head);
+  [[-0.42,0.7,0],[0.42,0.7,0]].forEach(([ax,ay,az]) => {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.22,0.9,0.22), bm);
+    arm.position.set(ax,ay,az); group.add(arm);
+  });
+  [[-0.18,-0.05,0],[0.18,-0.05,0]].forEach(([lx,ly,lz]) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.28,0.8,0.28), lm);
+    leg.position.set(lx,ly,lz); group.add(leg);
+  });
+
+  group.position.set(x, 0, z);
+  const angle = Math.random() * Math.PI * 2;
+  group.userData = {
+    isNPC: true, speed: 1.5 + Math.random()*1.5,
+    direction: new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle)),
+    walkCycle: Math.random()*Math.PI*2,
+    changeTimer: 2 + Math.random()*4,
+    health: 100, injured: false, arrested: false,
+    isCriminal: Math.random() < 0.08
+  };
+  scene.add(group);
+  npcs.push(group);
+  return group;
+}
+
+function spawnNPCs() {
+  for (let i = 0; i < 40; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = 12 + Math.random() * 180;
+    // place on sidewalk-ish area
+    const x = Math.cos(angle) * r + (Math.random()-0.5)*8;
+    const z = Math.sin(angle) * r + (Math.random()-0.5)*8;
+    createNPC(x, z);
+  }
+}
+
+// ===== PLAYER CONTROLS =====
+let camTarget = new THREE.Vector3();
+let playerVel = new THREE.Vector3();
+let playerYaw = 0;
+let isDragging = false;
+let mouseXDelta = 0;
+
+function setupControls() {
+  document.addEventListener('keydown', e => {
+    if (!GS.playing || GS.paused) return;
+    GS.keys[e.code] = true;
+
+    if (e.code === 'Escape') {
+      if (isAnyMenuOpen()) { closeAllMenus(); return; }
+      GS.paused ? resumeGame() : pauseGame();
+    }
+    if (e.code === 'Tab') { e.preventDefault(); openInventory(); }
+    if (e.code === 'KeyE') handleInteract();
+    if (e.code === 'KeyF') handleVehicleEnterExit();
+    if (e.code === 'Slash') { e.preventDefault(); openCmd(); }
+    if (e.code === 'Space') doJump();
+    if (e.code === 'KeyC') GS.isCrouching = !GS.isCrouching;
+    if (e.code === 'KeyH') openShop();
+    if (e.code === 'KeyJ') openJobBoard();
+    if (e.code === 'KeyB') openBank();
+    if (e.code === 'KeyM') openAdmin();
+  });
+  document.addEventListener('keyup', e => { GS.keys[e.code] = false; });
+
+  document.addEventListener('mousedown', e => {
+    if (e.button === 2 && GS.playing && !GS.paused) {
+      isDragging = true;
+      GS.lastX = e.clientX;
+    }
+  });
+  document.addEventListener('mouseup', () => isDragging = false);
+  document.addEventListener('mousemove', e => {
+    if (isDragging) {
+      mouseXDelta = (e.clientX - GS.lastX) * 0.005;
+      cameraAngleX += mouseXDelta;
+      GS.lastX = e.clientX;
+      mouseXDelta = 0;
+    }
+  });
+  document.addEventListener('wheel', e => {
+    cameraDistance = Math.max(5, Math.min(40, cameraDistance + e.deltaY * 0.02));
+  });
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('click', e => {
+    if (!GS.playing || GS.paused) return;
+    // Look for interactables
+  });
+}
+
+function doJump() {
+  if (!GS.isJumping && !GS.inVehicle && !GS.isCrouching) {
+    GS.isJumping = true;
+    playerVel.y = 12;
+  }
+}
+
+// ===== ANIMATION LOOP =====
+let rainParticles = [];
+let prevTime = 0;
+let lightbarFlash = 0;
+let dayNightTimer = 0;
+let weatherTimer = 0;
+
+function animate() {
+  animFrameId = requestAnimationFrame(animate);
+  if (!GS.playing) return;
+
+  let delta = Math.min(clock.getDelta(), 0.05);
+  
+  // Apply slow motion effect
+  if (GS.slowmo) delta *= 0.3;
+  
+  const elapsed = clock.getElapsedTime();
+
+  if (GS.paused) return;
+
+  // Day/night cycle (1 real min = 24 in-game hours)
+  if (!GS.timeFrozen) {
+    GS.gameTime = (GS.gameTime + delta * 0.25) % 24;
+  }
+  updateDayNight(GS.gameTime, elapsed);
+
+  // Auto weather change
+  weatherTimer += delta;
+  if (GS.settings.weather && weatherTimer > 120 + Math.random()*180) {
+    const weathers = ['sunny','sunny','sunny','rain','fog'];
+    setWeather(weathers[Math.floor(Math.random()*weathers.length)]);
+    weatherTimer = 0;
+  }
+
+  // Player movement
+  if (!GS.inVehicle) updatePlayerMovement(delta, elapsed);
+  else updateVehicleMovement(delta, elapsed);
+
+  // AI vehicles
+  updateAIVehicles(delta, elapsed);
+
+  // NPCs
+  updateNPCs(delta, elapsed);
+
+  // Camera
+  updateCamera(elapsed);
+
+  // Lightbars
+  lightbarFlash += delta * 5;
+  vehicles.forEach(v => {
+    if (v.userData.lightbar) {
+      v.userData.lightbar.material.color.set(
+        Math.sin(lightbarFlash) > 0 ? 0x0033ff : 0xff2200
+      );
+    }
+  });
+
+  // Rain
+  if (GS.weather === 'rain' || GS.weather === 'storm') drawRain();
+
+  // Stamina recovery
+  if (!GS.isSprinting && GS.player.stamina < 100) {
+    GS.player.stamina = Math.min(100, GS.player.stamina + delta * 15);
+  }
+
+  // Update minimap
+  updateMinimap();
+
+  // Update HUD values
+  updateSpeedometer();
+
+  renderer.render(scene, camera);
+}
+
+// ===== PLAYER MOVEMENT =====
+function updatePlayerMovement(delta, elapsed) {
+  const speed = GS.noclip ? 30 : (GS.isSprinting && GS.player.stamina > 0 ? 10 : GS.isCrouching ? 2.5 : 5.5);
+
+  GS.isSprinting = GS.keys['ShiftLeft'] || GS.keys['ShiftRight'];
+  if (GS.isSprinting && GS.player.stamina > 0) {
+    GS.player.stamina = Math.max(0, GS.player.stamina - delta * 25);
+    if (GS.player.stamina <= 0) GS.isSprinting = false;
+  }
+
+  const forward = new THREE.Vector3(-Math.sin(cameraAngleX), 0, -Math.cos(cameraAngleX));
+  const right = new THREE.Vector3(Math.cos(cameraAngleX), 0, -Math.sin(cameraAngleX));
+  let moved = false;
+
+  const moveDir = new THREE.Vector3();
+  if (GS.keys['KeyW'] || GS.keys['ArrowUp']) { moveDir.add(forward); moved = true; }
+  if (GS.keys['KeyS'] || GS.keys['ArrowDown']) { moveDir.sub(forward); moved = true; }
+  if (GS.keys['KeyA'] || GS.keys['ArrowLeft']) { moveDir.sub(right); moved = true; }
+  if (GS.keys['KeyD'] || GS.keys['ArrowRight']) { moveDir.add(right); moved = true; }
+
+  if (moved) {
+    moveDir.normalize();
+    playerGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
+    if (!GS.noclip) {
+      playerGroup.position.x += moveDir.x * speed * delta;
+      playerGroup.position.z += moveDir.z * speed * delta;
+    } else {
+      playerGroup.position.x += moveDir.x * speed * delta;
+      playerGroup.position.z += moveDir.z * speed * delta;
+    }
+  }
+
+  // Fly mode (admin)
+  if (GS.flyMode || GS.noclip) {
+    if (GS.keys['Space']) playerGroup.position.y += speed * delta;
+    if (GS.keys['KeyC']) playerGroup.position.y -= speed * delta;
+    playerGroup.position.y = Math.max(0, playerGroup.position.y);
+  } else {
+    // Gravity
+    playerVel.y -= 25 * delta;
+    playerGroup.position.y += playerVel.y * delta;
+    if (playerGroup.position.y <= 0) {
+      playerGroup.position.y = 0;
+      playerVel.y = 0;
+      GS.isJumping = false;
+    }
+  }
+
+  // Crouch scale
+  playerMesh.scale.y = GS.isCrouching ? 0.6 : 1;
+
+  // Walk animation
+  if (moved) {
+    const walkCycle = elapsed * (GS.isSprinting ? 10 : 6);
+    playerGroup.children[3].rotation.x = Math.sin(walkCycle) * 0.5;
+    playerGroup.children[4].rotation.x = -Math.sin(walkCycle) * 0.5;
+  }
+
+  // Bounds
+  const bound = 380;
+  playerGroup.position.x = Math.max(-bound, Math.min(bound, playerGroup.position.x));
+  playerGroup.position.z = Math.max(-bound, Math.min(bound, playerGroup.position.z));
+
+  // Interaction prompt
+  checkNearbyInteractables();
+}
+
+function checkNearbyInteractables() {
+  const pp = playerGroup.position;
+  let nearest = null, nearestDist = 8;
+  const prompt = document.getElementById('interactPrompt');
+
+  // Check vehicles
+  vehicles.forEach(v => {
+    if (!v.userData.occupied) {
+      const d = pp.distanceTo(v.position);
+      if (d < nearestDist) { nearest = { type: 'vehicle', obj: v }; nearestDist = d; }
+    }
+  });
+
+  // Check buildings / NPCs
+  if (!nearest) {
+    // Police station
+    if (Math.abs(pp.x+200)<20 && Math.abs(pp.z)<20) { nearest = { type: 'police_station' }; }
+    // Hospital
+    if (Math.abs(pp.x-200)<20 && Math.abs(pp.z)<20) { nearest = { type: 'hospital' }; }
+    // Bank
+    if (Math.abs(pp.x)<20 && Math.abs(pp.z+220)<25) { nearest = { type: 'bank' }; }
+    // Gas station shop
+    if (Math.abs(pp.x-120)<16 && Math.abs(pp.z+120)<16) { nearest = { type: 'shop' }; }
+    // Job board (city hall)
+    if (Math.abs(pp.x)<25 && Math.abs(pp.z-220)<25) { nearest = { type: 'jobs' }; }
+  }
+
+  // NPCs
+  if (!nearest) {
+    npcs.forEach(n => {
+      if (n.userData.injured) {
+        const d = pp.distanceTo(n.position);
+        if (d < 6) { nearest = { type: 'revive', obj: n }; nearestDist = d; }
+      }
+    });
+  }
+
+  if (nearest) {
+    const labels = {
+      vehicle: `<span class="key">F</span> Enter ${nearest.obj?.userData.label || 'Vehicle'}`,
+      police_station: `<span class="key">E</span> Enter Police Station`,
+      hospital: `<span class="key">E</span> Enter Hospital`,
+      bank: `<span class="key">E</span> SparkzBank`,
+      shop: `<span class="key">E</span> Open Shop`,
+      jobs: `<span class="key">E</span> Job Board`,
+      revive: `<span class="key">E</span> Revive Injured Person`,
+    };
+    prompt.innerHTML = labels[nearest.type] || '';
+    prompt.style.display = 'block';
+    window._nearestInteractable = nearest;
+  } else {
+    prompt.style.display = 'none';
+    window._nearestInteractable = null;
+  }
+}
+
+function handleInteract() {
+  const ni = window._nearestInteractable;
+  if (!ni) return;
+  switch(ni.type) {
+    case 'bank': openBank(); break;
+    case 'shop': openShop(); break;
+    case 'jobs': openJobBoard(); break;
+    case 'police_station': notify('🚔 Police Station: Armor +50','police'); GS.player.armor = Math.min(100, GS.player.armor+50); updateHUD(); break;
+    case 'hospital': notify('🏥 Hospital: Health fully restored!','success'); GS.player.health = 100; updateHUD(); break;
+    case 'revive':
+      if (GS.mode === 'ems') {
+        ni.obj.userData.injured = false;
+        notify('✅ Patient revived!','success');
+        addXP(50);
+        addMoney(250);
+        checkAchievement('first_revive');
+      } else notify('🚑 Only EMS can revive patients.','warning');
+      break;
+  }
+}
+
+function handleVehicleEnterExit() {
+  if (GS.inVehicle) {
+    exitVehicle();
+  } else {
+    const pp = playerGroup.position;
+    for (const v of vehicles) {
+      if (pp.distanceTo(v.position) < 8 && !v.userData.occupied) {
+        enterVehicle(v);
+        break;
+      }
+    }
+  }
+}
+
+function enterVehicle(v) {
+  GS.inVehicle = true;
+  GS.currentVehicle = v;
+  v.userData.occupied = true;
+  v.userData.isAI = false;
+  playerGroup.visible = false;
+  notify(`🚗 Entered ${v.userData.label}`, 'success');
+}
+
+function exitVehicle() {
+  if (!GS.currentVehicle) return;
+  GS.currentVehicle.userData.occupied = false;
+  GS.currentVehicle.userData.isAI = true;
+  playerGroup.position.set(
+    GS.currentVehicle.position.x + 3,
+    0,
+    GS.currentVehicle.position.z + 3
+  );
+  playerGroup.visible = true;
+  GS.inVehicle = false;
+  GS.currentVehicle = null;
+}
+
+// ===== VEHICLE MOVEMENT =====
+function updateVehicleMovement(delta) {
+  if (!GS.currentVehicle) return;
+  const v = GS.currentVehicle;
+  const maxSpeed = v.userData.speed;
+  const accel = 18, braking = 30, steerSpeed = 2.2;
+
+  if (GS.keys['KeyW'] || GS.keys['ArrowUp']) v.userData.velocity = Math.min(maxSpeed, v.userData.velocity + accel * delta);
+  else if (GS.keys['KeyS'] || GS.keys['ShiftLeft'] || GS.keys['ShiftRight'] || GS.keys['ArrowDown']) v.userData.velocity = Math.max(-maxSpeed*0.4, v.userData.velocity - braking * delta);
+  else v.userData.velocity *= 0.92;
+
+  const absV = Math.abs(v.userData.velocity);
+  if (GS.keys['KeyA'] || GS.keys['ArrowLeft']) v.rotation.y -= steerSpeed * delta * (absV / maxSpeed);
+  if (GS.keys['KeyD'] || GS.keys['ArrowRight']) v.rotation.y += steerSpeed * delta * (absV / maxSpeed);
+
+  v.position.x -= Math.sin(v.rotation.y) * v.userData.velocity * delta;
+  v.position.z -= Math.cos(v.rotation.y) * v.userData.velocity * delta;
+  v.position.x = Math.max(-380, Math.min(380, v.position.x));
+  v.position.z = Math.max(-380, Math.min(380, v.position.z));
+
+  // Sync player
+  playerGroup.position.copy(v.position);
+
+  // Camera behind vehicle
+  cameraAngleX = v.rotation.y + Math.PI;
+}
+
+// ===== AI VEHICLES =====
+const aiWaypoints = [
+  [14,0],[14,80],[14,160],[0,160],[-14,160],[-14,80],[-14,0],[-14,-80],
+  [0,-80],[14,-80],[80,0],[80,80],[80,-80],[-80,0],[-80,80],[-80,-80]
+];
+
+function updateAIVehicles(delta) {
+  vehicles.forEach(v => {
+    if (!v.userData.isAI || v.userData.occupied) return;
+
+    if (!v.userData.aiTarget) {
+      v.userData.aiTarget = aiWaypoints[Math.floor(Math.random()*aiWaypoints.length)];
+    }
+
+    const target = new THREE.Vector3(v.userData.aiTarget[0], 0, v.userData.aiTarget[1]);
+    const diff = target.clone().sub(v.position);
+    const dist = diff.length();
+
+    if (dist < 8) {
+      v.userData.aiTarget = aiWaypoints[Math.floor(Math.random()*aiWaypoints.length)];
+    } else {
+      const targetAngle = Math.atan2(-diff.x, -diff.z);
+      let da = targetAngle - v.rotation.y;
+      while (da > Math.PI) da -= Math.PI*2;
+      while (da < -Math.PI) da += Math.PI*2;
+      v.rotation.y += da * delta * 2;
+
+      v.userData.velocity = Math.min(v.userData.speed * 0.5, v.userData.velocity + 8*delta);
+      v.position.x -= Math.sin(v.rotation.y) * v.userData.velocity * delta;
+      v.position.z -= Math.cos(v.rotation.y) * v.userData.velocity * delta;
+    }
+  });
+}
+
+// ===== NPC MOVEMENT =====
+function updateNPCs(delta, elapsed) {
+  npcs.forEach(npc => {
+    if (npc.userData.injured || npc.userData.arrested) return;
+
+    npc.userData.changeTimer -= delta;
+    if (npc.userData.changeTimer < 0) {
+      const angle = Math.random() * Math.PI * 2;
+      npc.userData.direction.set(Math.cos(angle), 0, Math.sin(angle));
+      npc.userData.changeTimer = 2 + Math.random() * 5;
+    }
+
+    const spd = npc.userData.speed;
+    npc.position.x += npc.userData.direction.x * spd * delta;
+    npc.position.z += npc.userData.direction.z * spd * delta;
+    npc.rotation.y = Math.atan2(npc.userData.direction.x, npc.userData.direction.z);
+
+    const b = 350;
+    if (Math.abs(npc.position.x) > b || Math.abs(npc.position.z) > b) {
+      npc.userData.direction.negate();
+    }
+
+    // Walk anim
+    npc.userData.walkCycle += delta * spd * 3;
+    if (npc.children[3]) npc.children[3].rotation.x = Math.sin(npc.userData.walkCycle) * 0.4;
+    if (npc.children[4]) npc.children[4].rotation.x = -Math.sin(npc.userData.walkCycle) * 0.4;
+
+    // Criminal behavior
+    if (npc.userData.isCriminal && Math.random() < 0.0005) {
+      if (GS.mode === 'police') {
+        notify('🔴 Dispatch: Suspicious individual spotted nearby!','police');
+        incrementWanted(0);
+      }
+    }
+  });
+}
+
+// ===== CAMERA =====
+function updateCamera(elapsed) {
+  const target = playerGroup.position.clone().add(new THREE.Vector3(0, 2, 0));
+  camTarget.lerp(target, 0.15);
+
+  const camX = camTarget.x + Math.sin(cameraAngleX) * Math.cos(cameraAngleY) * cameraDistance;
+  const camY = camTarget.y + Math.sin(cameraAngleY) * cameraDistance + 1;
+  const camZ = camTarget.z + Math.cos(cameraAngleX) * Math.cos(cameraAngleY) * cameraDistance;
+
+  camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 0.1);
+  camera.lookAt(camTarget);
+}
+
+// ===== DAY/NIGHT CYCLE =====
+function updateDayNight(time, elapsed) {
+  const t = time / 24;
+  const isDay = time > 6 && time < 20;
+  const isSunrise = time > 5 && time < 8;
+  const isSunset = time > 18 && time < 21;
+  const isNight = time < 5 || time > 21;
+
+  // Sun position
+  const sunAngle = (time - 6) / 12 * Math.PI;
+  const sunX = Math.cos(sunAngle) * 300;
+  const sunY = Math.sin(sunAngle) * 200 + 50;
+  const sunZ = 100;
+  sunLight.position.set(sunX, Math.max(5, sunY), sunZ);
+  if (window.sunMesh) window.sunMesh.position.set(sunX * 2.5, sunY * 2.5, sunZ * 2.5);
+
+  // Sky colors
+  let topC, botC, ambI, sunI, fogC;
+  if (isNight) {
+    topC = new THREE.Color(0x000510); botC = new THREE.Color(0x0a0a1a);
+    ambI = 0.05; sunI = 0.0; fogC = 0x000510;
+  } else if (isSunrise) {
+    const r = (time - 5) / 3;
+    topC = new THREE.Color().lerpColors(new THREE.Color(0x000510), new THREE.Color(0x0077ff), r);
+    botC = new THREE.Color().lerpColors(new THREE.Color(0x0a0a1a), new THREE.Color(0xffbb44), r);
+    ambI = r * 0.5; sunI = r * 1.8; fogC = 0xffbb44;
+  } else if (isSunset) {
+    const r = 1 - (time - 18) / 3;
+    topC = new THREE.Color().lerpColors(new THREE.Color(0x000510), new THREE.Color(0x0077ff), r);
+    botC = new THREE.Color().lerpColors(new THREE.Color(0x0a0a1a), new THREE.Color(0xff6622), r);
+    ambI = r * 0.5; sunI = r * 1.8; fogC = 0xff6622;
+  } else if (isDay) {
+    topC = new THREE.Color(0x1a6eff); botC = new THREE.Color(0xc8e8ff);
+    ambI = 0.5; sunI = 2.2; fogC = 0xc8e8ff;
+  }
+
+  if (skyUniforms && topC) {
+    skyUniforms.topColor.value.lerp(topC, 0.05);
+    skyUniforms.bottomColor.value.lerp(botC, 0.05);
+  }
+  if (ambientLight) ambientLight.intensity += (ambI - ambientLight.intensity) * 0.05;
+  if (sunLight) sunLight.intensity += (sunI - sunLight.intensity) * 0.05;
+  if (scene.fog && fogC) scene.fog.color.lerp(new THREE.Color(fogC), 0.05);
+
+  // Stars visibility
+  if (window.starField) window.starField.material.opacity = Math.max(0, isNight ? 0.9 : (isSunrise || isSunset ? 0.3 : 0));
+
+  // Hemi
+  if (hemiLight) hemiLight.intensity = isNight ? 0.05 : (isSunrise||isSunset ? 0.4 : 0.8);
+}
+
+// ===== WEATHER =====
+function setWeather(w) {
+  GS.weather = w;
+  const rain = document.getElementById('rainOverlay');
+  const fog = document.getElementById('fogOverlay');
+
+  if (w === 'sunny') {
+    rain.style.display = 'none';
+    fog.style.background = 'rgba(180,190,210,0)';
+    scene.fog.near = 80; scene.fog.far = 400;
+    notify('☀ Weather: Clear skies', 'success');
+  } else if (w === 'rain' || w === 'storm') {
+    rain.style.display = 'block';
+    fog.style.background = 'rgba(100,110,130,0.1)';
+    scene.fog.near = 30; scene.fog.far = 200;
+    initRainParticles();
+    notify(`🌧 Weather: ${w === 'storm' ? 'Thunderstorm' : 'Rain'}`, '');
+  } else if (w === 'fog') {
+    rain.style.display = 'none';
+    fog.style.background = 'rgba(180,190,200,0.35)';
+    scene.fog.near = 15; scene.fog.far = 80;
+    notify('🌫 Weather: Foggy', '');
+  }
+}
+
+let rainDrops = [];
+function initRainParticles() {
+  rainDrops = [];
+  const rc = document.getElementById('rainCanvas');
+  for (let i = 0; i < 300; i++) {
+    rainDrops.push({ x: Math.random()*rc.width, y: Math.random()*rc.height, speed: 8+Math.random()*10, len: 12+Math.random()*14 });
+  }
+}
+function drawRain() {
+  const rc = document.getElementById('rainCanvas');
+  const ctx = window.rainCtx;
+  if (!ctx) return;
+  ctx.clearRect(0,0,rc.width,rc.height);
+  ctx.strokeStyle = 'rgba(180,200,240,0.35)';
+  ctx.lineWidth = 1;
+  rainDrops.forEach(d => {
+    ctx.beginPath();
+    ctx.moveTo(d.x, d.y);
+    ctx.lineTo(d.x+2, d.y+d.len);
+    ctx.stroke();
+    d.y += d.speed;
+    d.x += 1;
+    if (d.y > rc.height) { d.y = 0; d.x = Math.random()*rc.width; }
+  });
+}
+
+// ===== MINIMAP =====
+function setupMinimap() {
+  minimapCtx = document.getElementById('minimapCanvas').getContext('2d');
+}
+function updateMinimap() {
+  if (!minimapCtx) return;
+  const ctx = minimapCtx;
+  const w = 170, h = 170, scale = 0.35;
+  ctx.clearRect(0,0,w,h);
+
+  // Background
+  ctx.fillStyle = 'rgba(10,20,30,0.9)';
+  ctx.fillRect(0,0,w,h);
+
+  const cx = w/2 - playerGroup.position.x * scale;
+  const cy = h/2 - playerGroup.position.z * scale;
+
+  // Roads
+  ctx.fillStyle = '#333344';
+  ctx.fillRect(cx-800*scale/2, cy-8*scale, 800*scale, 16*scale);
+  ctx.fillRect(cx-8*scale, cy-800*scale/2, 16*scale, 800*scale);
+  ctx.fillRect(cx+(80-8)*scale, cy-400*scale, 12*scale, 400*scale);
+  ctx.fillRect(cx+(-80-6)*scale, cy-400*scale, 12*scale, 400*scale);
+  ctx.fillRect(cx-400*scale, cy+(80-6)*scale, 400*scale, 12*scale);
+  ctx.fillRect(cx-400*scale, cy+(-80-6)*scale, 400*scale, 12*scale);
+
+  // Buildings (dots)
+  ctx.fillStyle = 'rgba(80,120,180,0.6)';
+  buildings.forEach(b => {
+    const bx = cx + b.position.x * scale;
+    const bz = cy + b.position.z * scale;
+    ctx.fillRect(bx-3, bz-3, 6, 6);
+  });
+
+  // Vehicles
+  vehicles.forEach(v => {
+    const vx = cx + v.position.x * scale;
+    const vz = cy + v.position.z * scale;
+    if (vx < 0 || vx > w || vz < 0 || vz > h) return;
+    const colors = { police: '#5080ff', ambulance: '#ff3250', civilian: '#aaaaff', sport: '#ff2255' };
+    ctx.fillStyle = colors[v.userData.type] || '#aaaaff';
+    ctx.fillRect(vx-2, vz-2, 5, 4);
+  });
+
+  // NPCs
+  ctx.fillStyle = '#00ff9d';
+  npcs.forEach(n => {
+    const nx = cx + n.position.x * scale;
+    const nz = cy + n.position.z * scale;
+    if (nx < 0 || nx > w || nz < 0 || nz > h) return;
+    ctx.fillRect(nx-1, nz-1, 3, 3);
+  });
+
+  // Landmarks
+  const lm = [[-200,0,'#5080ff'],[200,0,'#ff3250'],[0,-220,'#00ff9d'],[0,220,'#ffffff']];
+  lm.forEach(([lx,lz,c]) => {
+    const px = cx+lx*scale, pz = cy+lz*scale;
+    if (px<0||px>w||pz<0||pz>h) return;
+    ctx.fillStyle = c;
+    ctx.fillRect(px-3,pz-3,7,7);
+  });
+
+  // Player
+  ctx.save();
+  ctx.translate(w/2, h/2);
+  ctx.rotate(-playerGroup.rotation.y);
+  ctx.fillStyle = '#00d4ff';
+  ctx.beginPath();
+  ctx.moveTo(0,-6); ctx.lineTo(4,4); ctx.lineTo(-4,4);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // Compass
+  const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+  const angle = -cameraAngleX;
+  const di = Math.round(((angle / (Math.PI*2)) * 8 + 8.5) % 8);
+  document.getElementById('compassLabel').textContent = dirs[di];
+}
+
+// ===== HUD UPDATES =====
+function updateHUD() {
+  document.getElementById('healthBar').style.width = GS.player.health + '%';
+  document.getElementById('healthVal').textContent = Math.round(GS.player.health);
+  document.getElementById('armorBar').style.width = GS.player.armor + '%';
+  document.getElementById('armorVal').textContent = Math.round(GS.player.armor);
+  document.getElementById('staminaBar').style.width = GS.player.stamina + '%';
+  document.getElementById('staminaVal').textContent = Math.round(GS.player.stamina);
+  document.getElementById('moneyDisplay').textContent = '$' + GS.player.money.toLocaleString();
+  document.getElementById('xpLevel').textContent = `Level ${GS.level} · ${GS.xp} / ${GS.level*100} XP`;
+  document.getElementById('xpBar').style.width = (GS.xp / (GS.level*100) * 100) + '%';
+  updateWantedStars();
+}
+
+function updateSpeedometer() {
+  let speed = 0;
+  if (GS.inVehicle && GS.currentVehicle) speed = Math.abs(GS.currentVehicle.userData.velocity);
+  else if (GS.isSprinting) speed = 8;
+  else if (GS.keys['KeyW'] || GS.keys['KeyS'] || GS.keys['KeyA'] || GS.keys['KeyD']) speed = 4;
+  document.getElementById('speedVal').textContent = Math.round(speed * 2.5);
+}
+
+function updateWantedStars() {
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('s'+i).classList.toggle('active', i <= GS.wantedLevel);
+  }
+}
+
+function incrementWanted(n = 1) {
+  if (GS.mode !== 'police' && GS.mode !== 'ems') {
+    GS.wantedLevel = Math.min(5, GS.wantedLevel + n);
+    updateWantedStars();
+    if (GS.wantedLevel > 0) notify(`⭐ Wanted Level: ${GS.wantedLevel}`, 'danger');
+  }
+}
+
+// ===== NOTIFICATIONS =====
+function notify(msg, type = '') {
+  const container = document.getElementById('notifContainer');
+  const el = document.createElement('div');
+  el.className = 'notif ' + type;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ===== ECONOMY =====
+function addMoney(amount) {
+  GS.player.money += amount;
+  GS.player.cash += amount;
+  document.getElementById('moneyDisplay').textContent = '$' + GS.player.money.toLocaleString();
+  if (GS.player.money >= 50000) checkAchievement('rich');
+}
+function spendMoney(amount) {
+  if (GS.player.money >= amount) { GS.player.money -= amount; GS.player.cash -= amount; return true; }
+  notify('💸 Insufficient funds!', 'danger'); return false;
+}
+
+// ===== FUN EFFECTS =====
+function createParticles(x, y, z) {
+  for (let i = 0; i < 20; i++) {
+    const geo = new THREE.SphereGeometry(0.2 + Math.random() * 0.3, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ 
+      color: new THREE.Color().setHSL(Math.random(), 0.8, 0.6)
+    });
+    const particle = new THREE.Mesh(geo, mat);
+    particle.position.set(x + (Math.random()-0.5)*5, y + (Math.random()-0.5)*5, z + (Math.random()-0.5)*5);
+    particle.velocity = new THREE.Vector3(
+      (Math.random()-0.5)*20, 
+      Math.random()*15 + 5, 
+      (Math.random()-0.5)*20
+    );
+    scene.add(particle);
+    
+    // Animate and remove
+    const startTime = Date.now();
+    const duration = 1000 + Math.random() * 500;
+    
+    const animateParticle = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = elapsed / duration;
+      
+      if (progress >= 1) {
+        scene.remove(particle);
+        return;
+      }
+      
+      particle.position.addScaledVector(particle.velocity, 0.016);
+      particle.velocity.y -= 9.8 * 0.016;
+      particle.material.opacity = 1 - progress;
+      
+      requestAnimationFrame(animateParticle);
+    };
+    animateParticle();
+  }
+}
+
+function addXP(amount) {
+  GS.xp += amount;
+  if (GS.xp >= GS.level * 100) {
+    GS.xp -= GS.level * 100;
+    GS.level++;
+    notify(`🎉 Level Up! You are now Level ${GS.level}!`, 'success');
+    if (GS.level >= 5) checkAchievement('level5');
+  }
+  updateHUD();
+}
+
+// ===== MENUS =====
+function pauseGame() { GS.paused = true; showScreen('pauseMenu'); }
+function resumeGame() { GS.paused = false; showScreen(''); }
+
+function isAnyMenuOpen() {
+  return [...document.querySelectorAll('.ingame-menu.open')].length > 0 ||
+         document.getElementById('cmdConsole').classList.contains('open');
+}
+function closeAllMenus() {
+  document.querySelectorAll('.ingame-menu').forEach(m => m.classList.remove('open'));
+  document.getElementById('cmdConsole').classList.remove('open');
+}
+function closeMenu(id) { document.getElementById(id)?.classList.remove('open'); }
+function openMenu(id) {
+  closeAllMenus();
+  document.getElementById(id)?.classList.add('open');
+}
+
+function openInventory() {
+  buildInventoryUI();
+  openMenu('inventoryMenu');
+}
+function buildInventoryUI() {
+  const grid = document.getElementById('invGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 20; i++) {
+    const item = GS.inventory[i];
+    const slot = document.createElement('div');
+    slot.className = 'inv-slot';
+    if (item) {
+      slot.innerHTML = `<div>${item.icon}</div><div class="inv-label">${item.name}</div>${item.qty>1?`<div class="inv-qty">${item.qty}</div>`:''}`;
+      slot.title = item.desc || item.name;
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function addToInventory(item) {
+  const existing = GS.inventory.find(i => i.id === item.id);
+  if (existing) { existing.qty = (existing.qty || 1) + 1; }
+  else GS.inventory.push({ ...item, qty: 1 });
+  notify(`➕ Added ${item.name} to inventory`, 'success');
+}
+
+const shopItems = [
+  { id: 'med_kit', name: 'Medical Kit', icon: '🩹', price: 150, desc: 'Restore 50 HP' },
+  { id: 'armor_vest', name: 'Body Armor', icon: '🛡️', price: 500, desc: 'Adds 50 Armor' },
+  { id: 'energy_drink', name: 'Energy Drink', icon: '⚡', price: 50, desc: 'Restores Stamina' },
+  { id: 'phone', name: 'Smartphone', icon: '📱', price: 800, desc: 'Contact NPCs' },
+  { id: 'map', name: 'City Map', icon: '🗺️', price: 100, desc: 'Reveals all locations' },
+  { id: 'lockpick', name: 'Lockpick', icon: '🔑', price: 300, desc: 'Open locked vehicles' },
+  { id: 'radio', name: 'Police Scanner', icon: '📻', price: 600, desc: 'Monitor police freq' },
+  { id: 'food', name: 'Burger', icon: '🍔', price: 25, desc: 'Restore 20 HP' },
+];
+
+function openShop() {
+  const body = document.getElementById('shopBody');
+  body.innerHTML = '';
+  shopItems.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'shop-item';
+    row.innerHTML = `
+      <div style="font-size:28px;margin-right:12px">${item.icon}</div>
+      <div class="shop-item-info" style="flex:1">
+        <div class="item-name">${item.name}</div>
+        <div class="item-desc">${item.desc}</div>
+      </div>
+      <span class="shop-item-price">$${item.price}</span>
+      <button class="buy-btn" onclick="buyItem('${item.id}')">BUY</button>
+    `;
+    body.appendChild(row);
+  });
+  openMenu('shopMenu');
+}
+
+function buyItem(id) {
+  const item = shopItems.find(i => i.id === id);
+  if (!item) return;
+  if (spendMoney(item.price)) {
+    addToInventory(item);
+    useItem(item);
+  }
+}
+
+function useItem(item) {
+  if (item.id === 'med_kit') { GS.player.health = Math.min(100, GS.player.health + 50); updateHUD(); notify('🩹 Used Medical Kit - Health +50', 'success'); }
+  if (item.id === 'armor_vest') { GS.player.armor = Math.min(100, GS.player.armor + 50); updateHUD(); notify('🛡️ Equipped Body Armor - Armor +50', 'success'); }
+  if (item.id === 'energy_drink') { GS.player.stamina = 100; updateHUD(); notify('⚡ Drank Energy Drink - Stamina restored', 'success'); }
+  if (item.id === 'food') { GS.player.health = Math.min(100, GS.player.health + 20); updateHUD(); notify('🍔 Ate Burger - Health +20', 'success'); }
+  if (item.id === 'phone') { notify('📱 Smartphone active - Contact NPCs and access services', 'success'); GS.phoneActive = true; }
+  if (item.id === 'map') { notify('🗺️ Map revealed - All locations marked on minimap', 'success'); GS.mapRevealed = true; }
+  if (item.id === 'lockpick') { notify('🔑 Lockpick equipped - Crack vehicle locks', 'success'); GS.canPickLocks = true; }
+  if (item.id === 'radio') { notify('📻 Police Scanner online - Monitor dispatch calls', 'success'); GS.scannerActive = true; }
+  if (item.id === 'defibrillator') { notify('⚡ Defibrillator ready - Revive unconscious patients', 'success'); GS.defibReady = true; }
+  if (item.id === 'med_bag') { GS.player.health = Math.min(100, GS.player.health + 75); updateHUD(); notify('🩺 Used Medical Bag - Health +75', 'success'); }
+  if (item.id === 'cuffs') { notify('⛓️ Handcuffs equipped - Ready to apprehend suspects', 'success'); GS.cuffsEquipped = true; }
+  if (item.id === 'admin_badge') { notify('⚡ Admin Badge activated - Full system access granted', 'warning'); GS.adminAccess = true; }
+  addXP(10);
+}
+
+const jobs = [
+  { id: 'taxi', name: 'Taxi Driver', icon: '🚕', pay: '$80-150/run', desc: 'Transport passengers across the city.' },
+  { id: 'delivery', name: 'Pizza Delivery', icon: '🍕', pay: '$40-80/delivery', desc: 'Deliver pizzas before they go cold.' },
+  { id: 'garbage', name: 'Garbage Collector', icon: '🗑️', pay: '$120/shift', desc: 'Collect waste from around the city.' },
+  { id: 'mechanic', name: 'Mechanic', icon: '🔧', pay: '$200/repair', desc: 'Repair damaged vehicles at the garage.' },
+  { id: 'fisherman', name: 'Fisherman', icon: '🎣', pay: '$60-200/catch', desc: 'Fish at the lake south of town.' },
+  { id: 'miner', name: 'Miner', icon: '⛏️', pay: '$300/load', desc: 'Mine resources at the quarry.' },
+  { id: 'security', name: 'Security Guard', icon: '👮', pay: '$150-250/shift', desc: 'Protect buildings and patrol areas.' },
+  { id: 'construction', name: 'Construction Worker', icon: '👷', pay: '$180/shift', desc: 'Build and renovate structures.' },
+  { id: 'chef', name: 'Chef', icon: '👨‍🍳', pay: '$250-400/shift', desc: 'Cook meals at restaurants.' },
+  { id: 'photographer', name: 'Photographer', icon: '📸', pay: '$100-300/shoot', desc: 'Capture events and sell photos.' },
+  { id: 'developer', name: 'Developer', icon: '💻', pay: '$500/project', desc: 'Create software and apps.' },
+  { id: 'artist', name: 'Street Artist', icon: '🎨', pay: '$50-150/piece', desc: 'Create art and sell on the street.' },
+];
+
+function openJobBoard() {
+  const body = document.getElementById('jobBody');
+  body.innerHTML = '';
+  jobs.forEach(job => {
+    const entry = document.createElement('div');
+    entry.className = 'job-entry';
+    entry.innerHTML = `
+      <div style="font-size:28px;margin-right:12px">${job.icon}</div>
+      <div style="flex:1">
+        <div class="job-name">${job.name}</div>
+        <div class="job-desc">${job.desc}</div>
+      </div>
+      <div>
+        <div class="job-pay">${job.pay}</div>
+        <button class="buy-btn" style="margin-top:4px" onclick="startJob('${job.id}')">START</button>
+      </div>
+    `;
+    body.appendChild(entry);
+  });
+  openMenu('jobMenu');
+}
+
+function startJob(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  GS.activeJob = job;
+  closeMenu('jobMenu');
+  notify(`💼 Started: ${job.name}`, 'success');
+  // Simulate job completion
+  setTimeout(() => {
+    if (GS.activeJob?.id === id) {
+      const earned = Math.floor(Math.random() * 150 + 50);
+      addMoney(earned);
+      addXP(25);
+      notify(`✅ Job complete! Earned $${earned}`, 'success');
+      GS.activeJob = null;
+      checkAchievement('first_job');
+    }
+  }, 8000 + Math.random() * 10000);
+}
+
+function openBank() {
+  document.getElementById('bankCash').textContent = '$' + GS.player.cash.toLocaleString();
+  document.getElementById('bankBalance').textContent = '$' + GS.player.bank.toLocaleString();
+  document.getElementById('bankTotal').textContent = '$' + (GS.player.cash + GS.player.bank).toLocaleString();
+  openMenu('bankMenu');
+}
+
+function bankDeposit() {
+  const amt = GS.player.cash;
+  GS.player.bank += amt;
+  GS.player.cash = 0;
+  openBank();
+  notify(`🏦 Deposited $${amt.toLocaleString()}`, 'success');
+  addXP(5);
+}
+function bankWithdraw() {
+  if (GS.player.bank >= 500) {
+    GS.player.bank -= 500;
+    GS.player.cash += 500;
+    openBank();
+    notify('🏦 Withdrew $500', 'success');
+  } else notify('Insufficient bank balance!', 'danger');
+}
+
+// ===== POLICE SYSTEMS =====
+let dispatchTimer = null;
+const callouts = [
+  { type: '10-90 Robbery', loc: 'First National Bank', x: 0, z: -220 },
+  { type: '10-51 Traffic Stop', loc: 'Main St & 5th Ave', x: 14, z: 80 },
+  { type: '10-15 Fight', loc: 'Downtown Park', x: 110, z: 110 },
+  { type: '10-33 Shots Fired', loc: 'Industrial District', x: 170, z: -170 },
+  { type: 'Medical 10-52', loc: 'City Hospital', x: 200, z: 0 },
+  { type: '10-39 Vehicle Pursuit', loc: 'Highway North', x: 0, z: -160 },
+  { type: 'Code 4 Assist', loc: 'Police Station', x: -200, z: 0 },
+  { type: 'Trespassing', loc: 'Residential Area', x: -170, z: 50 },
+];
+
+function startDispatch() {
+  const list = document.getElementById('dispatchList');
+  dispatchTimer = setInterval(() => {
+    const call = callouts[Math.floor(Math.random()*callouts.length)];
+    const el = document.createElement('div');
+    el.className = 'dispatch-call';
+    el.innerHTML = `<div class="call-type">${call.type}</div><div class="call-loc">📍 ${call.loc}</div>`;
+    el.onclick = () => {
+      playerGroup.position.set(call.x, 0, call.z);
+      notify(`📡 Responding to: ${call.type}`, GS.mode === 'police' ? 'police' : 'ems');
+      el.style.background = 'rgba(0,200,255,0.1)';
+    };
+    list.insertBefore(el, list.firstChild);
+    if (list.children.length > 5) list.removeChild(list.lastChild);
+    notify(`📡 New Callout: ${call.type} at ${call.loc}`, GS.mode === 'police' ? 'police' : 'ems');
+  }, 18000 + Math.random()*12000);
+
+  // First callout
+  setTimeout(() => {
+    const call = callouts[0];
+    const el = document.createElement('div');
+    el.className = 'dispatch-call';
+    el.innerHTML = `<div class="call-type">${call.type}</div><div class="call-loc">📍 ${call.loc}</div>`;
+    list.appendChild(el);
+  }, 1000);
+}
+
+function stopDispatch() {
+  if (dispatchTimer) { clearInterval(dispatchTimer); dispatchTimer = null; }
+}
+
+function arrestNPC() {
+  const panel = document.getElementById('arrestPanel');
+  const charges = ['Speeding', 'Running a Red Light', 'Trespassing', 'Disturbing the Peace', 'Possession of Contraband'];
+  document.getElementById('arrestCharges').textContent = 'Charges: ' + charges[Math.floor(Math.random()*charges.length)];
+  panel.classList.add('visible');
+}
+
+function acceptArrest() {
+  document.getElementById('arrestPanel').classList.remove('visible');
+  GS.player.health = 60;
+  GS.player.money = Math.max(0, GS.player.money - 500);
+  GS.wantedLevel = 0;
+  updateHUD();
+  notify('🚔 Arrested — Fined $500. Released from jail.', 'danger');
+  if (GS.mode === 'police') { notify('✅ Arrest completed!', 'police'); checkAchievement('first_arrest'); addXP(100); addMoney(300); }
+}
+function denyArrest() {
+  document.getElementById('arrestPanel').classList.remove('visible');
+  incrementWanted(1);
+  notify('⚠ Resisting arrest! Wanted level increased.', 'danger');
+}
+
+// ===== ADMIN =====
+function openAdmin() {
+  if (GS.mode !== 'admin' && GS.mode !== 'police') { notify('⛔ Admin access denied.', 'danger'); return; }
+  openMenu('adminPanelMenu');
+}
+
+function adminCmd(cmd) {
+  switch(cmd) {
+    case 'godmode':
+      GS.godMode = !GS.godMode;
+      notify(GS.godMode ? '⚡ God Mode ON' : '⚡ God Mode OFF', 'warning');
+      break;
+    case 'noclip':
+      GS.noclip = !GS.noclip;
+      notify(GS.noclip ? '👻 No Clip ON' : '👻 No Clip OFF', 'warning');
+      break;
+    case 'fly':
+      GS.flyMode = !GS.flyMode;
+      notify(GS.flyMode ? '✈ Fly Mode ON (Space=up C=down)' : '✈ Fly Mode OFF', 'warning');
+      break;
+    case 'heal':
+      GS.player.health = 100; GS.player.armor = 100; GS.player.stamina = 100;
+      updateHUD();
+      notify('❤ Fully healed!', 'success');
+      break;
+    case 'speedboost':
+      if (GS.inVehicle && GS.currentVehicle) {
+        GS.currentVehicle.userData.velocity = Math.min(GS.currentVehicle.userData.speed * 1.5, GS.currentVehicle.userData.velocity + 30);
+        notify('🚀 SPEED BOOST ENGAGED!', 'warning');
+      } else {
+        notify('🚀 Get in a vehicle first!', 'danger');
+      }
+      break;
+    case 'particles':
+      createParticles(playerGroup.position.x, playerGroup.position.y, playerGroup.position.z);
+      notify('✨ Particles created!', 'success');
+      break;
+    case 'slowmo':
+      GS.slowmo = !GS.slowmo;
+      notify(GS.slowmo ? '🐢 Slow Motion ON' : '🐢 Slow Motion OFF', 'warning');
+      break;
+    case 'freeze':
+      GS.timeFrozen = !GS.timeFrozen;
+      notify(GS.timeFrozen ? '❄️ Time Frozen' : '❄️ Time Resumed', 'warning');
+      break;
+    case 'clear':
+      vehicles.forEach((v,i) => { if (!v.userData.occupied && i > 3) { scene.remove(v); } });
+      vehicles = vehicles.filter(v => v.userData.occupied || vehicles.indexOf(v) <= 3);
+      notify('🗑 Cleared idle vehicles.', 'warning');
+      break;
+    case 'money':
+      addMoney(10000);
+      notify('💰 +$10,000 added!', 'success');
+      break;
+    case 'spawnNPC':
+      createNPC(playerGroup.position.x+5, playerGroup.position.z+5);
+      notify('🚶 NPC spawned!', 'warning');
+      break;
+    case 'cleanup':
+      let removed = 0;
+      while (npcs.length > 40) { scene.remove(npcs.pop()); removed++; }
+      notify(`🧹 Cleaned ${removed} excess NPCs.`, 'warning');
+      break;
+  }
+}
+
+function adminSpawnVehicle() {
+  const type = document.getElementById('adminVehSelect').value;
+  const v = createVehicle(type, playerGroup.position.x+8, playerGroup.position.z+8, 0, false);
+  notify(`🚗 Spawned ${v.userData.label}!`, 'warning');
+}
+
+function adminSetTime(val) {
+  GS.gameTime = parseFloat(val);
+  const h = Math.floor(val), m = Math.round((val-h)*60);
+  document.getElementById('timeLabel').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  updateDayNight(GS.gameTime, 0);
+}
+
+function adminSetWeather(val) { setWeather(val); }
+function adminTeleport() {
+  const val = document.getElementById('tpInput').value;
+  const parts = val.split(',');
+  if (parts.length >= 2) {
+    const x = parseFloat(parts[0]), z = parseFloat(parts[1]);
+    if (!isNaN(x) && !isNaN(z)) {
+      playerGroup.position.set(x, 0, z);
+      notify(`📍 Teleported to ${x}, ${z}`, 'warning');
+    }
+  }
+}
+
+// ===== COMMAND CONSOLE =====
+function openCmd() {
+  const con = document.getElementById('cmdConsole');
+  con.classList.toggle('open');
+  if (con.classList.contains('open')) {
+    document.getElementById('cmdInput').value = '/';
+    document.getElementById('cmdInput').focus();
+  }
+}
+
+function handleCmd(e) {
+  if (e.key !== 'Enter') return;
+  const input = document.getElementById('cmdInput').value.trim();
+  document.getElementById('cmdConsole').classList.remove('open');
+  parseCommand(input);
+}
+
+function parseCommand(cmd) {
+  const parts = cmd.split(' ');
+  const command = parts[0].toLowerCase();
+  switch(command) {
+    case '/tp': {
+      const x = parseFloat(parts[1]) || 0;
+      const z = parseFloat(parts[2]) || 0;
+      playerGroup.position.set(x, 0, z);
+      notify(`📍 Teleported to ${x}, ${z}`, 'warning'); break;
+    }
+    case '/car': {
+      const type = parts[1] || 'civilian';
+      createVehicle(type, playerGroup.position.x+8, playerGroup.position.z, 0, false);
+      notify(`🚗 Spawned ${type}`, 'warning'); break;
+    }
+    case '/heal':
+      GS.player.health = 100; GS.player.armor = 100; GS.player.stamina = 100;
+      updateHUD(); notify('❤ Fully healed!', 'success'); break;
+    case '/god':
+      GS.godMode = !GS.godMode;
+      notify(`⚡ God Mode: ${GS.godMode ? 'ON' : 'OFF'}`, 'warning'); break;
+    case '/weather':
+      setWeather(parts[1] || 'sunny'); break;
+    case '/time': {
+      const t = parseFloat(parts[1]);
+      if (!isNaN(t)) { GS.gameTime = t; updateDayNight(t, 0); notify(`🕐 Time set to ${t}:00`, 'warning'); }
+      break;
+    }
+    case '/revive':
+      notify('❤ Nearest NPC revived!', 'success');
+      npcs.forEach(n => { if (n.userData.injured) { n.userData.injured = false; } }); break;
+    case '/noclip':
+      GS.noclip = !GS.noclip;
+      notify(`👻 Noclip: ${GS.noclip ? 'ON' : 'OFF'}`, 'warning'); break;
+    case '/spectate':
+      GS.flyMode = !GS.flyMode; playerGroup.visible = !GS.flyMode;
+      notify(`👁 Spectate: ${GS.flyMode ? 'ON' : 'OFF'}`, 'warning'); break;
+    case '/money': {
+      const amt = parseInt(parts[1]) || 1000;
+      addMoney(amt); notify(`💰 Added $${amt}`, 'success'); break;
+    }
+    case '/wanted': {
+      const w = parseInt(parts[1]) || 0;
+      GS.wantedLevel = Math.max(0, Math.min(5, w));
+      updateWantedStars();
+      notify(`⭐ Wanted level set to ${GS.wantedLevel}`, 'warning'); break;
+    }
+    case '/arrest': arrestNPC(); break;
+    case '/help':
+      notify('Commands: /tp x z  /car [type]  /heal  /god  /weather [type]  /time [0-24]  /money [amt]  /noclip  /spectate  /wanted [0-5]  /arrest', ''); break;
+    default:
+      notify(`❓ Unknown command: ${command} — try /help`, 'danger');
+  }
+}
+
+// ===== ACHIEVEMENTS =====
+function checkAchievement(id) {
+  if (GS.achievements.includes(id)) return;
+  const ach = GS.achievements_list.find(a => a.id === id);
+  if (!ach) return;
+  GS.achievements.push(id);
+  showAchievement(ach);
+  addXP(50);
+}
+
+function showAchievement(ach) {
+  const el = document.createElement('div');
+  el.className = 'achievement-toast';
+  el.innerHTML = `<div class="ach-icon">${ach.icon}</div><div class="ach-text"><div class="ach-label">Achievement Unlocked</div><div class="ach-name">${ach.name}</div></div>`;
+  document.getElementById('hud').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ===== SAVE / LOAD =====
+function saveGame() {
+  const data = {
+    mode: GS.mode, char: GS.char, player: GS.player,
+    xp: GS.xp, level: GS.level, wantedLevel: GS.wantedLevel,
+    inventory: GS.inventory, achievements: GS.achievements,
+    position: { x: playerGroup?.position.x || 0, z: playerGroup?.position.z || 0 },
+    savedAt: new Date().toISOString()
+  };
+  localStorage.setItem('sparkzworld_save', JSON.stringify(data));
+  notify('💾 Game saved!', 'success');
+}
+
+function loadGame() {
+  const raw = localStorage.getItem('sparkzworld_save');
+  if (!raw) { notify('No save data found!', 'danger'); return; }
+  const data = JSON.parse(raw);
+  Object.assign(GS.player, data.player);
+  GS.xp = data.xp; GS.level = data.level;
+  GS.wantedLevel = data.wantedLevel;
+  GS.inventory = data.inventory;
+  GS.achievements = data.achievements;
+  GS.char = data.char;
+  notify('Save data found! Starting saved game...', 'success');
+  startGame(data.mode || 'civilian');
+  setTimeout(() => {
+    if (playerGroup && data.position) {
+      playerGroup.position.set(data.position.x, 0, data.position.z);
+    }
+    updateHUD();
+    notify(`Loaded save from ${new Date(data.savedAt).toLocaleString()}`, 'success');
+  }, 3000);
+}
+
+function autoSave() {
+  setInterval(() => { if (GS.playing) saveGame(); }, 60000);
+}
+
+// ===== SETTINGS =====
+function toggleSetting(el, key) {
+  el.classList.toggle('on');
+  GS.settings[key] = el.classList.contains('on');
+  if (key === 'shadows' && renderer) renderer.shadowMap.enabled = GS.settings.shadows;
+  if (key === 'weather' && !GS.settings.weather) setWeather('sunny');
+}
+function setSetting(key, val) { GS.settings[key] = parseFloat(val); }
+
+// ===== RESIZE =====
+function onResize() {
+  if (!camera || !renderer) return;
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  const rc = document.getElementById('rainCanvas');
+  if (rc) { rc.width = window.innerWidth; rc.height = window.innerHeight; }
+}
+
+// ===== DAMAGE SYSTEM =====
+function takeDamage(amount) {
+  if (GS.godMode) return;
+  const effective = Math.max(0, amount - GS.player.armor);
+  GS.player.armor = Math.max(0, GS.player.armor - amount * 0.5);
+  GS.player.health -= effective;
+  updateHUD();
+  // Flash damage vignette
+  const v = document.getElementById('damageVignette');
+  v.classList.add('hit');
+  setTimeout(() => v.classList.remove('hit'), 400);
+  if (GS.player.health <= 0) {
+    GS.player.health = 0;
+    playerDown();
+  }
+}
+
+function playerDown() {
+  GS.isInjured = true;
+  document.getElementById('injuryPanel').classList.add('visible');
+  document.getElementById('bleedOverlay').classList.add('active');
+  notify('🩸 You are injured! Awaiting EMS...', 'danger');
+  if (GS.mode === 'ems') { notify('🚑 EMS dispatched to your location!', 'ems'); }
+  // Auto-revive after 30s in non-ems
+  setTimeout(() => {
+    if (GS.isInjured) {
+      GS.isInjured = false;
+      GS.player.health = 30;
+      document.getElementById('injuryPanel').classList.remove('visible');
+      document.getElementById('bleedOverlay').classList.remove('active');
+      updateHUD();
+      notify('🏥 You were transported to the hospital.', 'success');
+      playerGroup.position.set(200, 0, 0);
+    }
+  }, 30000);
+}
+
+// ===== SETUP INVENTORY =====
+function setupInventory() {
+  // Starting items based on mode
+  const startItems = {
+    civilian: [{ id: 'phone', name: 'Smartphone', icon: '📱', desc: 'Contact NPCs' }, { id: 'map', name: 'City Map', icon: '🗺️', desc: 'Reveals locations' }],
+    police: [{ id: 'radio', name: 'Police Radio', icon: '📻', desc: 'Police comms' }, { id: 'cuffs', name: 'Handcuffs', icon: '⛓', desc: 'Detain suspects' }],
+    ems: [{ id: 'defibrillator', name: 'Defibrillator', icon: '⚡', desc: 'Revive patients' }, { id: 'med_bag', name: 'Medical Bag', icon: '🩺', desc: 'Treat injuries' }],
+    admin: [{ id: 'admin_badge', name: 'Admin Badge', icon: '⚡', desc: 'Unlimited access' }],
+  };
+  GS.inventory = (startItems[GS.mode] || startItems.civilian).map(i => ({...i, qty:1}));
+}
+
+// ===== GAME LOOP HEALTH DRAIN =====
+setInterval(() => {
+  if (!GS.playing || GS.paused || GS.godMode || GS.isInjured) return;
+  // Random chance of criminal attack
+  if (GS.wantedLevel >= 3 && Math.random() < 0.3) { takeDamage(5); }
+  // Minor hunger drain (very slow)
+  if (GS.player.health > 10 && Math.random() < 0.05) { GS.player.health = Math.max(10, GS.player.health - 0.5); updateHUD(); }
+}, 5000);
+
+// ===== STAMINA DISPLAY UPDATE =====
+setInterval(() => {
+  if (GS.playing && !GS.paused) updateHUD();
+}, 500);
+
+// ===== INITIALIZE =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Set the active screen to main menu
+  document.getElementById('mainMenu').classList.add('active');
+});
+</script>
+
+<script>
+/* SparkzWorld Fake Multiplayer Layer */
+window.MP = {
+    room: "sparkzworld",
+    players: {},
+    fakePlayers: ["Bacon_Space","Sparky","OfficerMike","EMS_Jane"]
+};
+
+class FakeWebSocket {
+    constructor(room){
+        this.room = room;
+        this.id = Math.random().toString(36).slice(2);
+
+        window.addEventListener("storage",(e)=>{
+            if(e.key !== "sparkzworld_mp" || !e.newValue) return;
+            if(this.onmessage){
+                this.onmessage({data:e.newValue});
+            }
+        });
+
+        setTimeout(()=>{
+            if(this.onopen) this.onopen();
+        },100);
+    }
+
+    send(data){
+        localStorage.setItem("sparkzworld_mp", JSON.stringify({
+            room:this.room,
+            sender:this.id,
+            payload:data,
+            time:Date.now()
+        }));
+    }
+
+    close(){
+        if(this.onclose) this.onclose();
+    }
+}
+
+window.addEventListener("load", ()=>{
+    window.fakeMP = new FakeWebSocket("sparkzworld");
+
+    fakeMP.onopen = ()=>{
+        console.log("Fake Multiplayer Connected");
+    };
+
+    fakeMP.onmessage = (event)=>{
+        console.log("MP Message:", event.data);
+    };
+});
+</script>
+
+
+<!-- SparkzWorld V3 Enhancements -->
+<style>
+#v3Status{
+position:fixed;top:10px;left:50%;transform:translateX(-50%);
+background:rgba(0,0,0,.8);color:#00ff9d;padding:8px 16px;
+border:1px solid #00ff9d;z-index:9999;font-family:Arial;
+}
+</style>
+<script>
+window.SPARKZ_V3 = true;
+
+function v3AutoSave(){
+    try{
+        localStorage.setItem("sparkzworld_v3_save", JSON.stringify({
+            lastPlayed: Date.now(),
+            money: window.money || 1000
+        }));
+    }catch(e){}
+}
+setInterval(v3AutoSave,5000);
+
+window.addEventListener("load",()=>{
+    console.log("SparkzWorld V3 Loaded");
+
+    if(window.MP){
+        MP.playerCount = MP.fakePlayers ? MP.fakePlayers.length : 1;
+    }
+
+    const status=document.getElementById("v3Status");
+    setTimeout(()=>{
+        if(status) status.innerHTML="SparkzWorld V3 Ready";
+    },3000);
+});
+</script>
+
+</body>
+</html>
