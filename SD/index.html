@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STELLAR DRIFT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600&display=swap');
+
+  :root{
+    --void:#05060f;
+    --void2:#0a0d1f;
+    --cyan:#4df3ff;
+    --magenta:#ff3fd8;
+    --gold:#ffd23f;
+    --danger:#ff3b4e;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    padding:16px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:radial-gradient(ellipse at 50% 20%, #10143a 0%, var(--void) 55%, #020208 100%);
+    font-family:'Rajdhani', sans-serif;
+    color:var(--cyan);
+    overflow:auto;
+  }
+
+  #stage{
+    transform-origin: top center;
+  }
+
+  #wrap{
+    position:relative;
+  }
+
+  canvas{
+    border:2px solid rgba(77,243,255,0.6);
+    border-radius:6px;
+    box-shadow:
+      0 0 25px rgba(77,243,255,0.35),
+      0 0 70px rgba(255,63,216,0.15),
+      inset 0 0 40px rgba(77,243,255,0.06);
+    background:#000;
+    display:block;
+  }
+
+  h1.title{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    letter-spacing:8px;
+    font-size:28px;
+    margin:0 0 10px 0;
+    text-align:center;
+    color:#eafcff;
+    text-shadow:0 0 12px var(--cyan), 0 0 30px rgba(77,243,255,0.6);
+  }
+  h1.title span{ color:var(--magenta); text-shadow:0 0 12px var(--magenta), 0 0 30px rgba(255,63,216,0.6);}
+
+  #hud{
+    position:absolute;
+    top:14px;
+    left:14px;
+    z-index:100;
+    background:linear-gradient(135deg, rgba(10,13,31,0.85), rgba(10,13,31,0.55));
+    border:1px solid rgba(77,243,255,0.45);
+    border-radius:4px;
+    padding:10px 16px;
+    font-family:'Orbitron', sans-serif;
+    font-size:12px;
+    letter-spacing:1px;
+    box-shadow:0 0 15px rgba(77,243,255,0.15);
+  }
+  #hud .row{ margin:4px 0; display:flex; justify-content:space-between; gap:14px; }
+  #hud .label{ color:#7fdfff; opacity:0.75; }
+  #hud .val{ color:#fff; text-shadow:0 0 6px var(--cyan); }
+  #hud .val.boostval{ color:var(--gold); text-shadow:0 0 6px var(--gold); }
+
+  #boostbar{
+    width:150px;
+    height:8px;
+    margin-top:6px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(77,243,255,0.4);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  #boostfill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--gold), #fff6c8);
+    box-shadow:0 0 10px var(--gold);
+    transition:width 0.08s linear;
+  }
+
+  #highscore{
+    position:absolute;
+    top:14px;
+    right:14px;
+    z-index:100;
+    font-family:'Orbitron', sans-serif;
+    font-size:12px;
+    background:linear-gradient(135deg, rgba(10,13,31,0.85), rgba(10,13,31,0.55));
+    border:1px solid rgba(255,210,63,0.45);
+    border-radius:4px;
+    padding:10px 16px;
+    color:var(--gold);
+    text-shadow:0 0 6px var(--gold);
+    box-shadow:0 0 15px rgba(255,210,63,0.12);
+  }
+
+  #overlay{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    background:rgba(5,6,15,0.92);
+    padding:34px 46px;
+    border:2px solid var(--danger);
+    border-radius:6px;
+    display:none;
+    z-index:200;
+    box-shadow:0 0 40px rgba(255,59,78,0.5), inset 0 0 30px rgba(255,59,78,0.1);
+    font-family:'Orbitron', sans-serif;
+    min-width:280px;
+  }
+  #overlay.start{
+    border-color:var(--cyan);
+    box-shadow:0 0 40px rgba(77,243,255,0.5), inset 0 0 30px rgba(77,243,255,0.1);
+  }
+  #overlay h2{
+    margin:0 0 8px 0;
+    font-size:26px;
+    letter-spacing:4px;
+    color:var(--danger);
+    text-shadow:0 0 14px var(--danger);
+  }
+  #overlay.start h2{
+    color:var(--cyan);
+    text-shadow:0 0 14px var(--cyan);
+  }
+  #overlay p{
+    font-family:'Rajdhani', sans-serif;
+    font-size:16px;
+    color:#cdefff;
+    margin:6px 0;
+    letter-spacing:1px;
+  }
+  #overlay .big{
+    font-size:30px;
+    color:var(--gold);
+    text-shadow:0 0 12px var(--gold);
+    font-weight:700;
+  }
+  #overlay .newbest{
+    color:var(--magenta);
+    text-shadow:0 0 12px var(--magenta);
+    font-size:13px;
+    letter-spacing:2px;
+    display:none;
+  }
+
+  button{
+    font-family:'Orbitron', sans-serif;
+    padding:12px 30px;
+    font-size:14px;
+    letter-spacing:2px;
+    background:linear-gradient(135deg, var(--cyan), #1c9fb0);
+    color:#001417;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    margin-top:18px;
+    font-weight:700;
+    box-shadow:0 0 15px rgba(77,243,255,0.6);
+    transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  button:hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 0 25px rgba(77,243,255,0.9); }
+  button:active{ transform:translateY(0) scale(0.98); }
+
+  #controls{
+    margin-top:12px;
+    font-family:'Rajdhani', sans-serif;
+    font-size:13px;
+    color:#5c7a94;
+    letter-spacing:1px;
+    text-align:center;
+  }
+  #controls b{ color:#9fd8ea; }
+</style>
+</head>
+<body>
+
+<div id="stage">
+<h1 class="title">STELLAR <span>DRIFT</span></h1>
+
+<div id="wrap">
+  <div id="hud">
+    <div class="row"><span class="label">VELOCITY</span><span class="val"><span id="speed">0</span> WU</span></div>
+    <div class="row"><span class="label">RANGE</span><span class="val"><span id="distance">0</span> LY</span></div>
+    <div class="row"><span class="label">CELLS</span><span class="val boostval"><span id="cells">0</span></span></div>
+    <div id="boostbar"><div id="boostfill"></div></div>
+  </div>
+
+  <div id="highscore">BEST <span id="best">0</span> LY</div>
+
+  <canvas id="game" width="800" height="600"></canvas>
+
+  <div id="overlay" class="start">
+    <div id="overlay-start">
+      <h2>STELLAR DRIFT</h2>
+      <p>Navigate the hyperlane. Dodge the debris.</p>
+      <p>Collect energy cells to overcharge your engine.</p>
+      <button onclick="startGame()">LAUNCH</button>
+    </div>
+    <div id="overlay-end" style="display:none;">
+      <h2>HULL BREACH</h2>
+      <p>Range covered</p>
+      <p class="big"><span id="finalscore">0</span> LY</p>
+      <p>Energy cells collected: <span id="finalcells">0</span></p>
+      <p id="newbest" class="newbest">NEW BEST RANGE</p>
+      <button onclick="startGame()">RELAUNCH</button>
+    </div>
+  </div>
+</div>
+
+<div id="controls"><b>&uarr; / W</b> Thrust &nbsp; <b>&larr; &rarr; / A D</b> Steer &nbsp; <b>&darr; / S</b> Reverse</div>
+</div><!-- /stage -->
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const speedEl = document.getElementById('speed');
+const distanceEl = document.getElementById('distance');
+const cellsEl = document.getElementById('cells');
+const bestEl = document.getElementById('best');
+const boostfill = document.getElementById('boostfill');
+const overlay = document.getElementById('overlay');
+
+const LANE_WIDTH = 380;
+const LANE_LEFT = (canvas.width - LANE_WIDTH) / 2;
+
+let ship, distance, cellCount, boost, gameRunning, gameStarted;
+let keys = {};
+let obstacles = [], orbs = [], particles = [], stars = [];
+let lastObstacleTime = 0, lastOrbTime = 0;
+let shake = 0;
+let bestDistance = 0;
+let laneScroll = 0;
+
+function initStars(){
+  stars = [];
+  for(let layer=0; layer<3; layer++){
+    for(let i=0;i<40;i++){
+      stars.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        layer: layer,
+        size: layer===2? 2.2 : layer===1? 1.4 : 0.8,
+        tw: Math.random()*Math.PI*2
+      });
+    }
+  }
+}
+
+function resetShip(){
+  ship = { x: canvas.width/2, y: 480, speed: 0, angle: 0, vx:0 };
+}
+
+function initGame(){
+  resetShip();
+  distance = 0; cellCount = 0; boost = 0;
+  obstacles = []; orbs = []; particles = [];
+  laneScroll = 0;
+  gameRunning = true;
+  lastObstacleTime = Date.now();
+  lastOrbTime = Date.now();
+}
+
+function randomObstacle(){
+  const size = 40 + Math.random()*40;
+  const points = [];
+  const sides = 7 + Math.floor(Math.random()*3);
+  for(let i=0;i<sides;i++){
+    const a = (i/sides)*Math.PI*2;
+    const r = size*(0.75 + Math.random()*0.35);
+    points.push({x:Math.cos(a)*r, y:Math.sin(a)*r});
+  }
+  return {
+    x: LANE_LEFT + 45 + Math.random()*(LANE_WIDTH - 90),
+    y: -140,
+    size: size,
+    points: points,
+    rot: Math.random()*Math.PI*2,
+    rotSpeed: (Math.random()-0.5)*0.04
+  };
+}
+
+function randomOrb(){
+  return {
+    x: LANE_LEFT + 45 + Math.random()*(LANE_WIDTH - 90),
+    y: -60,
+    r: 12,
+    pulse: Math.random()*Math.PI*2
+  };
+}
+
+window.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+});
+window.addEventListener('keyup', e => keys[e.key] = false);
+
+function spawnTrail(){
+  particles.push({
+    x: ship.x + (Math.random()-0.5)*16,
+    y: ship.y + 38,
+    vx: (Math.random()-0.5)*0.6 - Math.sin(ship.angle)*ship.speed*0.15,
+    vy: 2 + Math.random()*2,
+    life: 1,
+    color: boost > 0 ? '255,210,63' : '77,243,255'
+  });
+}
+
+function spawnBurst(x,y,color,count){
+  for(let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = 1 + Math.random()*4;
+    particles.push({
+      x, y,
+      vx: Math.cos(a)*sp,
+      vy: Math.sin(a)*sp,
+      life: 1,
+      color
+    });
+  }
+}
+
+function update(){
+  if(!gameRunning) return;
+
+  const boosting = boost > 0;
+  const maxSpeed = boosting ? 26 : 18;
+  const accel = boosting ? 0.9 : 0.6;
+
+  if(keys['ArrowUp'] || keys['w'] || keys['W']) ship.speed = Math.min(ship.speed + accel, maxSpeed);
+  else if(keys['ArrowDown'] || keys['s'] || keys['S']) ship.speed = Math.max(ship.speed - 1.2, -8);
+  else ship.speed *= 0.97;
+
+  if((keys['ArrowLeft'] || keys['a'] || keys['A']) && Math.abs(ship.speed) > 1) ship.angle -= 0.06;
+  if((keys['ArrowRight'] || keys['d'] || keys['D']) && Math.abs(ship.speed) > 1) ship.angle += 0.06;
+  ship.angle = Math.max(Math.min(ship.angle, 0.8), -0.8);
+
+  ship.x += Math.sin(ship.angle) * ship.speed * 1.1;
+  ship.y -= Math.cos(ship.angle) * ship.speed * 0.6;
+
+  if(ship.x < LANE_LEFT + 40) ship.x = LANE_LEFT + 40;
+  if(ship.x > LANE_LEFT + LANE_WIDTH - 40) ship.x = LANE_LEFT + LANE_WIDTH - 40;
+  if(ship.y < 80) ship.y = 80;
+  if(ship.y > canvas.height - 60) ship.y = canvas.height - 60;
+
+  if(boost > 0) boost = Math.max(0, boost - 0.35);
+
+  distance = Math.max(0, distance + ship.speed * 1.8 * (boosting ? 1.4 : 1));
+  distanceEl.textContent = Math.floor(distance/10);
+  speedEl.textContent = Math.floor(ship.speed * 13);
+  cellsEl.textContent = cellCount;
+  boostfill.style.width = boost + '%';
+
+  laneScroll = (laneScroll + ship.speed*3 + (boosting?6:0)) % 100;
+
+  if(Math.random() < 0.6 + ship.speed*0.02) spawnTrail();
+
+  const spawnGap = Math.max(550, 1050 - ship.speed*45);
+  if(Date.now() - lastObstacleTime > spawnGap){
+    obstacles.push(randomObstacle());
+    lastObstacleTime = Date.now();
+  }
+  if(Date.now() - lastOrbTime > 2600 + Math.random()*1800){
+    orbs.push(randomOrb());
+    lastOrbTime = Date.now();
+  }
+
+  const fall = Math.max(2, 7 + ship.speed*0.6 + (boosting?4:0));
+
+  for(let i=obstacles.length-1;i>=0;i--){
+    const o = obstacles[i];
+    o.y += fall;
+    o.rot += o.rotSpeed;
+    if(o.y > canvas.height + 150) obstacles.splice(i,1);
+  }
+  for(let i=orbs.length-1;i>=0;i--){
+    const orb = orbs[i];
+    orb.y += fall*0.9;
+    orb.pulse += 0.15;
+    if(orb.y > canvas.height + 60) orbs.splice(i,1);
+  }
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.life -= 0.035;
+    if(p.life <= 0) particles.splice(i,1);
+  }
+
+  for(let s of stars){
+    s.y += (s.layer+1) * (1 + ship.speed*0.08);
+    if(s.y > canvas.height) s.y = -5;
+  }
+
+  for(let o of obstacles){
+    const dx = ship.x - o.x, dy = ship.y - o.y;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    if(dist < o.size*0.7 + 20){
+      crash();
+      return;
+    }
+  }
+  for(let i=orbs.length-1;i>=0;i--){
+    const orb = orbs[i];
+    const dx = ship.x - orb.x, dy = ship.y - orb.y;
+    if(Math.sqrt(dx*dx+dy*dy) < orb.r + 26){
+      cellCount++;
+      boost = Math.min(100, boost + 34);
+      spawnBurst(orb.x, orb.y, '77,243,255', 14);
+      orbs.splice(i,1);
+    }
+  }
+
+  if(shake > 0) shake *= 0.9;
+}
+
+function crash(){
+  gameRunning = false;
+  spawnBurst(ship.x, ship.y, '255,59,78', 40);
+  shake = 18;
+
+  const finalRange = Math.floor(distance/10);
+
+  if(finalRange > bestDistance){
+    bestDistance = finalRange;
+    bestEl.textContent = bestDistance;
+    document.getElementById('newbest').style.display = 'block';
+  } else {
+    document.getElementById('newbest').style.display = 'none';
+  }
+
+  document.getElementById('finalscore').textContent = finalRange;
+  document.getElementById('finalcells').textContent = cellCount;
+  overlay.classList.remove('start');
+  document.getElementById('overlay-start').style.display = 'none';
+  document.getElementById('overlay-end').style.display = 'block';
+  overlay.style.display = 'block';
+}
+
+function drawStarfield(){
+  ctx.fillStyle = '#04050e';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(let s of stars){
+    const alpha = 0.4 + Math.sin(s.tw + Date.now()*0.002)*0.3;
+    ctx.fillStyle = `rgba(200,230,255,${Math.max(0.15,alpha)})`;
+    ctx.fillRect(s.x, s.y, s.size, s.size);
+  }
+}
+
+function drawLane(){
+  const grad = ctx.createLinearGradient(LANE_LEFT, 0, LANE_LEFT+LANE_WIDTH, 0);
+  grad.addColorStop(0, 'rgba(77,243,255,0.03)');
+  grad.addColorStop(0.5, 'rgba(20,25,50,0.55)');
+  grad.addColorStop(1, 'rgba(77,243,255,0.03)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(LANE_LEFT, 0, LANE_WIDTH, canvas.height);
+
+  ctx.strokeStyle = 'rgba(77,243,255,0.9)';
+  ctx.lineWidth = 2;
+  ctx.shadowBlur = 8;
+  ctx.shadowColor = 'rgba(77,243,255,0.8)';
+  ctx.beginPath();
+  ctx.moveTo(LANE_LEFT, 0); ctx.lineTo(LANE_LEFT, canvas.height);
+  ctx.moveTo(LANE_LEFT+LANE_WIDTH, 0); ctx.lineTo(LANE_LEFT+LANE_WIDTH, canvas.height);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = 'rgba(255,63,216,0.55)';
+  ctx.lineWidth = 6;
+  for(let i=-2;i<10;i++){
+    const y = (i*100 + laneScroll) % (canvas.height+100);
+    ctx.beginPath();
+    ctx.moveTo(LANE_LEFT+LANE_WIDTH/2 - 3, y);
+    ctx.lineTo(LANE_LEFT+LANE_WIDTH/2 - 3, y+50);
+    ctx.stroke();
+  }
+}
+
+function drawParticles(){
+  for(let p of particles){
+    ctx.fillStyle = `rgba(${p.color},${Math.max(0,p.life)})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3*p.life, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawObstacles(){
+  for(let o of obstacles){
+    ctx.save();
+    ctx.translate(o.x, o.y);
+    ctx.rotate(o.rot);
+    ctx.beginPath();
+    o.points.forEach((pt,i)=>{ i===0? ctx.moveTo(pt.x,pt.y) : ctx.lineTo(pt.x,pt.y); });
+    ctx.closePath();
+    ctx.fillStyle = '#3a2a3f';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,63,216,0.6)';
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(255,63,216,0.5)';
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+}
+
+function drawOrbs(){
+  for(let orb of orbs){
+    const pulse = 1 + Math.sin(orb.pulse)*0.25;
+    ctx.save();
+    ctx.translate(orb.x, orb.y);
+    ctx.beginPath();
+    ctx.arc(0,0, orb.r*pulse, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(77,243,255,0.9)';
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = '#4df3ff';
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(0,0, orb.r*0.4, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+}
+
+function drawShip(){
+  if(!gameRunning && shake <= 0.5) return;
+  ctx.save();
+  ctx.translate(ship.x, ship.y);
+  ctx.rotate(ship.angle);
+
+  // engine glow
+  const boosting = boost > 0;
+  ctx.fillStyle = boosting ? 'rgba(255,210,63,0.8)' : 'rgba(77,243,255,0.7)';
+  ctx.shadowBlur = boosting ? 25 : 15;
+  ctx.shadowColor = boosting ? '#ffd23f' : '#4df3ff';
+  ctx.beginPath();
+  ctx.moveTo(-14, 34); ctx.lineTo(0, 34 + 18 + Math.random()*8); ctx.lineTo(14,34);
+  ctx.closePath();
+  ctx.fill();
+
+  // hull
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = '#4df3ff';
+  ctx.fillStyle = '#dff7ff';
+  ctx.beginPath();
+  ctx.moveTo(0,-42);
+  ctx.lineTo(24, 30);
+  ctx.lineTo(12, 22);
+  ctx.lineTo(0, 34);
+  ctx.lineTo(-12, 22);
+  ctx.lineTo(-24, 30);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#4df3ff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // cockpit
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#0a2f3a';
+  ctx.beginPath();
+  ctx.ellipse(0,-8,7,14,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function draw(){
+  ctx.save();
+  if(shake > 0.3){
+    ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
+  }
+  drawStarfield();
+  drawLane();
+  drawOrbs();
+  drawObstacles();
+  drawParticles();
+  drawShip();
+  ctx.restore();
+}
+
+function gameLoop(){
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function startGame(){
+  initGame();
+  overlay.style.display = 'none';
+}
+
+initStars();
+resetShip();
+gameRunning = false;
+overlay.style.display = 'block';
+draw();
+gameLoop();
+
+// Scale the whole stage to fit the viewport so nothing goes off screen
+const stage = document.getElementById('stage');
+function fitStage(){
+  stage.style.transform = 'scale(1)';
+  const rect = stage.getBoundingClientRect();
+  const maxW = window.innerWidth * 0.96;
+  const maxH = window.innerHeight * 0.96;
+  const scale = Math.min(1, maxW / rect.width, maxH / rect.height);
+  stage.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', fitStage);
+fitStage();
+</script>
+
+</body>
+</html>
