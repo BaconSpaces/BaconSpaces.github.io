@@ -419,16 +419,11 @@ const APP_CONFIG = {
      import needed. Used to auto-load the existing leaderboard.json next
      to this page (no prompt needed for reading). -->
 
-<script type="module">
-/* ============================================================
-   browser-fs-access — real local file save/open, no key, no server
-   Kept in its own module so a failure here can't take fetch-json
-   down with it (or vice versa) — each loads independently.
-   ============================================================ */
-import { fileOpen, fileSave } from 'https://cdn.jsdelivr.net/npm/browser-fs-access/dist/index.modern.js';
-window.browserFsAccess = { fileOpen, fileSave };
-console.log('[browser-fs-access] loaded');
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@larrym/file-saver@2.0.10/dist/FileSaver.min.js"></script>
+<!-- file-saver — sets window.saveAs directly. Triggers a browser download
+     of leaderboard.json on every result. No picker, no prompt — but no
+     in-place file editing either: each save is a new download that the
+     browser will typically auto-number rather than overwrite. -->
 
 <script>
 /* ============================================================
@@ -941,73 +936,36 @@ const DiscordAuth = (function () {
 
 <script>
 /* ============================================================
-   LEADERBOARD (saved to a local .json file via browser-fs-access)
+   LEADERBOARD (saved via file download, using @larrym/file-saver)
    ============================================================ */
-// Leaderboard — committed directly into this GitHub repo as a JSON
-// Leaderboard — saved as a real .json file on this computer, via the
-// browser's File System Access API (through the browser-fs-access
-// library, loaded as an ES module below). The first save needs one
-// click to pick/permit the file (browsers require that — no page can
-// touch your filesystem silently); after that, saves happen without
-// prompting again for the rest of the session.
+// Leaderboard — auto-loads leaderboard.json from next to this page on
+// boot, then every result triggers a fresh download of an updated
+// leaderboard.json via file-saver. No picker, no prompt to connect —
+// but also no in-place file editing: each save is a new download,
+// which most browsers will auto-number (leaderboard(1).json,
+// leaderboard(2).json, ...) rather than overwrite the original.
 
 const Leaderboard = (function () {
     let cache = { scores: {} };
-    let fileHandle = null; // set once the user connects a file; reused for subsequent saves
 
     async function init() {
-        console.log('[Leaderboard] using local file storage (browser-fs-access) — auto-loading leaderboards.json');
-        // Read-only auto-load: works with zero prompts because it's just a
-        // normal fetch of a file sitting next to this page. This does NOT
-        // give us write access — saving still needs the one-click picker
-        // below, since no page can write to disk without that permission.
+        console.log('[Leaderboard] using file-saver — auto-loading', APP_CONFIG.localFile.fileName);
         try {
             const data = await window.fetchJson.get(APP_CONFIG.localFile.fileName);
-            if (data && data.scores) { cache = data; console.log('[Leaderboard] auto-loaded existing leaderboards.json'); }
+            if (data && data.scores) { cache = data; console.log('[Leaderboard] auto-loaded existing', APP_CONFIG.localFile.fileName); }
         } catch (err) {
-            console.log('[Leaderboard] no existing leaderboards.json found next to this page yet — starting empty');
+            console.log('[Leaderboard] no existing', APP_CONFIG.localFile.fileName, 'found yet — starting empty');
         }
     }
 
-    function isConnected() { return !!fileHandle; }
-
-    // Opens the picker so the user selects (or creates) leaderboard.json.
-    // Must be called from a user gesture (e.g. a button click) — browsers
-    // block file pickers triggered without direct user interaction.
-    async function connect() {
-        const { fileOpen } = window.browserFsAccess;
-        try {
-            const file = await fileOpen({
-                mimeTypes: ['application/json'],
-                extensions: ['.json'],
-                description: 'Leaderboard JSON file'
-            });
-            fileHandle = file.handle || null;
-            const text = await file.text();
-            try { const parsed = JSON.parse(text); cache = parsed && parsed.scores ? parsed : { scores: {} }; }
-            catch (e) { cache = { scores: {} }; }
-            console.log('[Leaderboard] connected to local file:', file.name);
-            return true;
-        } catch (err) {
-            console.log('[Leaderboard] file connect cancelled or failed', err);
-            return false;
-        }
-    }
-
-    async function saveToFile() {
-        const { fileSave } = window.browserFsAccess;
+    function saveToFile() {
         const blob = new Blob([JSON.stringify(cache, null, 2)], { type: 'application/json' });
-        fileHandle = await fileSave(
-            blob,
-            { fileName: APP_CONFIG.localFile.fileName, extensions: ['.json'] },
-            fileHandle // reusing the handle skips the picker on repeat saves, where supported
-        );
+        window.saveAs(blob, APP_CONFIG.localFile.fileName);
     }
 
     // One win = one point. Tracked per Discord display name.
     async function recordResult(name, gameId, success, elapsedMs) {
         console.log('[Leaderboard] recording result', { name, gameId, success, elapsedMs });
-        if (!isConnected()) { console.warn('[Leaderboard] no file connected yet — result not saved'); return; }
         const entry = cache.scores[name] || { name, wins: 0, plays: 0, bestMs: null };
         entry.plays += 1;
         if (success) {
@@ -1017,8 +975,8 @@ const Leaderboard = (function () {
         entry.lastGame = gameId;
         entry.updatedAt = Date.now();
         cache.scores[name] = entry;
-        try { await saveToFile(); }
-        catch (err) { console.error('[Leaderboard] failed to save local file', err); }
+        try { saveToFile(); }
+        catch (err) { console.error('[Leaderboard] failed to save file', err); }
     }
 
     async function top(limit = 10) {
@@ -1027,13 +985,13 @@ const Leaderboard = (function () {
             .slice(0, limit);
     }
 
-    async function clear() {
+    function clear() {
         cache = { scores: {} };
-        try { await saveToFile(); console.log('[Leaderboard] local file cleared'); }
-        catch (err) { console.error('[Leaderboard] failed to clear local file', err); }
+        try { saveToFile(); console.log('[Leaderboard] cleared and saved'); }
+        catch (err) { console.error('[Leaderboard] failed to save cleared file', err); }
     }
 
-    return { init, recordResult, top, clear, connect, isConnected };
+    return { init, recordResult, top, clear };
 })();
 
 </script>
