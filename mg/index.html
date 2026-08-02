@@ -325,9 +325,8 @@ table.lb tr:hover td { background: rgba(255,255,255,0.03); }
 <!-- ============== Leaderboard ============== -->
 <div id="leaderboard" class="hidden">
     <h2>Leaderboard</h2>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <button id="connect-file-btn" class="btn">Connect Save File</button>
-        <span id="file-status" style="font-size:12px;color:var(--muted);">no file connected — scores won't be saved until you connect one</span>
+    <div style="margin-bottom:12px;">
+        <span id="file-status" style="font-size:12px;color:var(--muted);">no save file connected yet — pick one when you play your first game</span>
     </div>
     <table class="lb">
         <thead><tr><th>Rank</th><th>Name</th><th>Wins</th><th>Plays</th><th>Last Played</th></tr></thead>
@@ -409,7 +408,7 @@ const APP_CONFIG = {
   // this is genuinely local, not shared across players/devices,
   // since there is no server in this setup to share it through.
   localFile: {
-    fileName: 'leaderboard.json'
+    fileName: 'leaderboards.json'
   }
 };
 
@@ -7551,9 +7550,28 @@ MG.register('welding', {
             const card = document.createElement('button');
             card.className = 'game-card';
             card.innerHTML = `<div class="g-title">${g.title}</div><div class="g-hint">${g.hint}</div>`;
-            card.onclick = () => openDifficultyPicker(g.id);
+            card.onclick = () => onPlayClicked(g.id);
             grid.appendChild(card);
         });
+    }
+
+    async function onPlayClicked(gameId) {
+        // First play click in the session: this is a real user gesture, so
+        // it's the only valid moment a browser will allow a file picker.
+        if (!Leaderboard.isConnected()) {
+            const status = $('file-status');
+            status.textContent = 'pick or create leaderboards.json to save your scores…';
+            const ok = await Leaderboard.connect();
+            if (ok) {
+                status.textContent = 'connected — scores will save to this file';
+                status.style.color = 'var(--success)';
+                renderLeaderboard();
+            } else {
+                status.textContent = 'no file connected — this session\'s scores won\'t be saved';
+                status.style.color = 'var(--muted)';
+            }
+        }
+        openDifficultyPicker(gameId);
     }
 
     function openDifficultyPicker(gameId) {
@@ -7607,19 +7625,6 @@ MG.register('welding', {
     $('diff-cancel').onclick = () => $('diff-picker').classList.add('hidden');
 
     $('discord-login-btn').onclick = () => DiscordAuth.login();
-
-    $('connect-file-btn').onclick = async () => {
-        const ok = await Leaderboard.connect();
-        const status = $('file-status');
-        if (ok) {
-            status.textContent = 'connected — scores will save to this file';
-            status.style.color = 'var(--success)';
-            renderLeaderboard();
-        } else {
-            status.textContent = 'not connected — pick or create a leaderboard.json to save scores';
-            status.style.color = 'var(--muted)';
-        }
-    };
 
     // ---- Boot sequence ----
     await loadManifest();  // sync now, kept awaited in case it changes later
