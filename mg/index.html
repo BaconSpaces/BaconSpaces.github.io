@@ -414,18 +414,20 @@ const APP_CONFIG = {
 
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/fetch-json@3.5/dist/fetch-json.min.js"></script>
+<!-- fetch-json's official CDN build — sets window.fetchJson directly, no
+     import needed. Used to auto-load the existing leaderboard.json next
+     to this page (no prompt needed for reading). -->
+
 <script type="module">
 /* ============================================================
    browser-fs-access — real local file save/open, no key, no server
-   fetch-json — simple JSON GET wrapper, used to auto-load the
-   existing leaderboards.json next to this page (no prompt needed
-   for reading — only saving requires the file-picker click)
+   Kept in its own module so a failure here can't take fetch-json
+   down with it (or vice versa) — each loads independently.
    ============================================================ */
 import { fileOpen, fileSave } from 'https://cdn.jsdelivr.net/npm/browser-fs-access/dist/index.modern.js';
-import fetchJson from 'https://cdn.jsdelivr.net/npm/fetch-json/dist/fetch-json.esm.min.js';
 window.browserFsAccess = { fileOpen, fileSave };
-window.fetchJson = fetchJson;
-console.log('[browser-fs-access + fetch-json] loaded');
+console.log('[browser-fs-access] loaded');
 </script>
 
 <script>
