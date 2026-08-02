@@ -326,7 +326,7 @@ table.lb tr:hover td { background: rgba(255,255,255,0.03); }
 <div id="leaderboard" class="hidden">
     <h2>Leaderboard</h2>
     <table class="lb">
-        <thead><tr><th>Rank</th><th>Name</th><th>Wins</th><th>Plays</th></tr></thead>
+        <thead><tr><th>Rank</th><th>Name</th><th>Wins</th><th>Plays</th></tr><th>Last Played</th></tr></thead>
         <tbody id="lb-body"></tbody>
     </table>
 </div>
@@ -7541,8 +7541,9 @@ MG.register('welding', {
         tbody.innerHTML = '';
         rows.forEach((r, i) => {
             const tr = document.createElement('tr');
+            const lastGameTitle = entry.lastGame ? (gameMap[entry.lastGame] || entry.lastGame) : '—';
             const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-            tr.innerHTML = `<td class="${rankClass}">#${i + 1}</td><td>${r.name}</td><td>${r.wins || 0}</td><td>${r.plays || 0}</td>`;
+            tr.innerHTML = `<td class="${rankClass}">#${i + 1}</td><td>${r.name}</td><td>${r.wins || 0}</td><td>${r.plays || 0}</td><td>${escapeHtml(lastGameTitle)}</td>`;
             tbody.appendChild(tr);
         });
     }
