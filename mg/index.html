@@ -325,6 +325,10 @@ table.lb tr:hover td { background: rgba(255,255,255,0.03); }
 <!-- ============== Leaderboard ============== -->
 <div id="leaderboard" class="hidden">
     <h2>Leaderboard</h2>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <button id="connect-file-btn" class="btn">Connect Save File</button>
+        <span id="file-status" style="font-size:12px;color:var(--muted);">no file connected — scores won't be saved until you connect one</span>
+    </div>
     <table class="lb">
         <thead><tr><th>Rank</th><th>Name</th><th>Wins</th><th>Plays</th><th>Last Played</th></tr></thead>
         <tbody id="lb-body"></tbody>
@@ -396,29 +400,28 @@ const APP_CONFIG = {
     scope: 'identify'
   },
 
-  // Leaderboard storage as a JSON file committed directly into this
-  // GitHub repo, via the GitHub Contents API.
-  // ⚠️ SERIOUS EXPOSURE: this token is visible to every visitor via
-  // view-source, same as the other fields above — but unlike those,
-  // a leaked GitHub token can let someone push commits to your repo,
-  // not just mess with a leaderboard. Strongly use a FINE-GRAINED
-  // token scoped to ONLY this repo, with ONLY "Contents: Read and
-  // write" permission — never a classic token with broad account access.
-  // Setup: 1) GitHub → Settings → Developer settings → Fine-grained
-  //           tokens → Generate new → repository access: only this repo →
-  //           permissions: Contents = Read and write
-  //        2) create a file at the path below in this repo containing:
-  //           {"scores":{}}
-  //        3) fill in owner/repo/path/branch/token below.
-  github: {
-    owner: 'YOUR_GITHUB_USERNAME',
-    repo: 'YOUR_REPO_NAME',
-    path: 'leaderboard.json',
-    branch: 'main',
-    token: 'YOUR_FINE_GRAINED_TOKEN'
+  // Leaderboard storage as a local .json file on this computer, via
+  // the browser's real File System Access API (through the
+  // browser-fs-access library). No key, no account, no server — the
+  // file lives wherever you save it. Only the "Connect Save File"
+  // button in the top bar is needed; nothing to fill in here.
+  // Note: scores stay on whichever computer's file you connect to —
+  // this is genuinely local, not shared across players/devices,
+  // since there is no server in this setup to share it through.
+  localFile: {
+    fileName: 'leaderboard.json'
   }
 };
 
+</script>
+
+<script type="module">
+/* ============================================================
+   browser-fs-access — real local file save/open, no key, no server
+   ============================================================ */
+import { fileOpen, fileSave } from 'https://cdn.jsdelivr.net/npm/browser-fs-access/dist/index.modern.js';
+window.browserFsAccess = { fileOpen, fileSave };
+console.log('[browser-fs-access] loaded');
 </script>
 
 <script>
@@ -932,104 +935,89 @@ const DiscordAuth = (function () {
 
 <script>
 /* ============================================================
-   LEADERBOARD (committed to a JSON file in this GitHub repo)
+   LEADERBOARD (saved to a local .json file via browser-fs-access)
    ============================================================ */
 // Leaderboard — committed directly into this GitHub repo as a JSON
-// file, via the GitHub Contents API. Every result read-modify-writes
-// that file with a new commit, so scores are shared across everyone
-// who plays and live in your repo's history.
+// Leaderboard — saved as a real .json file on this computer, via the
+// browser's File System Access API (through the browser-fs-access
+// library, loaded as an ES module below). The first save needs one
+// click to pick/permit the file (browsers require that — no page can
+// touch your filesystem silently); after that, saves happen without
+// prompting again for the rest of the session.
 
 const Leaderboard = (function () {
-    const g = () => APP_CONFIG.github;
-    const apiUrl = () => `https://api.github.com/repos/${g().owner}/${g().repo}/contents/${g().path}`;
-    const headers = () => ({
-        'Accept': 'application/vnd.github+json',
-        'Authorization': `Bearer ${g().token}`
-    });
-
-    let cache = { scores: {} }; // in-memory mirror of the file, refreshed on every read
-    let lastSha = null;         // required by GitHub to update an existing file
+    let cache = { scores: {} };
+    let fileHandle = null; // set once the user connects a file; reused for subsequent saves
 
     function init() {
-        console.log('[Leaderboard] using GitHub repo file storage:', g().owner + '/' + g().repo + '/' + g().path);
+        console.log('[Leaderboard] using local file storage (browser-fs-access) — click "Connect Save File" to begin');
     }
 
-    function b64ToUtf8(b64) {
-        return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
-    }
-    function utf8ToB64(str) {
-        return btoa(unescape(encodeURIComponent(str)));
+    function isConnected() { return !!fileHandle; }
+
+    // Opens the picker so the user selects (or creates) leaderboard.json.
+    // Must be called from a user gesture (e.g. a button click) — browsers
+    // block file pickers triggered without direct user interaction.
+    async function connect() {
+        const { fileOpen } = window.browserFsAccess;
+        try {
+            const file = await fileOpen({
+                mimeTypes: ['application/json'],
+                extensions: ['.json'],
+                description: 'Leaderboard JSON file'
+            });
+            fileHandle = file.handle || null;
+            const text = await file.text();
+            try { const parsed = JSON.parse(text); cache = parsed && parsed.scores ? parsed : { scores: {} }; }
+            catch (e) { cache = { scores: {} }; }
+            console.log('[Leaderboard] connected to local file:', file.name);
+            return true;
+        } catch (err) {
+            console.log('[Leaderboard] file connect cancelled or failed', err);
+            return false;
+        }
     }
 
-    async function fetchRemote() {
-        const res = await fetch(apiUrl() + `?ref=${g().branch}`, { headers: headers() });
-        if (!res.ok) throw new Error(`GitHub GET ${res.status}`);
-        const body = await res.json();
-        lastSha = body.sha;
-        const parsed = JSON.parse(b64ToUtf8(body.content));
-        cache = parsed && parsed.scores ? parsed : { scores: {} };
-        return cache;
-    }
-
-    async function pushRemote(message) {
-        const res = await fetch(apiUrl(), {
-            method: 'PUT',
-            headers: { ...headers(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: message || '[leaderboard] update scores',
-                content: utf8ToB64(JSON.stringify(cache, null, 2)),
-                sha: lastSha,
-                branch: g().branch
-            })
-        });
-        if (!res.ok) throw new Error(`GitHub PUT ${res.status}`);
-        const body = await res.json();
-        lastSha = body.content.sha; // keep sha current for the next write
+    async function saveToFile() {
+        const { fileSave } = window.browserFsAccess;
+        const blob = new Blob([JSON.stringify(cache, null, 2)], { type: 'application/json' });
+        fileHandle = await fileSave(
+            blob,
+            { fileName: APP_CONFIG.localFile.fileName, extensions: ['.json'] },
+            fileHandle // reusing the handle skips the picker on repeat saves, where supported
+        );
     }
 
     // One win = one point. Tracked per Discord display name.
     async function recordResult(name, gameId, success, elapsedMs) {
         console.log('[Leaderboard] recording result', { name, gameId, success, elapsedMs });
-        try {
-            await fetchRemote(); // pull latest sha + data before merging, to avoid clobbering other players' writes
-            const entry = cache.scores[name] || { name, wins: 0, plays: 0, bestMs: null };
-            entry.plays += 1;
-            if (success) {
-                entry.wins += 1;
-                entry.bestMs = (entry.bestMs === null || elapsedMs < entry.bestMs) ? elapsedMs : entry.bestMs;
-            }
-            entry.lastGame = gameId;
-            entry.updatedAt = Date.now();
-            cache.scores[name] = entry;
-            await pushRemote(`[leaderboard] ${name} played ${gameId}`);
-        } catch (err) {
-            console.error('[Leaderboard] failed to commit result to GitHub', err);
+        if (!isConnected()) { console.warn('[Leaderboard] no file connected yet — result not saved'); return; }
+        const entry = cache.scores[name] || { name, wins: 0, plays: 0, bestMs: null };
+        entry.plays += 1;
+        if (success) {
+            entry.wins += 1;
+            entry.bestMs = (entry.bestMs === null || elapsedMs < entry.bestMs) ? elapsedMs : entry.bestMs;
         }
+        entry.lastGame = gameId;
+        entry.updatedAt = Date.now();
+        cache.scores[name] = entry;
+        try { await saveToFile(); }
+        catch (err) { console.error('[Leaderboard] failed to save local file', err); }
     }
 
     async function top(limit = 10) {
-        try {
-            await fetchRemote();
-        } catch (err) {
-            console.error('[Leaderboard] failed to fetch leaderboard file', err);
-        }
         return Object.values(cache.scores)
             .sort((a, b) => b.wins - a.wins)
             .slice(0, limit);
     }
 
     async function clear() {
-        try {
-            await fetchRemote();
-            cache = { scores: {} };
-            await pushRemote('[leaderboard] clear scores');
-            console.log('[Leaderboard] repo file cleared');
-        } catch (err) {
-            console.error('[Leaderboard] failed to clear repo file', err);
-        }
+        cache = { scores: {} };
+        try { await saveToFile(); console.log('[Leaderboard] local file cleared'); }
+        catch (err) { console.error('[Leaderboard] failed to clear local file', err); }
     }
 
-    return { init, recordResult, top, clear };
+    return { init, recordResult, top, clear, connect, isConnected };
 })();
 
 </script>
@@ -7619,6 +7607,19 @@ MG.register('welding', {
     $('diff-cancel').onclick = () => $('diff-picker').classList.add('hidden');
 
     $('discord-login-btn').onclick = () => DiscordAuth.login();
+
+    $('connect-file-btn').onclick = async () => {
+        const ok = await Leaderboard.connect();
+        const status = $('file-status');
+        if (ok) {
+            status.textContent = 'connected — scores will save to this file';
+            status.style.color = 'var(--success)';
+            renderLeaderboard();
+        } else {
+            status.textContent = 'not connected — pick or create a leaderboard.json to save scores';
+            status.style.color = 'var(--muted)';
+        }
+    };
 
     // ---- Boot sequence ----
     await loadManifest();  // sync now, kept awaited in case it changes later
