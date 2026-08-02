@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Minigames</title>
+<title> Minigames</title>
 <style>
 /* BaconSpace's Minigames — shared stylesheet */
 
@@ -302,7 +302,7 @@ table.lb tr:hover td { background: rgba(255,255,255,0.03); }
 
 
 <div id="topbar">
-    <div id="brand"> <span>Minigames</span></div>
+    <div id="brand">Minigames</div>
     <div id="user-box"></div>
 </div>
 
@@ -950,10 +950,6 @@ const Leaderboard = (function () {
     async function recordResult(name, gameId, success, elapsedMs) {
         console.log('[Leaderboard] recording result', { name, gameId, success, elapsedMs });
         const cache = readCache();
-        const lastGameTitle = r.lastGame
-    ? GAMES_MANIFEST.find(g => g.id === r.lastGame)?.title || r.lastGame
-    : '—';
-        
         const entry = cache[name] || { name, wins: 0, plays: 0, bestMs: null };
         entry.plays += 1;
         if (success) {
@@ -7546,7 +7542,7 @@ MG.register('welding', {
         rows.forEach((r, i) => {
             const tr = document.createElement('tr');
             const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-            tr.innerHTML = `<td class="${rankClass}">#${i + 1}</td><td>${r.name}</td><td>${r.wins || 0}</td><td>${r.plays || 0} || ${lastGameTitle}</td>`;
+            tr.innerHTML = `<td class="${rankClass}">#${i + 1}</td><td>${r.name}</td><td>${r.wins || 0}</td><td>${r.plays || 0}</td>`;
             tbody.appendChild(tr);
         });
     }
