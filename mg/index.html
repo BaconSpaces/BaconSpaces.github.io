@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Minigames</title>
+<style>
+/* BaconSpace's Minigames — shared stylesheet */
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Azeret+Mono:wght@400;500;700&display=swap');
+
+:root {
+    --accent: #00e0b8;
+    --danger: #ff3b5c;
+    --success: #39d98a;
+    --bg: #0a0e14;
+    --panel: rgba(14, 19, 28, 0.92);
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #e8edf2;
+    --muted: #6b7686;
+    --display: 'Chakra Petch', sans-serif;
+    --mono: 'Azeret Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: var(--mono);
+    color: var(--text);
+    user-select: none;
+}
+
+.hidden { display: none !important; }
+
+#root {
+    position: fixed; inset: 0;
+    display: grid; place-items: center;
+}
+
+#stage {
+    position: relative; z-index: 1;
+    width: 560px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,0.4),
+        0 30px 80px rgba(0,0,0,0.6),
+        0 0 60px -20px var(--accent);
+    overflow: hidden;
+    animation: panel-in 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+@keyframes panel-in {
+    from { opacity: 0; transform: translateY(14px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ---------------- HUD ---------------- */
+#hud {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+}
+#hud-title { display: flex; flex-direction: column; gap: 2px; }
+#hud-tag {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+    color: var(--accent); text-transform: uppercase;
+}
+#hud-name {
+    font-family: var(--display); font-weight: 700;
+    font-size: 18px; letter-spacing: 0.5px;
+}
+#hud-timer { display: flex; align-items: center; gap: 10px; }
+#timer-bar {
+    width: 120px; height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.08); overflow: hidden;
+}
+#timer-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, var(--accent), #fff);
+    transition: width 0.1s linear;
+}
+#timer-text {
+    font-variant-numeric: tabular-nums;
+    font-size: 13px; color: var(--muted); min-width: 34px; text-align: right;
+}
+
+/* ---------------- Board ---------------- */
+#board {
+    position: relative;
+    min-height: 320px;
+    padding: 26px;
+    display: flex; align-items: center; justify-content: center;
+}
+#board canvas { display: block; }
+
+/* ---------------- Footer ---------------- */
+#footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    border-top: 1px solid var(--line);
+    min-height: 44px;
+}
+#dots { display: flex; gap: 7px; }
+.dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255,255,255,0.14);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.dot.done { background: var(--success); box-shadow: 0 0 10px var(--success); }
+.dot.fail { background: var(--danger);  box-shadow: 0 0 10px var(--danger); }
+.dot.active { background: var(--accent); transform: scale(1.3); }
+#hint {
+    font-size: 11px; letter-spacing: 1px; color: var(--muted);
+    text-transform: uppercase;
+}
+
+/* ---------------- Flash overlay ---------------- */
+#flash {
+    position: fixed; inset: 0; z-index: 5;
+    display: grid; place-items: center;
+    pointer-events: none;
+    background: transparent;
+}
+#flash-text {
+    font-family: var(--display); font-weight: 700;
+    font-size: 48px; letter-spacing: 6px; text-transform: uppercase;
+    padding: 14px 36px; border-radius: 12px;
+    background: rgba(10, 14, 20, 0.82);
+    animation: flash-pop 0.4s cubic-bezier(0.2,0.9,0.2,1) both;
+}
+#flash.win  #flash-text { color: var(--success); text-shadow: 0 0 30px var(--success); }
+#flash.lose #flash-text { color: var(--danger);  text-shadow: 0 0 30px var(--danger); }
+@keyframes flash-pop {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---------------- Reusable bits for games ---------------- */
+.btn {
+    font-family: var(--display); font-weight: 600;
+    letter-spacing: 1px; font-size: 14px;
+    padding: 12px 20px; border-radius: 8px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04);
+    color: var(--text); cursor: pointer;
+    transition: all 0.15s;
+}
+.btn:hover { border-color: var(--accent); background: rgba(0,224,184,0.08); }
+.btn.danger:hover { border-color: var(--danger); background: rgba(255,59,92,0.08); }
+
+.label {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+}
+
+.shake { animation: shake 0.3s; }
+@keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
+}
+
+.glow-accent  { color: var(--accent); }
+.glow-success { color: var(--success); }
+.glow-danger  { color: var(--danger); }
+
+
+/* Site-level layout: login gate, lobby, leaderboard.
+   Loaded after engine.css, which owns the in-game board look. */
+
+html, body {
+    overflow-y: auto;
+    background: var(--bg);
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(0,224,184,0.08), transparent),
+        var(--bg);
+}
+
+.hidden { display: none !important; }
+
+/* ---------------- Top bar ---------------- */
+#topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--line);
+}
+#brand {
+    font-family: var(--display); font-weight: 700;
+    font-size: 20px; letter-spacing: 1px;
+}
+#brand span { color: var(--accent); }
+#user-box {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 13px; color: var(--muted);
+}
+#user-box strong { color: var(--text); }
+
+/* ---------------- Login gate ---------------- */
+#login-gate {
+    min-height: 80vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 22px; text-align: center; padding: 24px;
+}
+#login-gate h1 {
+    font-family: var(--display); font-size: 30px; letter-spacing: 1px;
+}
+#login-gate p { color: var(--muted); max-width: 420px; font-size: 13px; line-height: 1.6; }
+
+.discord-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.5px;
+    padding: 14px 26px; border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #5865F2; color: #fff; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.discord-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(88,101,242,0.4); }
+
+/* ---------------- Lobby ---------------- */
+#lobby { padding: 26px 28px 60px; max-width: 1200px; margin: 0 auto; }
+#lobby h2 {
+    font-family: var(--display); font-size: 15px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted);
+    margin: 26px 0 12px;
+}
+#lobby h2:first-child { margin-top: 0; }
+
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+.game-card {
+    text-align: left;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--mono);
+}
+.game-card:hover { border-color: var(--accent); background: rgba(0,224,184,0.06); transform: translateY(-2px); }
+.game-card .g-title {
+    font-family: var(--display); font-weight: 700; font-size: 14px; margin-bottom: 4px;
+}
+.game-card .g-hint { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ---------------- Leaderboard ---------------- */
+#leaderboard {
+    max-width: 1200px; margin: 40px auto 0; padding: 0 28px 60px;
+}
+#leaderboard h2 {
+    font-family: var(--display); font-size: 15px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+}
+table.lb { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.lb th, table.lb td {
+    text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line);
+}
+table.lb th { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+table.lb tr:hover td { background: rgba(255,255,255,0.03); }
+.rank-1 { color: #ffd257; }
+.rank-2 { color: #cfd6e0; }
+.rank-3 { color: #d7935a; }
+
+/* ---------------- Difficulty picker (shown before launching a game) ---------------- */
+#diff-picker {
+    position: fixed; inset: 0; z-index: 4;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(6,8,12,0.7);
+}
+#diff-picker .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 26px; width: 320px; text-align: center;
+}
+#diff-picker .panel h3 { font-family: var(--display); margin-bottom: 4px; }
+#diff-picker .panel p { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+#diff-picker .diffs { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+#diff-picker .diffs button {
+    width: 40px; height: 40px; border-radius: 8px;
+    border: 1px solid var(--line); background: rgba(255,255,255,0.04);
+    color: var(--text); font-family: var(--display); cursor: pointer;
+}
+#diff-picker .diffs button.selected,
+#diff-picker .diffs button:hover { border-color: var(--accent); background: rgba(0,224,184,0.12); }
+
+</style>
+</head>
+<body>
+
+
+<div id="topbar">
+    <div id="brand"><span>Minigames</span></div>
+    <div id="user-box"></div>
+</div>
+
+<!-- ============== Login gate ============== -->
+<div id="login-gate" class="hidden">
+    <h1>Sign in to play</h1>
+    <p>We only ask Discord for your display name — nothing else is read, stored, or shared.</p>
+    <button id="discord-login-btn" class="discord-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z"/></svg>
+        Continue with Discord
+    </button>
+</div>
+
+<!-- ============== Lobby ============== -->
+<div id="lobby" class="hidden">
+    <h2>Choose a task</h2>
+    <div id="game-grid" class="game-grid"></div>
+</div>
+
+<!-- ============== Leaderboard ============== -->
+<div id="leaderboard" class="hidden">
+    <h2>Leaderboard</h2>
+    <table class="lb">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Wins</th>
+                <th>Plays</th>
+                <th>Last Game</th>
+            </tr>
+        </thead>
+        <tbody id="lb-body"></tbody>
+    </table>
+</div>
+
+<!-- ============== Difficulty picker ============== -->
+<div id="diff-picker" class="hidden">
+    <div class="panel">
+        <h3>Pick a difficulty</h3>
+        <p>1 is easiest, 5 is brutal</p>
+        <div class="diffs">
+            <button data-diff="1">1</button>
+            <button data-diff="2">2</button>
+            <button data-diff="3">3</button>
+            <button data-diff="4">4</button>
+            <button data-diff="5">5</button>
+        </div>
+        <button id="diff-cancel" class="btn">Cancel</button>
+    </div>
+</div>
+
+<!-- ============== In-game board (engine renders here) ============== -->
+<div id="root" class="hidden">
+    <div id="stage">
+        <header id="hud">
+            <div id="hud-title">
+                <span id="hud-tag"></span>
+                <span id="hud-name"></span>
+            </div>
+            <div id="hud-timer">
+                <div id="timer-bar"><div id="timer-fill"></div></div>
+                <span id="timer-text">0.0</span>
+            </div>
+        </header>
+        <main id="board"></main>
+        <footer id="footer">
+            <div id="dots"></div>
+            <div id="hint"></div>
+        </footer>
+    </div>
+    <div id="flash" class="hidden"><span id="flash-text"></span></div>
+</div>
+
+<!-- ============== App scripts ============== -->
+
+<script>
+/* ============================================================
+   CONFIG — put your Discord Client ID + redirect URI here
+   ============================================================ */
+const APP_CONFIG = {
+  discord: {
+    clientId: '1533497212145766624',
+    clientSecret: 'asPOl1-knjEIOiyvuoHplD4Ub4j_ANs5',
+    redirectUri: window.location.origin + window.location.pathname,
+    scope: 'identify'
+  }
+};
+</script>
+
+<script>
+/* ============================================================
+   GAMES MANIFEST (auto-generated)
+   ============================================================ */
+const GAMES_MANIFEST = [
+  { "id": "animus", "title": "Animus", "hint": "Click a ring to rotate \u00b7 align all key segments to the line", "file": "animus.js" },
+  { "id": "archery", "title": "Longshot", "hint": "Drag from the bow toward the target \u00b7 longer drag = more power \u00b7 release", "file": "archery.js" },
+  { "id": "beltsort", "title": "Quality Control", "hint": "Click the cracked (red) parts before they leave the belt \u00b7 let good ones pass", "file": "beltsort.js" },
+  { "id": "bluff", "title": "Bluff", "hint": "Read the tell \u00b7 CALL a bluff, FOLD on truth", "file": "bluff.js" },
+  { "id": "bonepin", "title": "Bone Set", "hint": "Drag each fragment onto its matching slot", "file": "bonepin.js" },
+  { "id": "breachmatrix", "title": "Breach Matrix", "hint": "Pick codes (row, then column, then row\u2026) to match the sequence", "file": "breachmatrix.js" },
+  { "id": "breathalyzer", "title": "Breathalyzer", "hint": "Hold SPACE / mouse to blow \u00b7 keep the flow in the green to log a reading", "file": "breathalyzer.js" },
+  { "id": "cascade", "title": "Cascade", "hint": "Watch the sequence \u00b7 repeat it back", "file": "cascade.js" },
+  { "id": "cashcount", "title": "Count The Take", "hint": "Click bills to hit the exact amount \u00b7 UNDO to remove the last", "file": "cashcount.js" },
+  { "id": "chopshop", "title": "Chop Shop", "hint": "Press & hold on each part to unbolt it \u00b7 strip the car before the heat maxes", "file": "chopshop.js" },
+  { "id": "constellation", "title": "Stargazing", "hint": "Connect the stars in number order \u00b7 trace the constellation", "file": "constellation.js" },
+  { "id": "cooking", "title": "Cooking", "hint": "Hit SPACE when the marker is in the green for each step", "file": "cooking.js" },
+  { "id": "counterfeit", "title": "Counterfeit", "hint": "Drag the plate onto the guides \u00b7 hold it aligned to print each bill", "file": "counterfeit.js" },
+  { "id": "crafting", "title": "Crafting", "hint": "Add ingredients in the shown order", "file": "crafting.js" },
+  { "id": "crane", "title": "Cargo Crane", "hint": "SPACE / click to drop \u00b7 lead the swing onto the truck", "file": "crane.js" },
+  { "id": "cuttheright", "title": "Cut The Right One", "hint": "Read the clue \u00b7 cut the correct wire", "file": "cuttheright.js" },
+  { "id": "daemonrun", "title": "Daemon Run", "hint": "WASD / arrows \u00b7 grab all data \u00b7 dodge the trace", "file": "daemonrun.js" },
+  { "id": "dataheist", "title": "Data Heist", "hint": "Catch the clean data \u00b7 dodge the corrupt (red) packets", "file": "dataheist.js" },
+  { "id": "deadcalm", "title": "Dead Calm", "hint": "Hold SPACE to steady \u00b7 CLICK to fire", "file": "deadcalm.js" },
+  { "id": "decrypt", "title": "Decrypt", "hint": "Type the highlighted token \u00b7 ENTER to submit", "file": "decrypt.js" },
+  { "id": "diving", "title": "Salvage Dive", "hint": "Move to grab the loot \u00b7 surface to breathe before air runs out", "file": "diving.js" },
+  { "id": "drilling", "title": "Drilling", "hint": "Hold to drill \u00b7 keep pressure in the green, don\\u2019t overheat", "file": "drilling.js" },
+  { "id": "eaglevision", "title": "Eagle Vision", "hint": "Memorize the mark \u00b7 then click every match", "file": "eaglevision.js" },
+  { "id": "fingerprint", "title": "Fingerprint", "hint": "Match the scanned print \u00b7 click the identical one", "file": "fingerprint.js" },
+  { "id": "fishing", "title": "Fishing", "hint": "Wait for the bite \u00b7 then keep the fish in the zone", "file": "fishing.js" },
+  { "id": "flatline", "title": "Flatline", "hint": "SPACE inside the green zone", "file": "flatline.js" },
+  { "id": "forge", "title": "Blacksmith", "hint": "SPACE / click to strike while the metal glows in the green", "file": "forge.js" },
+  { "id": "gaslight", "title": "Gaslight", "hint": "Memorize the scene \u00b7 then answer", "file": "gaslight.js" },
+  { "id": "getaway", "title": "Getaway", "hint": "A / D (or \u2190 \u2192) to switch lanes \u00b7 dodge traffic until you\u2019re clear", "file": "getaway.js" },
+  { "id": "ghostsignal", "title": "Ghost Signal", "hint": "\u2191\u2193 frequency \u00b7 \u2190\u2192 phase \u00b7 lock to match", "file": "ghostsignal.js" },
+  { "id": "harvest", "title": "Harvest", "hint": "SPACE / click as each crop crosses the cut line", "file": "harvest.js" },
+  { "id": "hottrace", "title": "Hot Trace", "hint": "Drag the probe to the end \u00b7 don\u2019t touch the walls", "file": "hottrace.js" },
+  { "id": "hotwire", "title": "Hotwire", "hint": "Connect matching wires, then time the ignition spark", "file": "hotwire.js" },
+  { "id": "intrusion", "title": "Intrusion", "hint": "Click a connected node to hop \u00b7 avoid red (monitored) nodes", "file": "intrusion.js" },
+  { "id": "jammer", "title": "Signal Jammer", "hint": "Jam each alarm channel when its bar peaks", "file": "jammer.js" },
+  { "id": "keypad", "title": "Keypad", "hint": "\u25cf right spot \u00b7 \u25cb right digit, wrong spot", "file": "keypad.js" },
+  { "id": "lasergrid", "title": "Laser Grid", "hint": "Move to the exit \u00b7 don\u2019t touch the lasers", "file": "lasergrid.js" },
+  { "id": "lightsout", "title": "Lights Out", "hint": "Turn every light off \u00b7 each click flips that cell and its neighbours", "file": "lightsout.js" },
+  { "id": "livewire", "title": "Live Wire", "hint": "Drag each wire to its matching color", "file": "livewire.js" },
+  { "id": "lockpick", "title": "Lockpick", "hint": "Move mouse to rotate \u00b7 click on the sweet spot", "file": "lockpick.js" },
+  { "id": "locksmith", "title": "Locksmith", "hint": "Raise each pin to the shear line \u00b7 SPACE to set", "file": "locksmith.js" },
+  { "id": "lugnuts", "title": "Lug Nuts", "hint": "SPACE / click when the torque needle hits the green band", "file": "lugnuts.js" },
+  { "id": "mash", "title": "Mash", "hint": "Tap SPACE / click rapidly to fill the bar", "file": "mash.js" },
+  { "id": "mining", "title": "Mining", "hint": "Click the glowing crack to strike \u00b7 break the rock", "file": "mining.js" },
+  { "id": "overflow", "title": "Overflow", "hint": "Click tiles to rotate \u00b7 connect source \u2192 drain", "file": "overflow.js" },
+  { "id": "override", "title": "Override", "hint": "SPACE / click when the marker hits the top notch", "file": "override.js" },
+  { "id": "packing", "title": "Crate Packing", "hint": "Drag every part into the crate so they all fit", "file": "packing.js" },
+  { "id": "paintspray", "title": "Paint Booth", "hint": "Hold mouse to spray \u00b7 cover the panel evenly \u00b7 don\u2019t over-soak", "file": "paintspray.js" },
+  { "id": "parry", "title": "Deflect", "hint": "Press \u2190 \u2191 \u2192 (or A W D) to parry each strike inside the ring", "file": "parry.js" },
+  { "id": "partsort", "title": "Parts Sort", "hint": "Send each part to its bin \u00b7 press 1 / 2 / 3 (or click a bin)", "file": "partsort.js" },
+  { "id": "pickpocket", "title": "Pickpocket", "hint": "Hold SPACE / mouse to lift \u00b7 release before they glance", "file": "pickpocket.js" },
+  { "id": "pillpress", "title": "Pill Press", "hint": "SPACE / click when the press is fully down on the die", "file": "pillpress.js" },
+  { "id": "pulse", "title": "Pulse", "hint": "Hit D F J K as notes cross the line", "file": "pulse.js" },
+  { "id": "quicktime", "title": "Quicktime", "hint": "Press the keys in order, fast", "file": "quicktime.js" },
+  { "id": "reaction", "title": "Reaction", "hint": "Wait for GREEN, then SPACE / click \u2014 don\u2019t jump early", "file": "reaction.js" },
+  { "id": "resonance", "title": "Resonance", "hint": "Tune the sliders so your wave matches the target", "file": "resonance.js" },
+  { "id": "skillcheck", "title": "Skill Check", "hint": "SPACE / click when the marker hits the zone", "file": "skillcheck.js" },
+  { "id": "slidepuzzle", "title": "Slide Puzzle", "hint": "Click a tile next to the gap to slide it \u00b7 order 1..N to finish", "file": "slidepuzzle.js" },
+  { "id": "stacker", "title": "Stacker", "hint": "SPACE / click to drop the block on the stack", "file": "stacker.js" },
+  { "id": "steadydose", "title": "Steady Dose", "hint": "Move mouse \u00b7 keep the needle in the band", "file": "steadydose.js" },
+  { "id": "suture", "title": "Suture", "hint": "Click each stitch when its ring shrinks into the green", "file": "suture.js" },
+  { "id": "targets", "title": "Targets", "hint": "Click the targets \u00b7 avoid the red ones", "file": "targets.js" },
+  { "id": "thermite", "title": "Thermite", "hint": "Memorize the lit cells \u00b7 then light the same ones", "file": "thermite.js" },
+  { "id": "titration", "title": "Titration", "hint": "Hold to pour \u00b7 stop in the green band \u00b7 don\u2019t overshoot", "file": "titration.js" },
+  { "id": "toolbox", "title": "Tool Board", "hint": "Drag each tool onto its matching outline", "file": "toolbox.js" },
+  { "id": "tripwire", "title": "Tripwire", "hint": "Move the mouse to weave past the sweeping lasers \u00b7 reach the green exit", "file": "tripwire.js" },
+  { "id": "vaultdrill", "title": "Vault Drill", "hint": "Stop each drill in the green core \u00b7 SPACE / click", "file": "vaultdrill.js" },
+  { "id": "vaultspin", "title": "Vault Spin", "hint": "Drag the dial to each lit number", "file": "vaultspin.js" },
+  { "id": "vitals", "title": "Vitals", "hint": "Keep every gauge in the green \u2014 tap 1 / 2 / 3 to stabilize", "file": "vitals.js" },
+  { "id": "welding", "title": "Welding", "hint": "Drag the torch along the seam \u2014 steady, not too fast", "file": "welding.js" }
+];
+</script>
+
+<script>
+/* ============================================================
+   DISCORD LOGIN (implicit OAuth grant, name only, no backend)
+   ============================================================ */
+const DiscordAuth = (function () {
+    const STORAGE_KEY = 'mg_discord_user';
+
+    function buildAuthorizeUrl() {
+        const p = new URLSearchParams({
+            client_id: APP_CONFIG.discord.clientId,
+            redirect_uri: APP_CONFIG.discord.redirectUri,
+            response_type: 'token',
+            scope: APP_CONFIG.discord.scope
+        });
+        return `https://discord.com/api/oauth2/authorize?${p.toString()}`;
+    }
+
+    function login() {
+        console.log('[DiscordAuth] redirecting to Discord authorize screen');
+        window.location.href = buildAuthorizeUrl();
+    }
+
+    function logout() {
+        console.log('[DiscordAuth] logging out');
+        sessionStorage.removeItem(STORAGE_KEY);
+    }
+
+    function getStoredUser() {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+    }
+
+    async function resolveFromRedirect() {
+        const existing = getStoredUser();
+        if (existing) return existing;
+
+        const hash = window.location.hash;
+        if (!hash || !hash.includes('access_token')) return null;
+
+        const params = new URLSearchParams(hash.slice(1));
+        const token = params.get('access_token');
+        if (!token) return null;
+
+        console.log('[DiscordAuth] received access token, fetching profile');
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+
+        try {
+            const res = await fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error(`Discord API ${res.status}`);
+            const profile = await res.json();
+            const name = profile.global_name || profile.username;
+            const user = { name };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            console.log('[DiscordAuth] logged in as', name);
+            return user;
+        } catch (err) {
+            console.error('[DiscordAuth] failed to resolve profile', err);
+            return null;
+        }
+    }
+
+    return { login, logout, getStoredUser, resolveFromRedirect };
+})();
+</script>
+
+<script>
+/* ============================================================
+   LEADERBOARD (cached in this browser via localStorage)
+   ============================================================ */
+const Leaderboard = (function () {
+    const CACHE_KEY = 'mg_leaderboard_cache';
+
+    function readCache() {
+        try {
+            const raw = localStorage.getItem(CACHE_KEY);
+            return raw ? JSON.parse(raw) : {};
+        } catch (err) {
+            console.error('[Leaderboard] failed to read cache', err);
+            return {};
+        }
+    }
+
+    function writeCache(data) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        } catch (err) {
+            console.error('[Leaderboard] failed to write cache', err);
+        }
+    }
+
+    function init() {
+        console.log('[Leaderboard] using local browser cache (localStorage)');
+    }
+
+    async function recordResult(name, gameId, success, elapsedMs) {
+        console.log('[Leaderboard] recording result', { name, gameId, success, elapsedMs });
+        const cache = readCache();
+        const entry = cache[name] || { name, wins: 0, plays: 0, bestMs: null };
+        entry.plays += 1;
+        if (success) {
+            entry.wins += 1;
+            entry.bestMs = (entry.bestMs === null || elapsedMs < entry.bestMs) ? elapsedMs : entry.bestMs;
+        }
+        entry.lastGame = gameId;
+        entry.updatedAt = Date.now();
+        cache[name] = entry;
+        writeCache(cache);
+    }
+
+    async function top(limit = 10) {
+        const cache = readCache();
+        return Object.values(cache)
+            .sort((a, b) => b.wins - a.wins)
+            .slice(0, limit);
+    }
+
+    function clear() {
+        localStorage.removeItem(CACHE_KEY);
+        console.log('[Leaderboard] cache cleared');
+    }
+
+    return { init, recordResult, top, clear };
+})();
+</script>
+
+<script>
+/* ============================================================
+   SFX
+   ============================================================ */
+const SFX = (function () {
+    let ctx = null;
+    let enabled = true;
+    let master = 0.5;
+
+    function ac() {
+        if (!ctx) {
+            try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+            catch (e) { enabled = false; }
+        }
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+        return ctx;
+    }
+
+    function tone(freq, dur, type, vol, slideTo, delay) {
+        if (!enabled) return;
+        const a = ac(); if (!a) return;
+        const t0 = a.currentTime + (delay || 0);
+        const osc = a.createOscillator();
+        const gain = a.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, t0);
+        if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+        const v = (vol == null ? 0.3 : vol) * master;
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(v, t0 + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(gain); gain.connect(a.destination);
+        osc.start(t0); osc.stop(t0 + dur + 0.02);
+    }
+
+    function noise(dur, vol, filterFreq) {
+        if (!enabled) return;
+        const a = ac(); if (!a) return;
+        const bufferSize = a.sampleRate * dur;
+        const buffer = a.createBuffer(1, bufferSize, a.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noiseNode = a.createBufferSource();
+        noiseNode.buffer = buffer;
+        const filter = a.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = filterFreq || 1000;
+        const gain = a.createGain();
+        const v = (vol == null ? 0.2 : vol) * master;
+        gain.gain.setValueAtTime(v, a.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+        noiseNode.connect(filter);
+        filter.connect(gain);
+        gain.connect(a.destination);
+        noiseNode.start();
+    }
+
+    return { tone, noise };
+})();
+</script>
+
+<script>
+/* ============================================================
+   UI & APP CONTROLLER
+   ============================================================ */
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+async function renderLeaderboard() {
+    const tbody = document.getElementById('lb-body');
+    if (!tbody) return;
+
+    const entries = await Leaderboard.top(10);
+    tbody.innerHTML = '';
+
+    if (entries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color: var(--muted); text-align: center; padding: 20px;">No games recorded yet</td></tr>';
+        return;
+    }
+
+    const gameMap = {};
+    if (typeof GAMES_MANIFEST !== 'undefined') {
+        GAMES_MANIFEST.forEach(g => { gameMap[g.id] = g.title; });
+    }
+
+    entries.forEach((entry, i) => {
+        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+        const rankLabel = `#${i + 1}`;
+        const lastGameTitle = entry.lastGame ? (gameMap[entry.lastGame] || entry.lastGame) : '—';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="${rankClass}">${rankLabel}</td>
+            <td><strong>${escapeHtml(entry.name)}</strong></td>
+            <td class="glow-success">${entry.wins}</td>
+            <td>${entry.plays}</td>
+            <td style="color: var(--accent);">${escapeHtml(lastGameTitle)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderLobby() {
+    const grid = document.getElementById('game-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    GAMES_MANIFEST.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.innerHTML = `
+            <div class="g-title">${escapeHtml(game.title)}</div>
+            <div class="g-hint">${escapeHtml(game.hint)}</div>
+        `;
+        card.addEventListener('click', () => {
+            console.log('[Lobby] Selected game:', game.id);
+            // Difficulty picker logic or launch can be attached here
+        });
+        grid.appendChild(card);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    Leaderboard.init();
+    
+    let user = await DiscordAuth.resolveFromRedirect();
+    const loginGate = document.getElementById('login-gate');
+    const lobby = document.getElementById('lobby');
+    const leaderboardEl = document.getElementById('leaderboard');
+    const userBox = document.getElementById('user-box');
+    const loginBtn = document.getElementById('discord-login-btn');
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => DiscordAuth.login());
+    }
+
+    if (user) {
+        if (loginGate) loginGate.classList.add('hidden');
+        if (lobby) lobby.classList.remove('hidden');
+        if (leaderboardEl) leaderboardEl.classList.remove('hidden');
+        if (userBox) userBox.innerHTML = `Signed in as <strong>${escapeHtml(user.name)}</strong>`;
+        renderLobby();
+        await renderLeaderboard();
+    } else {
+        if (loginGate) loginGate.classList.remove('hidden');
+        if (lobby) lobby.classList.add('hidden');
+        if (leaderboardEl) leaderboardEl.classList.add('hidden');
+    }
+});
+</script>
+
+</body>
+</html>
