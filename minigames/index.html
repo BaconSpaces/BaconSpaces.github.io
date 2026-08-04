@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title> Minigames</title>
+<title>BaconSpace's Minigames</title>
 <style>
 /* BaconSpace's Minigames — shared stylesheet */
 
@@ -302,18 +302,24 @@ table.lb tr:hover td { background: rgba(255,255,255,0.03); }
 
 
 <div id="topbar">
-    <div id="brand">Minigames</div>
+    <div id="brand">Mini<span>Games</span></div>
     <div id="user-box"></div>
 </div>
 
 <!-- ============== Login gate ============== -->
 <div id="login-gate" class="hidden">
     <h1>Sign in to play</h1>
-    <p>We only ask Discord for your display name — nothing else is read, stored, or shared.</p>
-    <button id="discord-login-btn" class="discord-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z"/></svg>
-        Continue with Discord
-    </button>
+    <p>We only ask for your display name — nothing else is read, stored, or shared.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+        <button id="discord-login-btn" class="discord-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z"/></svg>
+            Continue with Discord
+        </button>
+        <button id="kick-login-btn" class="discord-btn" style="background:#53fc18;color:#0a0e14;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2 2h6v6h2V6h2V4h2V2h6v6h-2v2h-2v2h-2v2h2v2h2v2h2v6h-6v-2h-2v-2h-2v-2H8v6H2V2z"/></svg>
+            Continue with Kick
+        </button>
+    </div>
 </div>
 
 <!-- ============== Lobby ============== -->
@@ -325,8 +331,11 @@ table.lb tr:hover td { background: rgba(255,255,255,0.03); }
 <!-- ============== Leaderboard ============== -->
 <div id="leaderboard" class="hidden">
     <h2>Leaderboard</h2>
+    <div style="margin-bottom:12px;">
+        <span id="file-status" style="font-size:12px;color:var(--muted);">scores auto-download as leaderboard.json after each game</span>
+    </div>
     <table class="lb">
-        <thead><tr><th>Rank</th><th>Name</th><th>Wins</th><th>Plays</th></tr></thead>
+        <thead><tr><th>Rank</th><th>Name</th><th>Wins</th><th>Plays</th><th>Last Played</th></tr></thead>
         <tbody id="lb-body"></tbody>
     </table>
 </div>
@@ -394,13 +403,46 @@ const APP_CONFIG = {
     // "identify" is enough to read the user's Discord display name —
     // nothing else is requested, no email, no guilds, no avatar upload.
     scope: 'identify'
-  }
+  },
 
-  // No leaderboard backend to configure — scores are cached locally
-  // in the browser (see js/leaderboard.js).
+  // Kick's OAuth (Authorization Code + PKCE) is NOT an implicit grant like
+  // Discord's — Kick's token exchange requires a client secret, so unlike
+  // the Discord setup above, this one genuinely can't avoid embedding one.
+  // ⚠️ EXPOSED TO EVERY VISITOR, same as the Discord secret above.
+  // Setup: Kick → Account Settings → Developer → Create App. Register the
+  // exact redirect URL this page will run at (trailing slash included).
+  kick: {
+    clientId: '01KZ524H4RN3HA9Q7ZD8Y4SQJE',
+    clientSecret: 'd1edabdd7ad7facd9763e21658632977854291c2d890e2dbefb97bd9889d6941',
+    redirectUri: window.location.origin + window.location.pathname,
+    scope: 'user:read'
+  },
+
+  // Leaderboard storage as a local .json file on this computer, via
+  // the browser's real File System Access API (through the
+  // browser-fs-access library). No key, no account, no server — the
+  // file lives wherever you save it. Only the "Connect Save File"
+  // button in the top bar is needed; nothing to fill in here.
+  // Note: scores stay on whichever computer's file you connect to —
+  // this is genuinely local, not shared across players/devices,
+  // since there is no server in this setup to share it through.
+  localFile: {
+    fileName: 'leaderboard.json'
+  }
 };
 
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/fetch-json@3.5/dist/fetch-json.min.js"></script>
+<!-- fetch-json's official CDN build — sets window.fetchJson directly, no
+     import needed. Used to auto-load the existing leaderboard.json next
+     to this page (no prompt needed for reading). -->
+
+<script src="https://cdn.jsdelivr.net/npm/@larrym/file-saver@2.0.10/dist/FileSaver.min.js"></script>
+<!-- file-saver — sets window.saveAs directly. Triggers a browser download
+     of leaderboard.json on every result. No picker, no prompt — but no
+     in-place file editing either: each save is a new download that the
+     browser will typically auto-number rather than overwrite. -->
 
 <script>
 /* ============================================================
@@ -860,6 +902,7 @@ const DiscordAuth = (function () {
 
     function login() {
         console.log('[DiscordAuth] redirecting to Discord authorize screen');
+        sessionStorage.setItem('mg_pending_hash_provider', 'discord');
         window.location.href = buildAuthorizeUrl();
     }
 
@@ -881,6 +924,8 @@ const DiscordAuth = (function () {
 
         const hash = window.location.hash;
         if (!hash || !hash.includes('access_token')) return null;
+        if (sessionStorage.getItem('mg_pending_hash_provider') !== 'discord') return null;
+        sessionStorage.removeItem('mg_pending_hash_provider');
 
         const params = new URLSearchParams(hash.slice(1));
         const token = params.get('access_token');
@@ -913,44 +958,158 @@ const DiscordAuth = (function () {
 
 <script>
 /* ============================================================
-   LEADERBOARD (cached in this browser via localStorage)
+   KICK LOGIN (Authorization Code + PKCE — needs a client secret,
+   unlike Discord's implicit grant above)
    ============================================================ */
-// Leaderboard — cached in this browser only, via localStorage.
-// No backend, no external service: scores just live in the browser's
-// own cache under the key below, keyed per player name. Since it's
-// local storage, only this browser sees these scores — there's no
-// shared leaderboard across different players/devices.
+// Kick's OAuth 2.1 flow: browser generates a PKCE verifier/challenge,
+// redirects to Kick to authorize, Kick redirects back with a ?code=,
+// and the page exchanges that code for a token directly with Kick's
+// token endpoint (id.kick.com) — this exchange is the step that
+// requires the client secret above. If Kick's token endpoint doesn't
+// allow cross-origin requests from this page, this exchange will fail
+// with a CORS error in the console; that would mean a small backend
+// proxy is needed to complete it instead of doing it purely client-side.
+
+const KickAuth = (function () {
+    const STORAGE_KEY = 'mg_kick_user';
+    const VERIFIER_KEY = 'mg_kick_pkce_verifier';
+    const STATE_KEY = 'mg_kick_oauth_state';
+
+    function randomString(len) {
+        const arr = new Uint8Array(len);
+        crypto.getRandomValues(arr);
+        return Array.from(arr, (b) => ('0' + b.toString(16)).slice(-2)).join('').slice(0, len);
+    }
+    function base64url(buffer) {
+        return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+            .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+    async function sha256(str) {
+        const data = new TextEncoder().encode(str);
+        return await crypto.subtle.digest('SHA-256', data);
+    }
+
+    async function login() {
+        const verifier = randomString(64);
+        const state = randomString(24);
+        sessionStorage.setItem(VERIFIER_KEY, verifier);
+        sessionStorage.setItem(STATE_KEY, state);
+        const challenge = base64url(await sha256(verifier));
+
+        const p = new URLSearchParams({
+            response_type: 'code',
+            client_id: APP_CONFIG.kick.clientId,
+            redirect_uri: APP_CONFIG.kick.redirectUri,
+            scope: APP_CONFIG.kick.scope,
+            state,
+            code_challenge: challenge,
+            code_challenge_method: 'S256'
+        });
+        console.log('[KickAuth] redirecting to Kick authorize screen');
+        window.location.href = `https://id.kick.com/oauth/authorize?${p.toString()}`;
+    }
+
+    function logout() {
+        console.log('[KickAuth] logging out');
+        sessionStorage.removeItem(STORAGE_KEY);
+    }
+
+    function getStoredUser() {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+    }
+
+    // Called on every page load. If the URL has a fresh ?code= from Kick,
+    // exchange it for a token, then resolve that token to a display name.
+    async function resolveFromRedirect() {
+        const existing = getStoredUser();
+        if (existing) return existing;
+
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const returnedState = params.get('state');
+        if (!code) return null;
+
+        const expectedState = sessionStorage.getItem(STATE_KEY);
+        const verifier = sessionStorage.getItem(VERIFIER_KEY);
+        if (!verifier || returnedState !== expectedState) {
+            console.error('[KickAuth] missing PKCE verifier or state mismatch — aborting');
+            return null;
+        }
+
+        history.replaceState(null, '', window.location.pathname);
+
+        try {
+            const tokenRes = await fetch('https://id.kick.com/oauth/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    grant_type: 'authorization_code',
+                    client_id: APP_CONFIG.kick.clientId,
+                    client_secret: APP_CONFIG.kick.clientSecret,
+                    redirect_uri: APP_CONFIG.kick.redirectUri,
+                    code_verifier: verifier,
+                    code
+                })
+            });
+            if (!tokenRes.ok) throw new Error(`Kick token exchange ${tokenRes.status}`);
+            const tokenBody = await tokenRes.json();
+
+            const userRes = await fetch('https://api.kick.com/public/v1/users', {
+                headers: { Authorization: `Bearer ${tokenBody.access_token}` }
+            });
+            if (!userRes.ok) throw new Error(`Kick API ${userRes.status}`);
+            const userBody = await userRes.json();
+            const profile = (userBody.data && userBody.data[0]) || {};
+            const name = profile.name || profile.username || 'Kick user';
+            const user = { name };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            console.log('[KickAuth] logged in as', name);
+            return user;
+        } catch (err) {
+            console.error('[KickAuth] failed to resolve profile', err);
+            return null;
+        }
+    }
+
+    return { login, logout, getStoredUser, resolveFromRedirect };
+})();
+
+</script>
+
+<script>
+/* ============================================================
+   LEADERBOARD (saved via file download, using @larrym/file-saver)
+   ============================================================ */
+// Leaderboard — auto-loads leaderboard.json from next to this page on
+// boot, then every result triggers a fresh download of an updated
+// leaderboard.json via file-saver. No picker, no prompt to connect —
+// but also no in-place file editing: each save is a new download,
+// which most browsers will auto-number (leaderboard(1).json,
+// leaderboard(2).json, ...) rather than overwrite the original.
 
 const Leaderboard = (function () {
-    const CACHE_KEY = 'mg_leaderboard_cache';
+    let cache = { scores: {} };
 
-    function readCache() {
+    async function init() {
+        console.log('[Leaderboard] using file-saver — auto-loading', APP_CONFIG.localFile.fileName);
         try {
-            const raw = localStorage.getItem(CACHE_KEY);
-            return raw ? JSON.parse(raw) : {};
+            const data = await window.fetchJson.get(APP_CONFIG.localFile.fileName);
+            if (data && data.scores) { cache = data; console.log('[Leaderboard] auto-loaded existing', APP_CONFIG.localFile.fileName); }
         } catch (err) {
-            console.error('[Leaderboard] failed to read cache', err);
-            return {};
+            console.log('[Leaderboard] no existing', APP_CONFIG.localFile.fileName, 'found yet — starting empty');
         }
     }
 
-    function writeCache(data) {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        } catch (err) {
-            console.error('[Leaderboard] failed to write cache', err);
-        }
-    }
-
-    function init() {
-        console.log('[Leaderboard] using local browser cache (localStorage)');
+    function saveToFile() {
+        const blob = new Blob([JSON.stringify(cache, null, 2)], { type: 'application/json' });
+        window.saveAs(blob, APP_CONFIG.localFile.fileName);
     }
 
     // One win = one point. Tracked per Discord display name.
     async function recordResult(name, gameId, success, elapsedMs) {
         console.log('[Leaderboard] recording result', { name, gameId, success, elapsedMs });
-        const cache = readCache();
-        const entry = cache[name] || { name, wins: 0, plays: 0, bestMs: null };
+        const entry = cache.scores[name] || { name, wins: 0, plays: 0, bestMs: null };
         entry.plays += 1;
         if (success) {
             entry.wins += 1;
@@ -958,20 +1117,21 @@ const Leaderboard = (function () {
         }
         entry.lastGame = gameId;
         entry.updatedAt = Date.now();
-        cache[name] = entry;
-        writeCache(cache);
+        cache.scores[name] = entry;
+        try { saveToFile(); }
+        catch (err) { console.error('[Leaderboard] failed to save file', err); }
     }
 
     async function top(limit = 10) {
-        const cache = readCache();
-        return Object.values(cache)
+        return Object.values(cache.scores)
             .sort((a, b) => b.wins - a.wins)
             .slice(0, limit);
     }
 
     function clear() {
-        localStorage.removeItem(CACHE_KEY);
-        console.log('[Leaderboard] cache cleared');
+        cache = { scores: {} };
+        try { saveToFile(); console.log('[Leaderboard] cleared and saved'); }
+        catch (err) { console.error('[Leaderboard] failed to save cleared file', err); }
     }
 
     return { init, recordResult, top, clear };
@@ -7485,7 +7645,7 @@ MG.register('welding', {
 
     console.log('[App] boot');
 
-    Leaderboard.init();
+    await Leaderboard.init();
 
     MG.onResult(async (gameId, success, elapsedMs) => {
         console.log('[App] result', { gameId, success, elapsedMs });
@@ -7535,23 +7695,30 @@ MG.register('welding', {
         const tbody = $('lb-body');
         const rows = await Leaderboard.top(10);
         if (rows.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4">No scores cached in this browser yet — play a game to add one.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5">No scores yet — play a game to add one.</td></tr>`;
             return;
         }
         tbody.innerHTML = '';
         rows.forEach((r, i) => {
             const tr = document.createElement('tr');
             const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-            tr.innerHTML = `<td class="${rankClass}">#${i + 1}</td><td>${r.name}</td><td>${r.wins || 0}</td><td>${r.plays || 0}</td>`;
+            const lastGame = manifest.find((g) => g.id === r.lastGame);
+            const lastGameName = lastGame ? lastGame.title : (r.lastGame || '—');
+            tr.innerHTML = `<td class="${rankClass}">#${i + 1}</td><td>${r.name}</td><td>${r.wins || 0}</td><td>${r.plays || 0}</td><td>${lastGameName}</td>`;
             tbody.appendChild(tr);
         });
     }
 
-    function showLoggedIn(user) {
+    function showLoggedIn(user, provider) {
         currentUser = user;
         $('login-gate').classList.add('hidden');
         $('user-box').innerHTML = `Playing as <strong>${user.name}</strong> · <a href="#" id="logout-link">log out</a>`;
-        $('logout-link').onclick = (e) => { e.preventDefault(); DiscordAuth.logout(); location.reload(); };
+        $('logout-link').onclick = (e) => {
+            e.preventDefault();
+            const auth = provider === 'kick' ? KickAuth : DiscordAuth;
+            auth.logout();
+            location.reload();
+        };
         showLobby();
     }
 
@@ -7562,14 +7729,22 @@ MG.register('welding', {
     $('diff-cancel').onclick = () => $('diff-picker').classList.add('hidden');
 
     $('discord-login-btn').onclick = () => DiscordAuth.login();
+    $('kick-login-btn').onclick = () => KickAuth.login();
 
     // ---- Boot sequence ----
     await loadManifest();  // sync now, kept awaited in case it changes later
     renderLobby();
 
-    const user = await DiscordAuth.resolveFromRedirect();
+    // Discord's redirect lands in the URL hash (#access_token=...), Kick's
+    // lands in the query string (?code=...), so checking both is safe —
+    // only the one matching what actually came back will resolve.
+    const discordUser = await DiscordAuth.resolveFromRedirect();
+    const kickUser = discordUser ? null : await KickAuth.resolveFromRedirect();
+    const user = discordUser || kickUser;
+    const provider = discordUser ? 'discord' : (kickUser ? 'kick' : null);
+
     if (user) {
-        showLoggedIn(user);
+        showLoggedIn(user, provider);
         renderLeaderboard();
     } else {
         $('login-gate').classList.remove('hidden');
