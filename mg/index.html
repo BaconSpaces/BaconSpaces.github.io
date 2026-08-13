@@ -1152,43 +1152,52 @@ const KickAuth = (function () {
          return raw ? JSON.parse(raw) : null;
      }
 
-     // Called on every page load. If the URL has a fresh ?code= from Twitch,
-     // exchange it for a token, then resolve that token to a display name.
-     async function resolveFromRedirect() {
-         const existing = getStoredUser();
-         if (existing) return existing;
+// Called on every page load. If the URL has a fresh ?code= from Twitch,
+      // exchange it for a token, then resolve that token to a display name.
+      async function resolveFromRedirect() {
+          const existing = getStoredUser();
+          if (existing) return existing;
 
-         const params = new URLSearchParams(window.location.search);
-         const code = params.get('code');
-         const returnedState = params.get('state');
-         if (!code) return null;
+          const params = new URLSearchParams(window.location.search);
+          const code = params.get('code');
+          const returnedState = params.get('state');
+          if (!code) return null;
 
-         const expectedState = sessionStorage.getItem(STATE_KEY);
-         const verifier = sessionStorage.getItem(VERIFIER_KEY);
-         if (!verifier || returnedState !== expectedState) {
-             console.error('[TwitchAuth] missing PKCE verifier or state mismatch — aborting');
-             return null;
-         }
+          const expectedState = sessionStorage.getItem(STATE_KEY);
+          const verifier = sessionStorage.getItem(VERIFIER_KEY);
+          if (!verifier || returnedState !== expectedState) {
+              console.error('[TwitchAuth] missing PKCE verifier or state mismatch — aborting');
+              return null;
+          }
 
-         history.replaceState(null, '', window.location.pathname);
+          // Remove any existing redirect params from history
+          history.replaceState(null, '', window.location.pathname + window.location.search);
 
-try {
-            const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    grant_type: 'authorization_code',
-                    client_id: APP_CONFIG.twitch.clientId,
-                    client_secret: APP_CONFIG.twitch.clientSecret,
-                    code_verifier: verifier,
-                    code: code
-                })
-            });
-             if (!tokenRes.ok) {
-                const errTxt = await tokenRes.text();
-                throw new Error(`Twitch token exchange ${tokenRes.status}: ${errTxt}`);
-            }
-             const tokenBody = await tokenRes.json();
+          try {
+              console.log('[TwitchAuth] Exchange code for token, verifier length:', verifier.length);
+              const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: new URLSearchParams({
+                      grant_type: 'authorization_code',
+                      client_id: APP_CONFIG.twitch.clientId,
+                      client_secret: APP_CONFIG.twitch.clientSecret,
+                      code_verifier: verifier,
+                      code: code,
+                      // Include the exact redirect URI that was used in the authorize request
+                      redirect_uri: window.location.origin + window.location.pathname
+                  })
+              });
+
+              const errTxt = await tokenRes.text();
+              console.log('[TwitchAuth] Token response status:', tokenRes.status);
+              console.log('[TwitchAuth] Token response body:', errTxt);
+
+              if (!tokenRes.ok) {
+                  throw new Error(`Twitch token exchange ${tokenRes.status}: ${errTxt}`);
+              }
+
+              const tokenBody = await tokenRes.json();
 
              const userRes = await fetch('https://api.twitch.tv/helix/users', {
                  headers: { 'Client-Id': APP_CONFIG.twitch.clientId, Authorization: `Bearer ${tokenBody.access_token}` }
