@@ -8154,9 +8154,9 @@
             // only the one matching what actually came back will resolve.
             const discordUser = await DiscordAuth.resolveFromRedirect();
             const kickUser = discordUser ? null : await KickAuth.resolveFromRedirect();
-            const twitchUser = kickUser ? null : await TwitchAuth.resolveFromRedirect();
+            const twitchUser = (discordUser || kickUser) ? null : await TwitchAuth.resolveFromRedirect();
             const user = discordUser || kickUser || twitchUser;
-            const provider = discordUser ? 'discord' : (kickUser ? 'kick' : null);
+            const provider = discordUser ? 'discord' : (kickUser ? 'kick' : (twitchUser ? 'twitch' : null));
 
             if (user) {
                 showLoggedIn(user, provider);
