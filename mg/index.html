@@ -1179,11 +1179,15 @@ try {
                 body: new URLSearchParams({
                     grant_type: 'authorization_code',
                     client_id: APP_CONFIG.twitch.clientId,
+                    client_secret: APP_CONFIG.twitch.clientSecret,
                     code_verifier: verifier,
                     code: code
                 })
             });
-             if (!tokenRes.ok) throw new Error(`Twitch token exchange ${tokenRes.status}`);
+             if (!tokenRes.ok) {
+                const errTxt = await tokenRes.text();
+                throw new Error(`Twitch token exchange ${tokenRes.status}: ${errTxt}`);
+            }
              const tokenBody = await tokenRes.json();
 
              const userRes = await fetch('https://api.twitch.tv/helix/users', {
