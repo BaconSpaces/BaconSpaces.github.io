@@ -1172,18 +1172,17 @@ const KickAuth = (function () {
 
          history.replaceState(null, '', window.location.pathname);
 
-         try {
-             const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                 body: new URLSearchParams({
-                     grant_type: 'authorization_code',
-                     client_id: APP_CONFIG.twitch.clientId,
-                     client_secret: APP_CONFIG.twitch.clientSecret,
-                     code_verifier: verifier,
-                     code: code
-                 })
-             });
+try {
+            const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    grant_type: 'authorization_code',
+                    client_id: APP_CONFIG.twitch.clientId,
+                    code_verifier: verifier,
+                    code: code
+                })
+            });
              if (!tokenRes.ok) throw new Error(`Twitch token exchange ${tokenRes.status}`);
              const tokenBody = await tokenRes.json();
 
