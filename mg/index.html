@@ -1091,52 +1091,26 @@ const KickAuth = (function () {
 
 <script>
 /* ============================================================
-   TWITCH LOGIN (Authorization Code + PKCE — needs a client secret,
-   unlike Discord's implicit grant above)
+   TWITCH LOGIN (Implicit OAuth grant — for single HTML page, no backend)
    ============================================================ */
- // Twitch's OAuth 2.1 flow: browser generates a PKCE verifier/challenge,
- // redirects to Twitch to authorize, Twitch redirects back with a ?code=,
- // and the page exchanges that code for a token directly with Twitch's
- // token endpoint (id.twitch.tv) — this exchange requires the client secret
- // above. If Twitch's token endpoint doesn't allow cross-origin requests
- // from this page, this exchange will fail with a CORS error in the console;
- // that would mean a small backend proxy is needed to complete it instead of
- // doing it purely client-side.
+ // Twitch's implicit grant flow: browser redirects to Twitch to authorize,
+ // Twitch redirects back with the access token in the URL fragment (#access_token=...),
+ // which we read once and use to fetch the user's display name.
+ // This is the flow designed for client-side-only apps (no backend server needed).
 
  const TwitchAuth = (function () {
      const STORAGE_KEY = 'mg_twitch_user';
-     const VERIFIER_KEY = 'mg_twitch_pkce_verifier';
-     const STATE_KEY = 'mg_twitch_oauth_state';
 
-     function randomString(len) {
-         const arr = new Uint8Array(len);
-         crypto.getRandomValues(arr);
-         return Array.from(arr, (b) => ('0' + b.toString(16)).slice(-2)).join('').slice(0, len);
-     }
-     function base64url(buffer) {
-         return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-             .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-     }
-     async function sha256(str) {
-         const data = new TextEncoder().encode(str);
-         return await crypto.subtle.digest('SHA-256', data);
-     }
-
-     async function login() {
-         const verifier = randomString(64);
+     function login() {
          const state = randomString(24);
-         sessionStorage.setItem(VERIFIER_KEY, verifier);
-         sessionStorage.setItem(STATE_KEY, state);
-         const challenge = base64url(await sha256(verifier));
+         sessionStorage.setItem('mg_twitch_oauth_state', state);
 
          const p = new URLSearchParams({
-             response_type: 'code',
+             response_type: 'token',
              client_id: APP_CONFIG.twitch.clientId,
              redirect_uri: APP_CONFIG.twitch.redirectUri,
              scope: APP_CONFIG.twitch.scope,
-             state,
-             code_challenge: challenge,
-             code_challenge_method: 'S256'
+             state
          });
          console.log('[TwitchAuth] redirecting to Twitch authorize screen');
          window.location.href = `https://id.twitch.tv/oauth2/authorize?${p.toString()}`;
@@ -1145,6 +1119,8 @@ const KickAuth = (function () {
      function logout() {
          console.log('[TwitchAuth] logging out');
          sessionStorage.removeItem(STORAGE_KEY);
+         sessionStorage.removeItem('mg_twitch_oauth_state');
+         location.reload();
      }
 
      function getStoredUser() {
@@ -1152,61 +1128,34 @@ const KickAuth = (function () {
          return raw ? JSON.parse(raw) : null;
      }
 
-// Called on every page load. If the URL has a fresh ?code= from Twitch,
-      // exchange it for a token, then resolve that token to a display name.
-      async function resolveFromRedirect() {
-          const existing = getStoredUser();
-          if (existing) return existing;
+     // Called on every page load. If the URL has a fresh access_token
+     // fragment from Twitch's implicit grant, resolve it to a display name.
+     async function resolveFromRedirect() {
+         const existing = getStoredUser();
+         if (existing) return existing;
 
-          const params = new URLSearchParams(window.location.search);
-          const code = params.get('code');
-          const returnedState = params.get('state');
-          if (!code) return null;
+         const hash = window.location.hash;
+         if (!hash || !hash.includes('access_token')) return null;
+         if (sessionStorage.getItem('mg_twitch_oauth_state') !== 'twitch') return null;
+         sessionStorage.removeItem('mg_twitch_oauth_state');
 
-          const expectedState = sessionStorage.getItem(STATE_KEY);
-          const verifier = sessionStorage.getItem(VERIFIER_KEY);
-          if (!verifier || returnedState !== expectedState) {
-              console.error('[TwitchAuth] missing PKCE verifier or state mismatch — aborting');
-              return null;
-          }
+         // Remove the hash so it doesn't persist in the URL
+         history.replaceState(null, '', window.location.pathname + window.location.search);
 
-          // Remove any existing redirect params from history
-          history.replaceState(null, '', window.location.pathname + window.location.search);
+         const params = new URLSearchParams(hash.slice(1));
+         const token = params.get('access_token');
+           const expiresIn = params.get('expires_in');
+         if (!token) return null;
 
-          try {
-              console.log('[TwitchAuth] Exchange code for token, verifier length:', verifier.length);
-              const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                  body: new URLSearchParams({
-                      grant_type: 'authorization_code',
-                      client_id: APP_CONFIG.twitch.clientId,
-                      client_secret: APP_CONFIG.twitch.clientSecret,
-                      code_verifier: verifier,
-                      code: code,
-                      // Include the exact redirect URI that was used in the authorize request
-                      redirect_uri: window.location.origin + window.location.pathname
-                  })
-              });
-
-              const errTxt = await tokenRes.text();
-              console.log('[TwitchAuth] Token response status:', tokenRes.status);
-              console.log('[TwitchAuth] Token response body:', errTxt);
-
-              if (!tokenRes.ok) {
-                  throw new Error(`Twitch token exchange ${tokenRes.status}: ${errTxt}`);
-              }
-
-              const tokenBody = await tokenRes.json();
-
+         try {
              const userRes = await fetch('https://api.twitch.tv/helix/users', {
-                 headers: { 'Client-Id': APP_CONFIG.twitch.clientId, Authorization: `Bearer ${tokenBody.access_token}` }
+                 headers: { 'Client-Id': APP_CONFIG.twitch.clientId, Authorization: `Bearer ${token}` }
              });
              if (!userRes.ok) throw new Error(`Twitch API ${userRes.status}`);
              const userBody = await userRes.json();
              const profile = (userBody.data && userBody.data[0]) || {};
              const name = profile.display_name || profile.login || 'Twitch user';
-             const user = { name };
+             const user = { name, token, expiresIn };
              sessionStorage.setItem(STORAGE_KEY, JSON.stringify(user));
              console.log('[TwitchAuth] logged in as', name);
              return user;
