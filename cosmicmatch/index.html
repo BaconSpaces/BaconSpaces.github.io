@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <title>Cosmic Match</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        -webkit-tap-highlight-color: transparent
+      }
+
+      :root {
+        --R: #ff4f6d;
+        --Y: #ffc43a;
+        --G: #35d49a;
+        --B: #4a9dff;
+        --tx: #ecebff;
+        --mute: #9b9dcb;
+        --line: #3a3d85;
+        --panel: #14163a
+      }
+
+      html,
+      body {
+        min-height: 100%
+      }
+
+      body {
+        font-family: ui-rounded, "Avenir Next", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+        color: var(--tx);
+        background: radial-gradient(ellipse at 50% -10%, #32206e 0, #0d0d2b 48%, #05050f 100%) fixed;
+        overflow-x: hidden
+      }
+
+      #stars {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: .5;
+        background-image: radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent), radial-gradient(1px 1px at 90px 120px, #bcd, transparent), radial-gradient(1.5px 1.5px at 160px 60px, #fff, transparent), radial-gradient(1px 1px at 210px 170px, #cbe, transparent);
+        background-size: 240px 200px
+      }
+
+      #app {
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: max(10px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom))
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px
+      }
+
+      h1 {
+        font-size: 24px;
+        letter-spacing: .5px;
+        font-weight: 800;
+        background: linear-gradient(90deg, var(--B), #b58cff, var(--R));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent
+      }
+
+      #modeTag {
+        display: block;
+        font-size: 12px;
+        color: var(--mute);
+        margin-top: 2px
+      }
+
+      .ghost,
+      button {
+        font: inherit;
+        color: var(--tx);
+        background: rgba(255, 255, 255, .08);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        cursor: pointer;
+        font-weight: 700
+      }
+
+      .ghost+.ghost {
+        margin-left: 6px
+      }
+
+      button:hover:not(:disabled) {
+        background: rgba(255, 255, 255, .16)
+      }
+
+      button:disabled {
+        opacity: .35;
+        cursor: default
+      }
+
+      button:focus-visible,
+      .card:focus-visible,
+      .mode:focus-visible {
+        outline: 3px solid #fff;
+        outline-offset: 2px
+      }
+
+      #opps {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap
+      }
+
+      .opp {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 14px;
+        padding: 8px 12px;
+        text-align: center;
+        min-width: 104px;
+        transition: border-color .2s, box-shadow .2s
+      }
+
+      .opp.act {
+        border-color: #b58cff;
+        box-shadow: 0 0 18px #7d5cff88
+      }
+
+      .opp.out {
+        opacity: .4
+      }
+
+      .opp .av {
+        font-size: 24px
+      }
+
+      .opp .nm {
+        font-weight: 800;
+        font-size: 14px
+      }
+
+      .opp .ct {
+        font-size: 12px;
+        color: var(--mute)
+      }
+
+      .fan {
+        display: flex;
+        justify-content: center;
+        height: 22px;
+        margin: 4px 0
+      }
+
+      .fan i {
+        width: 14px;
+        height: 22px;
+        border-radius: 3px;
+        border: 1px solid #fff9;
+        background: radial-gradient(circle at 50% 40%, #5a3fc0, #1c1450 70%);
+        margin-left: -6px
+      }
+
+      .fan i:first-child {
+        margin-left: 0
+      }
+
+      #table {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        padding: 14px 0 6px
+      }
+
+      #info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        min-width: 140px
+      }
+
+      #claim {
+        font-weight: 800;
+        padding: 5px 12px;
+        border-radius: 99px;
+        border: 2px solid #fff8;
+        font-size: 14px;
+        text-align: center
+      }
+
+      #dir,
+      #modeinfo {
+        color: var(--mute);
+        font-size: 13px;
+        text-align: center;
+        max-width: 220px
+      }
+
+      #modeinfo {
+        color: #d6c9ff;
+        font-weight: 700
+      }
+
+      .card {
+        position: relative;
+        width: 64px;
+        height: 92px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: #fff;
+        border: 2px solid #ffffffd9;
+        box-shadow: 0 4px 12px #0008;
+        user-select: none;
+        flex: 0 0 auto;
+        transition: transform .15s, opacity .15s
+      }
+
+      .card.R {
+        background: linear-gradient(150deg, #ff7a92, #c71f40)
+      }
+
+      .card.Y {
+        background: linear-gradient(150deg, #ffd75e, #d89200);
+        color: #2a1d00
+      }
+
+      .card.G {
+        background: linear-gradient(150deg, #58e9b2, #119565)
+      }
+
+      .card.B {
+        background: linear-gradient(150deg, #74b6ff, #1d62c4)
+      }
+
+      .card.W {
+        background: conic-gradient(var(--R), var(--Y), var(--G), var(--B), var(--R))
+      }
+
+      .card .big {
+        font-size: 32px;
+        text-shadow: 0 2px 6px #0006
+      }
+
+      .card .big.sm {
+        font-size: 20px
+      }
+
+      .card.Y .big {
+        text-shadow: none
+      }
+
+      .card .cn,
+      .card .cm {
+        position: absolute;
+        font-size: 13px
+      }
+
+      .card .cn {
+        top: 4px;
+        left: 6px
+      }
+
+      .card .cm {
+        bottom: 4px;
+        right: 6px
+      }
+
+      .card.liar {
+        border-style: dashed
+      }
+
+      .card .lb {
+        position: absolute;
+        top: -9px;
+        right: -7px;
+        font-size: 13px;
+        background: var(--panel);
+        border-radius: 50%;
+        padding: 1px 4px;
+        font-style: normal;
+        border: 1px solid var(--line);
+        color: #fff
+      }
+
+      .card .fx {
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 16px;
+        border-radius: 5px;
+        border: 1.5px solid #fff;
+        font-size: 10px;
+        font-style: normal;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff
+      }
+
+      .fx.R {
+        background: var(--R)
+      }
+
+      .fx.Y {
+        background: var(--Y);
+        color: #2a1d00
+      }
+
+      .fx.G {
+        background: var(--G)
+      }
+
+      .fx.B {
+        background: var(--B)
+      }
+
+      .card.back {
+        background: radial-gradient(circle at 50% 40%, #6a4ad8, #1c1450 70%);
+        font-size: 22px
+      }
+
+      .card.back span {
+        text-shadow: 0 0 10px #c9b6ff
+      }
+
+      #drawPile {
+        cursor: pointer
+      }
+
+      #drawPile.ready {
+        box-shadow: 0 0 0 3px #b58cff, 0 0 20px #7d5cff
+      }
+
+      #controls {
+        display: flex;
+        gap: 8px;
+        justify-content: center
+      }
+
+      #status {
+        text-align: center;
+        font-weight: 800;
+        min-height: 24px
+      }
+
+      #actbar {
+        position: relative;
+        display: none;
+        justify-content: center;
+        min-height: 54px
+      }
+
+      #actbar.on {
+        display: flex
+      }
+
+      #actbar button {
+        background: linear-gradient(90deg, #7d5cff, #e04cc2);
+        border: 0;
+        font-size: 17px;
+        padding: 10px 26px;
+        animation: pulse .8s infinite alternate
+      }
+
+      #actbar i {
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: 0;
+        height: 4px;
+        border-radius: 4px;
+        background: #b58cff;
+        transform-origin: left;
+        animation: shrink linear forwards
+      }
+
+      @keyframes shrink {
+        to {
+          transform: scaleX(0)
+        }
+      }
+
+      @keyframes pulse {
+        to {
+          transform: scale(1.06)
+        }
+      }
+
+      #log {
+        font-size: 13px;
+        color: var(--mute);
+        text-align: center;
+        min-height: 68px;
+        line-height: 1.35
+      }
+
+      #hand {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 4px 6px;
+        margin-top: auto
+      }
+
+      #hand .card {
+        cursor: pointer
+      }
+
+      #hand .card:hover:not(.dim) {
+        transform: translateY(-9px)
+      }
+
+      .dim {
+        opacity: .38;
+        filter: grayscale(.4)
+      }
+
+      #modal {
+        position: fixed;
+        inset: 0;
+        background: #03030cd0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        padding: 16px
+      }
+
+      #modal.on {
+        display: flex
+      }
+
+      .box {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px;
+        max-width: 520px;
+        width: 100%;
+        max-height: 92vh;
+        overflow: auto;
+        line-height: 1.45
+      }
+
+      .box h2 {
+        margin: 12px 0 8px;
+        font-size: 18px
+      }
+
+      .box p,
+      .box li {
+        margin: 6px 0;
+        font-size: 15px
+      }
+
+      .box ul {
+        padding-left: 20px
+      }
+
+      .cols {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px
+      }
+
+      .cols button {
+        flex: 1 1 90px
+      }
+
+      .cb.R {
+        background: var(--R)
+      }
+
+      .cb.Y {
+        background: var(--Y);
+        color: #2a1d00
+      }
+
+      .cb.G {
+        background: var(--G);
+        color: #042
+      }
+
+      .cb.B {
+        background: var(--B)
+      }
+
+      .cb {
+        border: 0
+      }
+
+      .menu {
+        text-align: center
+      }
+
+      .menu h1 {
+        font-size: 40px;
+        margin: 2px 0 4px
+      }
+
+      .menu .sub,
+      .menu .msg {
+        color: var(--mute);
+        margin-bottom: 12px
+      }
+
+      .menu .msg {
+        color: var(--tx);
+        font-weight: 800;
+        font-size: 18px
+      }
+
+      .demo {
+        display: flex;
+        justify-content: center;
+        height: 112px;
+        margin-top: 4px
+      }
+
+      .demo .card {
+        margin-left: -14px;
+        transform-origin: 50% 120%
+      }
+
+      .demo .card:nth-child(1) {
+        transform: rotate(-20deg)
+      }
+
+      .demo .card:nth-child(2) {
+        transform: rotate(-10deg)
+      }
+
+      .demo .card:nth-child(3) {
+        transform: translateY(-8px)
+      }
+
+      .demo .card:nth-child(4) {
+        transform: rotate(10deg)
+      }
+
+      .demo .card:nth-child(5) {
+        transform: rotate(20deg)
+      }
+
+      .modes {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: left
+      }
+
+      .mode {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: space-between;
+        border: 2px solid var(--line);
+        border-radius: 14px;
+        padding: 10px 12px;
+        cursor: pointer;
+        background: rgba(255, 255, 255, .04)
+      }
+
+      .mode.sel {
+        border-color: #b58cff;
+        background: rgba(125, 92, 255, .2);
+        box-shadow: 0 0 16px #7d5cff55
+      }
+
+      .mode b {
+        display: block;
+        font-size: 17px
+      }
+
+      .mode span {
+        font-size: 13px;
+        color: var(--mute)
+      }
+
+      .mode button {
+        flex: 0 0 auto;
+        padding: 6px 12px
+      }
+
+      .seg button.on {
+        background: #7d5cff;
+        border-color: #b58cff
+      }
+
+      .go {
+        background: linear-gradient(90deg, #7d5cff, #e04cc2) !important;
+        border: 0 !important;
+        font-size: 18px;
+        padding: 12px
+      }
+
+      @media(max-width:560px) {
+        .card {
+          width: 52px;
+          height: 76px
+        }
+
+        .card .big {
+          font-size: 26px
+        }
+
+        .card .big.sm {
+          font-size: 16px
+        }
+
+        .card .fx {
+          width: 20px;
+          height: 13px;
+          font-size: 8px
+        }
+
+        #hand {
+          gap: 6px
+        }
+
+        h1 {
+          font-size: 20px
+        }
+
+        .menu h1 {
+          font-size: 32px
+        }
+
+        .opp {
+          min-width: 84px;
+          padding: 6px 8px
+        }
+
+        #table {
+          gap: 12px
+        }
+
+        #info {
+          min-width: 100px
+        }
+      }
+
+      @media(prefers-reduced-motion:reduce) {
+        * {
+          animation: none !important;
+          transition: none !important
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stars"></div>
+    <div id="app">
+      <header>
+        <div>
+          <h1>✦ Cosmic Match</h1>
+          <span id="modeTag"></span>
+        </div>
+        <div>
+          <button class="ghost" id="rulesBtn">Rules</button>
+          <button class="ghost" id="newBtn">Menu</button>
+        </div>
+      </header>
+      <div id="opps"></div>
+      <div id="table">
+        <div id="drawPile" class="card back" role="button" tabindex="0" aria-label="Draw pile"></div>
+        <div id="info">
+          <div id="discard"></div>
+          <div id="claim"></div>
+          <div id="modeinfo"></div>
+          <div id="dir"></div>
+        </div>
+      </div>
+      <div id="status"></div>
+      <div id="actbar"></div>
+      <div id="controls">
+        <button id="drawBtn" disabled>Draw a card</button>
+        <button id="passBtn" disabled>End turn</button>
+      </div>
+      <div id="log"></div>
+      <div id="hand"></div>
+    </div>
+    <div id="modal"></div>
+    <script>
+      const COLORS = ['R', 'Y', 'G', 'B'],
+        CN = {
+          R: 'Red',
+          Y: 'Gold',
+          G: 'Green',
+          B: 'Blue'
+        },
+        SH = {
+          R: '●',
+          Y: '▲',
+          G: '◆',
+          B: '■'
+        };
+      const NAMES = ['Nova', 'Orion', 'Lyra', 'Vega', 'Atlas'],
+        AV = ['🛰️', '👽', '🌠', '🪐', '☄️'];
+      const KN = {
+        draw2: 'Draw Two',
+        skip: 'Skip',
+        rev: 'Reverse',
+        draw4: 'Draw Four',
+        discall: 'Discard All',
+        skipall: 'Skip Everyone',
+        wrev4: 'Wild Reverse Draw 4',
+        wd6: 'Wild Draw 6',
+        wd10: 'Wild Draw 10',
+        roul: 'Wild Color Roulette',
+        wflip: 'Wild All Flip',
+        wt2: 'Flex Wild Target Draw 2',
+        wall: 'Flex Wild All Draw',
+        wd4: 'Flex Wild Draw 4',
+        wild4: 'Wild Draw 4',
+        wildc: 'Wild Challenge',
+        wild: 'Wild'
+      };
+      const LAB = {
+        draw2: '+2',
+        skip: '⊘',
+        rev: '⇄',
+        draw4: '+4',
+        discall: '✖',
+        skipall: '⏭',
+        wrev4: '⇄+4',
+        wd6: '+6',
+        wd10: '+10',
+        roul: '🎲',
+        wflip: '⟲',
+        wt2: '◎2',
+        wall: '✦2',
+        wd4: '+4',
+        wild4: '+4',
+        wildc: '?!'
+      };
+      const DRAWV = {
+        draw2: 2,
+        draw4: 4,
+        wrev4: 4,
+        wd6: 6,
+        wd10: 10
+      };
+      const MODES = {
+        liars: {
+          name: "Liar's Match",
+          d: 'Liar cards are played face down. Bluff your way out, or call out someone else.'
+        },
+        mercy: {
+          name: 'No Mercy',
+          d: 'Stack draw cards, wipe out whole colors, and hit 25 cards and you\'re out.'
+        },
+        flex: {
+          name: 'Flex',
+          d: 'Two-sided cards and a Power card let you flex into a different color.'
+        }
+      };
+      const $ = s => document.querySelector(s),
+        sleep = ms => new Promise(r => setTimeout(r, ms));
+      const pick = a => a[Math.floor(Math.random() * a.length)],
+        mod = (a, n) => ((a % n) + n) % n;
+      const lab = c => c.k === 'num' ? c.n : LAB[c.k];
+      const isWild = c => c.c === null;
+      const desc = c => c.k === 'wild' ? `${CN[c.c]} (wild)` : c.c ? `${CN[c.c]} ${c.k==='num'?c.n:(c.flex?'Flex ':'')+KN[c.k]}` : KN[c.k];
+      let G = null,
+        uid = 0,
+        waiter = null,
+        selMode = 'liars',
+        selOpp = 3;
+
+      function shuffle(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]]
+        }
+        return a
+      }
+
+      function buildDeck(mode) {
+        const d = [];
+        const add = (o, t = 1) => {
+          for (let i = 0; i < t; i++) d.push({
+            liar: false,
+            flex: false,
+            f: null,
+            flip: false,
+            ...o
+          })
+        };
+        if (mode === 'liars') {
+          for (const c of COLORS) {
+            for (let n = 0; n <= 9; n++) {
+              add({
+                c,
+                k: 'num',
+                n
+              });
+              add({
+                c,
+                k: 'num',
+                n,
+                liar: true
+              })
+            }
+            for (const k of ['draw2', 'skip', 'rev']) add({
+              c,
+              k,
+              liar: true
+            }, 2)
+          }
+          add({
+            c: null,
+            k: 'wild4',
+            liar: true
+          }, 4);
+          add({
+            c: null,
+            k: 'wildc',
+            liar: true
+          }, 4)
+        } else if (mode === 'mercy') {
+          for (const c of COLORS) {
+            for (let n = 0; n <= 9; n++) add({
+              c,
+              k: 'num',
+              n
+            }, 2);
+            add({
+              c,
+              k: 'draw2'
+            }, 3);
+            add({
+              c,
+              k: 'draw4'
+            }, 2);
+            add({
+              c,
+              k: 'skip'
+            }, 3);
+            add({
+              c,
+              k: 'rev'
+            }, 3);
+            add({
+              c,
+              k: 'discall'
+            }, 3);
+            add({
+              c,
+              k: 'skipall'
+            }, 2)
+          }
+          for (const k of ['wrev4', 'wd6', 'wd10', 'roul']) add({
+            c: null,
+            k
+          }, 6)
+        } else {
+          COLORS.forEach((c, ci) => {
+            for (let n = 1; n <= 8; n++) {
+              add({
+                c,
+                k: 'num',
+                n,
+                flip: n === 3 || n === 6
+              });
+              add({
+                c,
+                k: 'num',
+                n,
+                flex: true,
+                f: COLORS[(ci + 1 + n % 3) % 4]
+              })
+            }
+            ['skip', 'rev', 'draw2'].forEach((k, i) => {
+              add({
+                c,
+                k
+              });
+              add({
+                c,
+                k,
+                flex: true,
+                f: COLORS[(ci + 1 + i) % 4]
+              })
+            })
+          });
+          for (const k of ['wflip', 'wt2', 'wall', 'wd4']) add({
+            c: null,
+            k,
+            flex: k !== 'wflip'
+          }, 4)
+        }
+        d.forEach(x => x.id = ++uid);
+        return d
+      }
+
+      function matches(c, t) {
+        return c.c === t.c || (c.k === 'num' && t.k === 'num' && c.n === t.n) || (c.k !== 'num' && c.k === t.k)
+      }
+      const aliveCount = () => G.players.filter(x => !x.out).length;
+      const others = p => G.players.filter(x => x !== p && !x.out);
+
+      function nextAlive() {
+        let i = G.cur;
+        do {
+          i = mod(i + G.dir, G.players.length)
+        } while (G.players[i].out);
+        return G.players[i]
+      }
+
+      function draw(p, n) {
+        for (let i = 0; i < n; i++) {
+          if (p.out) return;
+          if (!G.deck.length && (G.disc.length > 1 || G.aside.length)) {
+            const top = G.disc.pop();
+            G.deck = shuffle([...G.disc, ...G.aside]);
+            G.aside = [];
+            G.disc = [top]
+          }
+          if (!G.deck.length) return;
+          p.hand.push(G.deck.pop());
+          if (G.mode === 'mercy' && p.hand.length >= 25) {
+            p.out = true;
+            G.aside.push(...p.hand);
+            p.hand = [];
+            log(`💥 ${p.name} hit 25 cards and is out!`);
+            return
+          }
+        }
+      }
+
+      function drawOthers(p, v) {
+        others(p).forEach(q => draw(q, v))
+      }
+
+      function advance(s = 1) {
+        let k = 0,
+          guard = 0;
+        while (k < s && guard++ < 200) {
+          G.cur = mod(G.cur + G.dir, G.players.length);
+          if (!G.players[G.cur].out) k++
+        }
+      }
+
+      function log(m) {
+        G.log.push(m);
+        if (G.log.length > 4) G.log.shift();
+        $('#log').innerHTML = G.log.map(x => `
+									<div>${x}</div>`).join('')
+      }
+
+      function setStatus(m) {
+        $('#status').textContent = m
+      }
+      /* ---------- which sides of a card can be played right now ---------- */
+      function sidesFor(p, c) {
+        const m = G.mode,
+          t = G.top;
+        if (m === 'liars') return (c.liar || matches(c, t)) ? ['r'] : [];
+        if (m === 'mercy') {
+          if (G.pending > 0) return (DRAWV[c.k] && DRAWV[c.k] >= G.lastVal) ? ['r'] : [];
+          return (isWild(c) || matches(c, t)) ? ['r'] : []
+        }
+        if (c.k === 'wflip') return ['r'];
+        if (isWild(c)) return (c.flex && p.power) ? ['r', 'f'] : ['r'];
+        const reg = matches(c, t),
+          s = [];
+        if (reg) s.push('r');
+        if (c.flex && p.power && (c.f === t.c || (reg && c.k !== 'num'))) s.push('f');
+        return s
+      }
+      /* ---------- rendering ---------- */
+      function cardHTML(c, dim) {
+        const raw = String(lab(c)),
+          l = (c.k === 'num' && (c.n === 6 || c.n === 9)) ? `
+										<u>${c.n}</u>` : raw,
+          s = c.c ? SH[c.c] : '✦';
+        return `
+										<div class="card ${c.c||'W'} ${c.liar?'liar':''} ${dim?'dim':''}" data-id="${c.id}" ${dim===undefined?'':'tabindex="0"'} title="${desc(c)}${c.liar?' (Liar card)':''}${c.f?' · flex side: '+CN[c.f]:''}">
+											<b class="cn">${s}</b>
+											<span class="big ${raw.length>2?'sm':''}">${l}</span>
+											<b class="cm">${s}</b>${c.liar?'
+											<em class="lb">🎭</em>':c.flip?'
+											<em class="lb">⟳</em>':''}${c.f?`
+											<i class="fx ${c.f}">${SH[c.f]}</i>`:''}
+										</div>`
+      }
+
+      function render() {
+        if (!G) return;
+        const me = G.players[0],
+          myTurn = G.humanTurn,
+          M = G.mode === 'mercy';
+        $('#opps').innerHTML = G.players.slice(1).map((p, i) => `
+										<div class="opp ${G.cur===i+1?'act':''} ${p.out?'out':''}">
+											<div class="av">${p.out?'💥':p.av}</div>
+											<div class="nm">${p.name}</div>${p.out?'
+											<div class="ct">out</div>':`
+											<div class="fan">${'
+												<i></i>'.repeat(Math.min(p.hand.length,8))}
+											</div>
+											<div class="ct">${p.hand.length} card${p.hand.length===1?'':'s'}${G.mode==='flex'?(p.power?' · ⚡':' · ⭕'):''}</div>`}
+										</div>`).join('');
+        $('#drawPile').innerHTML = `
+										<span>${G.deck.length}</span>`;
+        $('#drawPile').classList.toggle('ready', !!myTurn && !G.drew);
+        $('#discard').innerHTML = G.topFace ? cardHTML(G.topCard) : `
+										<div class="card back">
+											<span>🎭</span>
+										</div>`;
+        const t = G.top,
+          col = t.c ? `var(--${t.c})` : '#fff';
+        $('#claim').textContent = (G.topFace ? '' : 'Claimed: ') + `${SH[t.c]} ${t.k==='wild'?CN[t.c]:desc(t)}`;
+        $('#claim').style.background = t.c ? `color-mix(in srgb,${col} 35%,#10122e)` : '#10122e';
+        $('#claim').style.borderColor = col;
+        $('#dir').textContent = G.dir === 1 ? '↻ clockwise' : '↺ counter-clockwise';
+        let mi = '';
+        if (M) mi = G.pending > 0 ? `Draw stack: +${G.pending}. Beat +${G.lastVal} or take it.` : (me.out ? 'You are out!' : `Out at 25 cards (you: ${me.hand.length})`);
+        if (G.mode === 'flex') mi = me.power ? '⚡ Power ON: flex sides available' : '⭕ Power OFF: regular sides only';
+        $('#modeinfo').textContent = mi;
+        const sorted = [...me.hand].sort((a, b) => (COLORS.indexOf(a.c) < 0 ? 9 : COLORS.indexOf(a.c)) - (COLORS.indexOf(b.c) < 0 ? 9 : COLORS.indexOf(b.c)) || (a.n ?? 20) - (b.n ?? 20) || a.k.localeCompare(b.k));
+        $('#hand').innerHTML = sorted.map(c => {
+          let dim = false;
+          if (myTurn) dim = G.drew ? c !== G.drew : !sidesFor(me, c).length;
+          return cardHTML(c, G.laying ? false : myTurn ? dim : false)
+        }).join('');
+        const anyLegal = !!myTurn && me.hand.some(c => sidesFor(me, c).length);
+        $('#drawBtn').textContent = M ? (G.pending > 0 ? `Take ${G.pending} cards` : 'Draw until playable') : 'Draw a card';
+        $('#drawBtn').disabled = !myTurn || !!G.drew || (M && G.pending === 0 && anyLegal);
+        $('#passBtn').disabled = !myTurn || !G.drew || M;
+      }
+      /* ---------- modals ---------- */
+      function modal(html) {
+        const m = $('#modal');
+        m.innerHTML = `
+												<div class="box">${html}</div>`;
+        m.classList.add('on');
+        m.onclick = null;
+        return m
+      }
+
+      function closeModal() {
+        $('#modal').classList.remove('on')
+      }
+
+      function pickColor(msg) {
+        return new Promise(r => {
+          modal(`
+												<h2>${msg}</h2>
+												<div class="cols">${COLORS.map(c=>`
+													<button class="cb ${c}" data-c="${c}">${SH[c]} ${CN[c]}</button>`).join('')}
+												</div>`).onclick = e => {
+            const b = e.target.closest('[data-c]');
+            if (b) {
+              closeModal();
+              r(b.dataset.c)
+            }
+          }
+        })
+      }
+
+      function pickPlayer(msg) {
+        return new Promise(r => {
+          const os = others(G.players[0]);
+          if (os.length === 1) return r(os[0]);
+          modal(`
+												<h2>${msg||'Choose a player'}</h2>
+												<div class="cols">${os.map(p=>`
+													<button data-i="${G.players.indexOf(p)}">${p.av} ${p.name} (${p.hand.length})</button>`).join('')}
+												</div>`).onclick = e => {
+            const b = e.target.closest('[data-i]');
+            if (b) {
+              closeModal();
+              r(G.players[+b.dataset.i])
+            }
+          }
+        })
+      }
+
+      function pickLaid(laid, col) {
+        return new Promise(r => {
+          modal(`
+												<h2>Wild Challenge: ${CN[col]}</h2>
+												<p>Everyone claims their card is ${CN[col]}. Flip one to check?</p>
+												<div class="cols">${laid.map((l,i)=>`
+													<button data-i="${i}">Flip ${l.q.name}'s card</button>`).join('')}
+													<button data-i="-1">No challenge</button>
+												</div>`).onclick = e => {
+            const b = e.target.closest('[data-i]');
+            if (b) {
+              closeModal();
+              r(laid[+b.dataset.i] || null)
+            }
+          }
+        })
+      }
+      const FXTXT = {
+        skip: 'Skip ALL others: you go again',
+        rev: 'Reverse, then skip the next player',
+        draw2: 'Every other player draws 1',
+        wt2: 'A player you choose draws 2',
+        wall: 'Every other player draws 2',
+        wd4: 'A player you choose draws 4'
+      };
+
+      function pickSide(c) {
+        return new Promise(r => {
+          modal(`
+												<h2>${desc(c)}</h2>
+												<p>Which side do you play?</p>
+												<div class="cols" style="flex-direction:column">
+													<button data-s="r">Regular side${isWild(c)?': classic wild':''}</button>
+													<button data-s="f">⚡ Flex side (uses your Power): ${FXTXT[c.k]||'color '+CN[c.f]}</button>
+												</div>`).onclick = e => {
+            const b = e.target.closest('[data-s]');
+            if (b) {
+              closeModal();
+              r(b.dataset.s)
+            }
+          }
+        })
+      }
+
+      function askChallenge(p) {
+        return new Promise(r => {
+          modal(`
+												<h2>${p.name} played a Flex Wild Draw 4</h2>
+												<p>Draw 4 and lose your turn, or challenge? If they held a card matching the color, they draw 4 instead. If not, you draw 6.</p>
+												<div class="cols">
+													<button data-v="0">Draw 4</button>
+													<button data-v="1">Challenge!</button>
+												</div>`).onclick = e => {
+            const b = e.target.closest('[data-v]');
+            if (b) {
+              closeModal();
+              r(b.dataset.v === '1')
+            }
+          }
+        })
+      }
+      const RULES = {
+        liars: `
+												<p>Be first to empty your hand. Match the top card by color, number or symbol.</p>
+												<ul>
+													<li>
+														<b>Regular cards</b> are played face up and must match.
+													</li>
+													<li>
+														<b>Liar cards 🎭</b> are always played face down. If one doesn't match, you're bluffing: you claim it's a match.
+													</li>
+													<li>
+														<b>Challenge</b> a face-down card before the next turn. Truth: the challenger draws 1. Lie: the liar takes the card back and draws 1. Unchallenged cards stay, and their action happens either way.
+													</li>
+													<li>
+														<b>Can't or won't play?</b> Draw one card. You may play it if you can, otherwise end your turn.
+													</li>
+													<li>
+														<b>+2, Skip, Reverse, Wild Draw 4</b> are all Liar cards. Wild Draw 4 is honest only if you hold no card of the current color.
+													</li>
+													<li>
+														<b>Wild Challenge</b>: pick a color. Everyone else lays one card face down claiming that color. The next player may flip one: if it's right they draw 2, if it's a lie the liar takes it back and draws 1.
+													</li>
+													<li>
+														<b>7</b> swaps hands with a player. 
+														<b>0</b> passes every hand in the direction of play.
+													</li>
+													<li>With one card left, hit 
+														<b>COSMIC!</b> before someone catches you. Forget it and you draw 2.
+													</li>
+												</ul>`,
+        mercy: `
+												<p>Be first to empty your hand, or be the last player standing. Match the top card by color, number or symbol.</p>
+												<ul>
+													<li>
+														<b>No match?</b> You must draw until you get a card you can play, then play it.
+													</li>
+													<li>
+														<b>Stacking:</b> when someone plays a draw card (+2, +4, +6, +10), you can stack a draw card of equal or higher value on top. If you can't (or won't), you take the whole pile and lose your turn.
+													</li>
+													<li>
+														<b>Mercy:</b> reach 25 cards and you're out.
+													</li>
+													<li>
+														<b>7</b> swaps your hand with a player you choose. 
+														<b>0</b> passes every hand in the direction of play.
+													</li>
+													<li>
+														<b>Colored actions:</b> Draw Two, Draw Four, Skip, Reverse (skips the other player in a 2-player game), 
+														<b>Discard All</b> (drop every card of its color from your hand) and 
+														<b>Skip Everyone</b> (take another turn).
+													</li>
+													<li>
+														<b>Wild Reverse Draw 4</b> reverses play and the next player draws 4 (with 2 players it comes back to you, but you can stack it onward). 
+														<b>Wild Draw 6</b> and 
+														<b>Wild Draw 10</b> make the next player draw that many and lose their turn.
+													</li>
+													<li>
+														<b>Wild Color Roulette:</b> the next player picks a color, then flips cards from the draw pile until one matches it. They keep every card and lose their turn.
+													</li>
+													<li>With one card left, hit 
+														<b>COSMIC!</b> or draw 2 if you're caught.
+													</li>
+												</ul>`,
+        flex: `
+												<p>Be first to empty your hand. Match the top card by color, number or symbol.</p>
+												<ul>
+													<li>
+														<b>Flex cards</b> have a regular side and a flex side with a second color (shown in the small tab at the bottom). Playing the flex side lets you match that second color, but play continues in the card's regular color.
+													</li>
+													<li>
+														<b>Power cards:</b> everyone starts with Power ON (⚡). Use a flex side and your Power flips OFF (⭕). Play a number card with the ⟳ icon to flip it again. When everyone's Power is OFF, all reset to ON.
+													</li>
+													<li>
+														<b>Flex Draw Two:</b> regular is Draw Two. Flex: every other player draws 1 and nobody is skipped.
+													</li>
+													<li>
+														<b>Flex Reverse:</b> regular is Reverse. Flex: reverse and skip the next player.
+													</li>
+													<li>
+														<b>Flex Skip:</b> regular is Skip. Flex: skip everyone, so you go again.
+													</li>
+													<li>
+														<b>Wild All Flip:</b> every player flips their Power card. Call a color.
+													</li>
+													<li>
+														<b>Flex Wild Target Draw 2:</b> regular is a classic wild. Flex: a player you choose draws 2.
+													</li>
+													<li>
+														<b>Flex Wild All Draw:</b> regular is a classic wild. Flex: every other player draws 2.
+													</li>
+													<li>
+														<b>Flex Wild Draw 4:</b> regular side is playable on anything. The next player draws 4 and loses their turn, or challenges. If you held a card matching the color, you draw 4. If not, they draw 6. Flex side: a player you choose draws 4.
+													</li>
+													<li>
+														<b>Can't or won't play?</b> Draw one card. You may play it if you can.
+													</li>
+													<li>With one card left, hit 
+														<b>COSMIC!</b> or draw 2 if you're caught.
+													</li>
+												</ul>`
+      };
+
+      function showRules(mode, back) {
+        modal(`
+												<h2 style="margin-top:0">${MODES[mode].name}: how to play</h2>${RULES[mode]}
+												<p>Colors also have shapes: ● Red, ▲ Gold, ◆ Green, ■ Blue.</p>
+												<div class="cols">
+													<button id="closeRules">Got it</button>
+												</div>`).onclick = e => {
+          if (e.target.id === 'closeRules' || e.target.id === 'modal') {
+            closeModal();
+            if (back) back()
+          }
+        }
+      }
+
+      function showMenu(msg) {
+        const demo = [{
+          c: 'R',
+          k: 'num',
+          n: 7
+        }, {
+          c: 'Y',
+          k: 'skip'
+        }, {
+          c: null,
+          k: 'wd10'
+        }, {
+          c: 'B',
+          k: 'draw2'
+        }, {
+          c: 'G',
+          k: 'num',
+          n: 3
+        }].map((c, i) => cardHTML({
+          ...c,
+          id: 'd' + i,
+          liar: false,
+          flex: false,
+          f: null,
+          flip: false
+        })).join('');
+        modal(`
+												<div class="menu">
+													<div class="demo">${demo}</div>
+													<h1>✦ Cosmic Match</h1>${msg?`
+													<p class="msg">${msg}</p>`:'
+													<p class="sub">Pick a mode, choose your opponents, and play.</p>'}
+  
+													<div class="modes">${Object.entries(MODES).map(([k,m])=>`
+														<div class="mode ${k===selMode?'sel':''}" data-m="${k}" role="button" tabindex="0">
+															<div>
+																<b>${m.name}</b>
+																<span>${m.d}</span>
+															</div>
+															<button data-r="${k}">Rules</button>
+														</div>`).join('')}
+													</div>
+													<h2>Opponents</h2>
+													<div class="cols seg">${[1,2,3,4,5].map(n=>`
+														<button class="${n===selOpp?'on':''}" data-n="${n}">${n}</button>`).join('')}
+													</div>
+													<div class="cols">
+														<button class="go" id="go">Start game</button>
+													</div>
+												</div>`).onclick = e => {
+          const r = e.target.closest('[data-r]');
+          if (r) {
+            showRules(r.dataset.r, () => showMenu(msg));
+            return
+          }
+          const m = e.target.closest('[data-m]');
+          if (m) {
+            selMode = m.dataset.m;
+            showMenu(msg);
+            return
+          }
+          const n = e.target.closest('[data-n]');
+          if (n) {
+            selOpp = +n.dataset.n;
+            showMenu(msg);
+            return
+          }
+          if (e.target.id === 'go') {
+            closeModal();
+            start(selOpp, selMode)
+          }
+        }
+      }
+      /* ---------- timed windows ---------- */
+      function race(label, ms, bots = []) {
+        return new Promise(res => {
+          const bar = $('#actbar'),
+            ts = [];
+          let done = false;
+          const fin = w => {
+            if (done) return;
+            done = true;
+            ts.forEach(clearTimeout);
+            bar.classList.remove('on');
+            res(w)
+          };
+          if (label) {
+            bar.innerHTML = `
+												<button id="actbtn">${label}</button>
+												<i style="animation-duration:${ms}ms"></i>`;
+            bar.classList.add('on');
+            $('#actbtn').onclick = () => fin('me')
+          }
+          ts.push(setTimeout(() => fin(null), ms));
+          bots.forEach(b => ts.push(setTimeout(() => fin(b.who), b.ms)));
+        })
+      }
+      async function challengeWin(p) {
+        const bots = G.players.filter(x => !x.human && x !== p).filter(() => Math.random() < (p.hand.length <= 2 ? .4 : .2)).map(b => ({
+          who: b,
+          ms: 500 + Math.random() * 2000
+        }));
+        setStatus(p.human ? 'Waiting to see if anyone calls your bluff…' : `Is ${p.name} lying? Challenge!`);
+        const r = await race(p.human ? null : `Challenge ${p.name}!`, 3200, bots);
+        return r === 'me' ? G.players[0] : r;
+      }
+      async function cosmic(p) {
+        if (p.human) {
+          setStatus('One card left: call COSMIC!');
+          const bot = G.players.find(x => !x.human && !x.out);
+          const r = await race('COSMIC! ✦', 2600, bot ? [{
+            who: bot,
+            ms: 2200
+          }] : []);
+          if (r === 'me') log('You called COSMIC!');
+          else {
+            log(`${r?r.name:'Someone'} caught you! You draw 2`);
+            draw(p, 2)
+          }
+        } else {
+          if (Math.random() < .8) {
+            log(`${p.name}: "COSMIC!"`);
+            await sleep(600);
+            return
+          }
+          setStatus(`${p.name} forgot to call!`);
+          const r = await race(G.players[0].out ? null : `Catch ${p.name}!`, 2400);
+          if (r === 'me') {
+            log(`You caught ${p.name}! They draw 2`);
+            draw(p, 2)
+          } else log(`${p.name}: "COSMIC!" just in time`);
+        }
+      }
+      /* ---------- shared turn plumbing ---------- */
+      function checkWin() {
+        if (G.over) return true;
+        const al = G.players.filter(p => !p.out),
+          w = al.find(p => !p.hand.length) || (al.length === 1 ? al[0] : null);
+        if (!w) return false;
+        G.over = true;
+        G.humanTurn = false;
+        render();
+        showMenu(w.human ? '🏆 You win! Nicely played.' : `${w.av} ${w.name} wins this round.`);
+        return true
+      }
+      async function finishTurn(p, skip) {
+        render();
+        if (checkWin()) return;
+        if (p.hand.length === 1) await cosmic(p);
+        if (checkWin()) return;
+        advance(1 + skip)
+      }
+
+      function mostColor(p) {
+        const cnt = {
+          R: 0,
+          Y: 0,
+          G: 0,
+          B: 0
+        };
+        p.hand.forEach(c => c.c && cnt[c.c]++);
+        return [...COLORS].sort((a, b) => cnt[b] - cnt[a])[0]
+      }
+      const playCard = (p, c, o) => G.mode === 'liars' ? playLiar(p, c, o) : playStd(p, c, o);
+      /* ---------- Liar's Match ---------- */
+      function effect(p, c, o) {
+        const n = G.players.length,
+          nx = G.players[mod(G.cur + G.dir, n)];
+        if (c.k === 'draw2') {
+          draw(nx, 2);
+          log(`${nx.name} draws 2 and is skipped`);
+          return 1
+        }
+        if (c.k === 'skip') {
+          log(`${nx.name} is skipped`);
+          return 1
+        }
+        if (c.k === 'rev') {
+          G.dir *= -1;
+          log('Direction reversed');
+          return n === 2 ? 1 : 0
+        }
+        if (c.k === 'wild4') {
+          draw(nx, 4);
+          log(`${nx.name} draws 4 and is skipped. Color: ${CN[o.color]}`);
+          return 1
+        }
+        if (c.k === 'num' && c.n === 7 && o.target) {
+          [p.hand, o.target.hand] = [o.target.hand, p.hand];
+          log(`${p.name} swaps hands with ${o.target.name}`)
+        }
+        if (c.k === 'num' && c.n === 0) passHands();
+        return 0
+      }
+
+      function passHands() {
+        const al = G.players.filter(x => !x.out),
+          hs = al.map(x => x.hand);
+        al.forEach((x, i) => {
+          x.hand = hs[mod(i - G.dir, al.length)]
+        });
+        log('Everyone passes their hand along!')
+      }
+      async function playLiar(p, c, o = {}) {
+        const prev = G.top,
+          prevFace = G.topFace,
+          prevCard = G.topCard;
+        p.hand.splice(p.hand.indexOf(c), 1);
+        let truth = true,
+          claim;
+        if (c.k === 'wild4' || c.k === 'wildc') {
+          claim = {
+            c: o.color,
+            k: 'wild'
+          };
+          if (c.k === 'wild4') truth = !p.hand.some(h => h.c === prev.c)
+        } else {
+          truth = matches(c, prev);
+          claim = {
+            c: truth ? c.c : prev.c,
+            k: c.k,
+            n: c.n
+          }
+        }
+        G.disc.push(c);
+        G.top = claim;
+        G.topCard = c;
+        G.topFace = !c.liar || c.k === 'wildc';
+        log(c.k === 'wildc' ? `${p.name} plays Wild Challenge: ${CN[o.color]}!` : c.liar ? `${p.name} lays a card face down: "${c.k==='wild4'?CN[o.color]:desc(claim)}"` : `${p.name} plays ${desc(c)}`);
+        render();
+        await sleep(500);
+        if (c.k === 'wildc') {
+          await wildChallenge(p);
+          return
+        }
+        let pen = null;
+        if (c.liar) {
+          const who = await challengeWin(p);
+          if (who) {
+            G.topFace = true;
+            render();
+            await sleep(300);
+            if (!truth) {
+              G.disc.pop();
+              p.hand.push(c);
+              draw(p, 1);
+              G.top = prev;
+              G.topFace = prevFace;
+              G.topCard = prevCard;
+              log(`${who.name} was right! ${p.name} was bluffing and takes it back +1`);
+              render();
+              await sleep(1100);
+              advance();
+              return
+            }
+            log(`${p.name} told the truth! ${who.name} draws 1`);
+            pen = who;
+            await sleep(900)
+          }
+        }
+        if (!p.hand.length) {
+          if (pen) draw(pen, 1);
+          return finishTurn(p, 0)
+        }
+        const skip = effect(p, c, o);
+        if (pen) draw(pen, 1);
+        await finishTurn(p, skip)
+      }
+      async function wildChallenge(p) {
+        const col = G.top.c,
+          n = G.players.length,
+          order = [];
+        for (let i = 1; i < n; i++) order.push(G.players[mod(G.cur + G.dir * i, n)]);
+        const laid = [];
+        for (const q of order) {
+          if (!q.hand.length) continue;
+          let card = null;
+          if (q.human) {
+            setStatus(`Lay a card face down and claim it's ${CN[col]}`);
+            G.laying = true;
+            render();
+            while (!card) {
+              const a = await waitAction();
+              if (a.t === 'play') card = a.card
+            }
+            G.laying = false
+          } else card = q.hand.find(h => h.c === col) || pick(q.hand);
+          q.hand.splice(q.hand.indexOf(card), 1);
+          laid.push({
+            q,
+            card,
+            truth: card.c === col
+          });
+          log(`${q.name} lays a card face down`);
+          render();
+          await sleep(350)
+        }
+        const ch = order[0],
+          cands = laid.filter(l => l.q !== ch);
+        let target = null;
+        if (cands.length) {
+          if (ch.human) target = await pickLaid(cands, col);
+          else if (Math.random() < .55) target = pick(cands)
+        }
+        if (target) {
+          log(`${ch.name} flips ${target.q.name}'s card: ${desc(target.card)}`);
+          if (target.truth) {
+            draw(ch, 2);
+            log(`It matched! ${ch.name} draws 2`)
+          } else {
+            target.q.hand.push(target.card);
+            draw(target.q, 1);
+            log(`Bluff! ${target.q.name} takes it back and draws 1`)
+          }
+        } else log('Nobody challenged');
+        const back = laid.filter(l => !(l === target && !l.truth)).map(l => l.card);
+        G.disc.splice(G.disc.length - 1, 0, ...back);
+        await sleep(900);
+        await finishTurn(p, 0)
+      }
+      /* ---------- No Mercy & Flex ---------- */
+      function takePenalty(p) {
+        const n = G.pending;
+        G.pending = 0;
+        G.lastVal = 0;
+        draw(p, n);
+        log(`${p.name} takes ${n} cards`)
+      }
+      async function drawUntil(p) {
+        let cnt = 0,
+          found = null;
+        for (let i = 0; i < 60; i++) {
+          const b = p.hand.length;
+          draw(p, 1);
+          if (p.out || p.hand.length === b) break;
+          cnt++;
+          const d = p.hand[p.hand.length - 1];
+          render();
+          if (sidesFor(p, d).length) {
+            found = d;
+            break
+          }
+          await sleep(110)
+        }
+        log(`${p.name} draws ${cnt} card${cnt===1?'':'s'}`);
+        return p.out ? null : found
+      }
+      async function playStd(p, c, o = {}) {
+        const M = G.mode === 'mercy',
+          F = G.mode === 'flex',
+          prev = G.top,
+          fx = o.side === 'f';
+        const hadMatch = p.hand.some(h => h !== c && (h.c === prev.c || isWild(h)));
+        p.hand.splice(p.hand.indexOf(c), 1);
+        G.disc.push(c);
+        G.topCard = c;
+        G.topFace = true;
+        G.top = {
+          c: isWild(c) ? (o.color || prev.c) : c.c,
+          k: isWild(c) ? 'wild' : c.k,
+          n: c.n
+        };
+        log(`${p.name} plays ${desc(c)}${fx?' (flex side)':''}${isWild(c)&&o.color?' → '+CN[o.color]:''}`);
+        if (F) {
+          if (fx) p.power = false;
+          if (c.flip) p.power = !p.power
+        }
+        render();
+        await sleep(500);
+        if (!p.hand.length) return finishTurn(p, 0);
+        const n = aliveCount(),
+          nx = nextAlive();
+        let skip = 0;
+        const addP = v => {
+          G.pending += v;
+          G.lastVal = v;
+          log(`Draw stack: +${G.pending}`)
+        };
+        switch (c.k) {
+          case 'num':
+            if (M && c.n === 7 && o.target) {
+              [p.hand, o.target.hand] = [o.target.hand, p.hand];
+              log(`${p.name} swaps hands with ${o.target.name}`)
+            }
+            if (M && c.n === 0) passHands();
+            break;
+          case 'skip':
+            skip = (F && fx) ? n - 1 : 1;
+            log(skip === n - 1 && n > 2 ? 'Everyone else is skipped' : `${nx.name} is skipped`);
+            break;
+          case 'rev':
+            G.dir *= -1;
+            log('Direction reversed');
+            skip = (F && fx) ? 1 : (n === 2 ? 1 : 0);
+            break;
+          case 'draw2':
+            if (M) addP(2);
+            else if (fx) {
+              drawOthers(p, 1);
+              log('Everyone else draws 1')
+            } else {
+              draw(nx, 2);
+              skip = 1;
+              log(`${nx.name} draws 2 and is skipped`)
+            }
+            break;
+          case 'draw4':
+            addP(4);
+            break;
+          case 'wrev4':
+            G.dir *= -1;
+            log('Direction reversed');
+            addP(4);
+            skip = n === 2 ? 1 : 0;
+            break;
+          case 'wd6':
+            addP(6);
+            break;
+          case 'wd10':
+            addP(10);
+            break;
+          case 'skipall':
+            skip = n - 1;
+            log('Everyone else is skipped');
+            break;
+          case 'discall': {
+            const mine = p.hand.filter(h => h.c === c.c);
+            p.hand = p.hand.filter(h => h.c !== c.c);
+            G.disc.splice(G.disc.length - 1, 0, ...mine);
+            log(`${p.name} dumps ${mine.length} more ${CN[c.c]} card${mine.length===1?'':'s'}!`);
+            break
+          }
+          case 'roul': {
+            const col = nx.human ? await pickColor('Color Roulette: choose a color') : mostColor(nx);
+            log(`${nx.name} picks ${CN[col]} and flips cards…`);
+            let got = 0;
+            for (let i = 0; i < 80; i++) {
+              const b = nx.hand.length;
+              draw(nx, 1);
+              if (nx.out || nx.hand.length === b) break;
+              got++;
+              if (nx.hand[nx.hand.length - 1].c === col) break
+            }
+            log(`${nx.name} takes ${got} card${got===1?'':'s'} and is skipped`);
+            G.top.c = col;
+            skip = 1;
+            break
+          }
+          case 'wflip':
+            G.players.forEach(q => q.power = !q.power);
+            log('Everyone flips their Power card!');
+            break;
+          case 'wt2':
+            if (fx) {
+              draw(o.target, 2);
+              log(`${o.target.name} draws 2`)
+            }
+            break;
+          case 'wall':
+            if (fx) {
+              drawOthers(p, 2);
+              log('Everyone else draws 2')
+            }
+            break;
+          case 'wd4':
+            if (fx) {
+              draw(o.target, 4);
+              log(`${o.target.name} draws 4`)
+            } else {
+              const ch = nx.human ? await askChallenge(p) : Math.random() < .35;
+              if (ch) {
+                if (hadMatch) {
+                  log(`Challenge! ${p.name} had a match and draws 4`);
+                  draw(p, 4)
+                } else {
+                  log(`Challenge failed! ${nx.name} draws 6 and is skipped`);
+                  draw(nx, 6);
+                  skip = 1
+                }
+              } else {
+                draw(nx, 4);
+                skip = 1;
+                log(`${nx.name} draws 4 and is skipped`)
+              }
+            }
+            break;
+        }
+        if (F && G.players.every(q => !q.power)) {
+          G.players.forEach(q => q.power = true);
+          log('All Power cards reset to ⚡')
+        }
+        await finishTurn(p, skip)
+      }
+      /* ---------- turns ---------- */
+      function waitAction() {
+        return new Promise(r => {
+          waiter = r
+        })
+      }
+
+      function act(a) {
+        if (waiter) {
+          const w = waiter;
+          waiter = null;
+          w(a)
+        }
+      }
+      async function humanOpts(p, c, side) {
+        const o = {
+          side
+        };
+        if (isWild(c) && c.k !== 'roul') o.color = await pickColor('Choose a color');
+        if (G.mode !== 'flex' && c.k === 'num' && c.n === 7) o.target = await pickPlayer('Swap hands with…');
+        if (G.mode === 'flex' && side === 'f' && (c.k === 'wt2' || c.k === 'wd4')) o.target = await pickPlayer(c.k === 'wd4' ? 'Who draws 4?' : 'Who draws 2?');
+        return o
+      }
+      async function humanTurn(p) {
+        let drew = null;
+        const M = G.mode === 'mercy';
+        const hint = () => {
+          if (drew) return setStatus(M ? 'Play the card you drew.' : 'Play the card you drew, or end your turn.');
+          if (M && G.pending > 0) return setStatus(`Stack a draw card (+${G.lastVal} or more), or take ${G.pending}.`);
+          if (M && !p.hand.some(c => sidesFor(p, c).length)) return setStatus('No playable card. Draw until you find one.');
+          setStatus(G.mode === 'liars' ? `Your turn: match ${desc(G.top)}, play a 🎭 Liar card face down, or draw.` : `Your turn: match ${desc(G.top)}${G.mode==='flex'?' (or use a flex side)':''}.`)
+        };
+        while (true) {
+          G.humanTurn = true;
+          G.drew = drew;
+          render();
+          hint();
+          const a = await waitAction();
+          if (a.t === 'draw') {
+            if (drew) continue;
+            if (M) {
+              if (G.pending > 0) {
+                G.humanTurn = false;
+                takePenalty(p);
+                render();
+                await sleep(900);
+                advance();
+                return
+              }
+              if (p.hand.some(c => sidesFor(p, c).length)) {
+                setStatus('You have a playable card!');
+                continue
+              }
+              G.humanTurn = false;
+              render();
+              drew = await drawUntil(p);
+              if (p.out || !drew) {
+                G.humanTurn = false;
+                render();
+                await sleep(600);
+                advance();
+                return
+              }
+              continue
+            }
+            draw(p, 1);
+            drew = p.hand[p.hand.length - 1];
+            log('You draw a card');
+            if (!drew || !sidesFor(p, drew).length) {
+              G.drew = null;
+              G.humanTurn = false;
+              render();
+              log('It can\'t be played');
+              await sleep(900);
+              advance();
+              return
+            }
+            continue
+          }
+          if (a.t === 'pass') {
+            if (!drew || M) continue;
+            G.humanTurn = false;
+            G.drew = null;
+            render();
+            advance();
+            return
+          }
+          if (a.t === 'play') {
+            const c = a.card;
+            if (drew && c !== drew) {
+              setStatus('Only the card you just drew can be played.');
+              continue
+            }
+            const sides = sidesFor(p, c);
+            if (!sides.length) {
+              setStatus(M && G.pending > 0 ? 'Stack a draw card of equal or higher value, or take the cards.' : G.mode === 'liars' ? 'That doesn\'t match. Try a 🎭 Liar card or draw.' : 'That card can\'t be played right now.');
+              continue
+            }
+            const side = sides.length > 1 ? await pickSide(c) : sides[0];
+            G.humanTurn = false;
+            G.drew = null;
+            render();
+            await playCard(p, c, await humanOpts(p, c, side));
+            return
+          }
+        }
+      }
+
+      function botOpts(p, c, side = 'r') {
+        const o = {
+          side
+        };
+        if (isWild(c) && c.k !== 'roul') o.color = mostColor(p);
+        if ((G.mode !== 'flex' && c.k === 'num' && c.n === 7) || (G.mode === 'flex' && side === 'f' && (c.k === 'wt2' || c.k === 'wd4'))) o.target = others(p).sort((a, b) => a.hand.length - b.hand.length)[0];
+        return o
+      }
+
+      function botPick(p, pool) {
+        const top = G.top,
+          reg = pool.filter(c => !c.liar && matches(c, top)),
+          tl = pool.filter(c => c.liar && c.c && matches(c, top)),
+          lies = pool.filter(c => c.liar && c.c && !matches(c, top));
+        const wc = pool.filter(c => c.k === 'wildc'),
+          w4 = pool.filter(c => c.k === 'wild4'),
+          noCol = !p.hand.some(c => c.c === top.c),
+          r = Math.random(),
+          safe = [...reg, ...tl];
+        if (w4.length && noCol && r < .6) return w4[0];
+        if (wc.length && r < .3) return wc[0];
+        if (safe.length && r < .88) {
+          const a = safe.filter(c => c.k !== 'num');
+          return pick(a.length && Math.random() < .5 ? a : safe)
+        }
+        if (lies.length && Math.random() < .55) return pick(lies);
+        if (w4.length && Math.random() < .2) return w4[0];
+        if (safe.length) return pick(safe);
+        if (wc.length) return wc[0];
+        return null
+      }
+      async function botTurn(p) {
+        setStatus(`${p.name} is thinking…`);
+        render();
+        await sleep(1000);
+        let c = botPick(p, p.hand);
+        if (!c) {
+          draw(p, 1);
+          log(`${p.name} draws a card`);
+          render();
+          await sleep(700);
+          const d = p.hand[p.hand.length - 1];
+          c = d ? botPick(p, [d]) : null;
+          if (!c) {
+            advance();
+            return
+          }
+        }
+        await playCard(p, c, botOpts(p, c))
+      }
+
+      function botChoose(p) {
+        let pool = p.hand.map(c => ({
+          c,
+          s: sidesFor(p, c)
+        })).filter(x => x.s.length);
+        if (!pool.length) return null;
+        if (G.mode === 'flex') {
+          const f = pool.filter(x => x.c.k !== 'wd4' || !p.hand.some(h => h !== x.c && (h.c === G.top.c || isWild(h))) || Math.random() < .12);
+          if (f.length) pool = f
+        }
+        const nw = pool.filter(x => !isWild(x.c));
+        let ch = nw.length && Math.random() < .8 ? nw : pool;
+        const ac = ch.filter(x => x.c.k !== 'num');
+        if (ac.length && Math.random() < .45) ch = ac;
+        const x = pick(ch);
+        return {
+          c: x.c,
+          side: x.s.length > 1 && Math.random() < .5 ? 'f' : x.s[0]
+        }
+      }
+      async function botTurnStd(p) {
+        setStatus(`${p.name} is thinking…`);
+        render();
+        await sleep(1000);
+        const M = G.mode === 'mercy';
+        if (M && G.pending > 0) {
+          const st = p.hand.filter(h => DRAWV[h.k] && DRAWV[h.k] >= G.lastVal).sort((a, b) => DRAWV[a.k] - DRAWV[b.k]);
+          if (st.length && Math.random() < .85) {
+            await playCard(p, st[0], botOpts(p, st[0]));
+            return
+          }
+          takePenalty(p);
+          render();
+          await sleep(800);
+          advance();
+          return
+        }
+        let ch = botChoose(p);
+        if (!ch) {
+          if (M) {
+            const d = await drawUntil(p);
+            render();
+            await sleep(500);
+            if (!d || p.out) {
+              advance();
+              return
+            }
+            ch = {
+              c: d,
+              side: 'r'
+            }
+          } else {
+            draw(p, 1);
+            log(`${p.name} draws a card`);
+            render();
+            await sleep(700);
+            const d = p.hand[p.hand.length - 1],
+              s = d ? sidesFor(p, d) : [];
+            if (!s.length || Math.random() < .15) {
+              advance();
+              return
+            }
+            ch = {
+              c: d,
+              side: s[0]
+            }
+          }
+        }
+        await playCard(p, ch.c, botOpts(p, ch.c, ch.side))
+      }
+      async function run() {
+        while (true) {
+          if (checkWin()) return;
+          const p = G.players[G.cur];
+          G.humanTurn = false;
+          render();
+          if (p.human) await humanTurn(p);
+          else if (G.mode === 'liars') await botTurn(p);
+          else await botTurnStd(p);
+        }
+      }
+
+      function start(n, mode) {
+        G = {
+          mode,
+          players: [{
+            name: 'You',
+            human: true,
+            hand: [],
+            power: true
+          }, ...Array.from({
+            length: n
+          }, (_, i) => ({
+            name: NAMES[i],
+            av: AV[i],
+            hand: [],
+            power: true
+          }))],
+          deck: shuffle(buildDeck(mode)),
+          disc: [],
+          dir: 1,
+          cur: 0,
+          log: [],
+          humanTurn: false,
+          pending: 0,
+          lastVal: 0,
+          aside: []
+        };
+        for (let r = 0; r < 7; r++) G.players.forEach(p => p.hand.push(G.deck.pop()));
+        const idx = G.deck.map((c, i) => c.k === 'num' && !c.liar ? i : -1).filter(i => i >= 0).pop(),
+          first = G.deck.splice(idx, 1)[0];
+        G.disc.push(first);
+        G.top = {
+          c: first.c,
+          k: 'num',
+          n: first.n
+        };
+        G.topCard = first;
+        G.topFace = true;
+        $('#log').innerHTML = '';
+        $('#modeTag').textContent = MODES[mode].name;
+        waiter = null;
+        run()
+      }
+      document.addEventListener('click', e => {
+        const cd = e.target.closest('#hand .card');
+        if (cd && G) {
+          const c = G.players[0].hand.find(x => x.id == cd.dataset.id);
+          if (c) act({
+            t: 'play',
+            card: c
+          });
+          return
+        }
+        if (e.target.closest('#drawBtn,#drawPile')) act({
+          t: 'draw'
+        });
+        if (e.target.closest('#passBtn')) act({
+          t: 'pass'
+        });
+      });
+      document.addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && (e.target.classList.contains('card') || e.target.classList.contains('mode'))) {
+          e.preventDefault();
+          e.target.click()
+        }
+      });
+      $('#rulesBtn').onclick = () => {
+        if (!$('#modal').classList.contains('on')) showRules(G ? G.mode : selMode, () => {})
+      };
+      $('#newBtn').onclick = () => location.reload();
+      showMenu();
+    </script>
+  </body>
+</html>
