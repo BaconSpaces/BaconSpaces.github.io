@@ -30,7 +30,7 @@ button:focus-visible,.card:focus-visible,.mode:focus-visible{outline:3px solid #
 #table{display:flex;align-items:center;justify-content:center;gap:22px;padding:14px 0 6px}
 #info{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:140px}
 #claim{font-weight:800;padding:5px 12px;border-radius:99px;border:2px solid #fff8;font-size:14px;text-align:center}
-#dir,#modeinfo{color:var(--mute);font-size:13px;text-align:center;max-width:220px}
+#dir,#modeinfo{color:var(--mute);font-size:13px;text-align:center;max-width:240px}
 #modeinfo{color:#d6c9ff;font-weight:700}
 .card{position:relative;width:64px;height:92px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;border:2px solid #ffffffd9;box-shadow:0 4px 12px #0008;user-select:none;flex:0 0 auto;transition:transform .15s,opacity .15s}
 .card.R{background:linear-gradient(150deg,#ff7a92,#c71f40)}
@@ -85,6 +85,15 @@ button:focus-visible,.card:focus-visible,.mode:focus-visible{outline:3px solid #
 .mode button{flex:0 0 auto;padding:6px 12px}
 .seg button.on{background:#7d5cff;border-color:#b58cff}
 .go{background:linear-gradient(90deg,#7d5cff,#e04cc2)!important;border:0!important;font-size:18px;padding:12px}
+.card.spin::after{content:"";position:absolute;inset:3px;border-radius:8px;background:repeating-conic-gradient(from 0deg,#ffffff2a 0 15deg,transparent 15deg 30deg);pointer-events:none}
+.wheelwrap{position:relative;width:270px;margin:0 auto;text-align:center}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-size:26px;z-index:2;color:#fff;text-shadow:0 2px 6px #000}
+.wheel{position:relative;width:250px;height:250px;border-radius:50%;margin:20px auto 12px;border:4px solid #fff;box-shadow:0 0 30px #7d5cff88;transition:transform 2.4s cubic-bezier(.12,.75,.2,1)}
+.wl{position:absolute;left:50%;top:50%;width:0;height:0}
+.wl i{position:absolute;left:0;top:0;font-style:normal;font-size:26px}
+.pickrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+textarea{width:100%;min-height:120px;margin-top:8px;border-radius:10px;border:1px solid var(--line);background:#0c0e2a;color:var(--tx);font:inherit;padding:8px;resize:vertical}
+.note{font-size:12px;color:var(--mute);margin-top:4px}
 @media(max-width:560px){.card{width:52px;height:76px}.card .big{font-size:26px}.card .big.sm{font-size:16px}.card .fx{width:20px;height:13px;font-size:8px}#hand{gap:6px}h1{font-size:20px}.menu h1{font-size:32px}.opp{min-width:84px;padding:6px 8px}#table{gap:12px}#info{min-width:100px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -111,20 +120,37 @@ button:focus-visible,.card:focus-visible,.mode:focus-visible{outline:3px solid #
 
 <script>
 const COLORS=['R','Y','G','B'],CN={R:'Red',Y:'Gold',G:'Green',B:'Blue'},SH={R:'●',Y:'▲',G:'◆',B:'■'};
-const NAMES=['Nova','Orion','Lyra','Vega','Atlas'],AV=['🛰️','👽','🌠','🪐','☄️'];
-const KN={draw2:'Draw Two',skip:'Skip',rev:'Reverse',draw4:'Draw Four',discall:'Discard All',skipall:'Skip Everyone',wrev4:'Wild Reverse Draw 4',wd6:'Wild Draw 6',wd10:'Wild Draw 10',roul:'Wild Color Roulette',wflip:'Wild All Flip',wt2:'Flex Wild Target Draw 2',wall:'Flex Wild All Draw',wd4:'Flex Wild Draw 4',wild4:'Wild Draw 4',wildc:'Wild Challenge',wild:'Wild'};
-const LAB={draw2:'+2',skip:'⊘',rev:'⇄',draw4:'+4',discall:'✖',skipall:'⏭',wrev4:'⇄+4',wd6:'+6',wd10:'+10',roul:'🎲',wflip:'⟲',wt2:'◎2',wall:'✦2',wd4:'+4',wild4:'+4',wildc:'?!'};
+const NAMES=['Nova','Orion','Lyra','Vega','Atlas','Zenith','Pulsar','Quasar','Comet','Astra','Helix','Nebula','Rigel','Sol','Titan'],AV=['🛰️','👽','🌠','🪐','☄️','🚀','🌌','🌙','⭐','🔭','🛸','🌞','🌍','🌑','✨'];
+const nm=q=>q.human?'You':q.name;
+const KN={draw2:'Draw Two',skip:'Skip',rev:'Reverse',draw4:'Draw Four',discall:'Discard All',skipall:'Skip Everyone',wrev4:'Wild Reverse Draw 4',wd6:'Wild Draw 6',wd10:'Wild Draw 10',roul:'Wild Color Roulette',wflip:'Wild All Flip',wt2:'Flex Wild Target Draw 2',wall:'Flex Wild All Draw',wd4:'Flex Wild Draw 4',wild4:'Wild Draw 4',wildc:'Wild Challenge',wild:'Wild',swild:'Wild',pt:'Point Taken',dtog:'Wild Drawn Together',pileup:'Wild Pile Up',dare:'Dare',wdare:'Wild Dare',hit2:'Hit 2',trade:'Trade Hands',allhit:'Wild All Hit',hitfire:'Wild Hit-Fire',awild:'Wild',arev:'Wild Reverse',askip:'Wild Skip',askip2:'Wild Skip Two',adraw2:'Wild Draw Two',adraw4:'Wild Draw Four',at2:'Wild Targeted Draw Two',aswap:'Wild Forced Swap'};
+const LAB={draw2:'+2',skip:'⊘',rev:'⇄',draw4:'+4',discall:'✖',skipall:'⏭',wrev4:'⇄+4',wd6:'+6',wd10:'+10',roul:'🎲',wflip:'⟲',wt2:'◎2',wall:'✦2',wd4:'+4',wild4:'+4',wildc:'?!',swild:'✦',pt:'☝️',dtog:'🔗',pileup:'📚',hit2:'×2',trade:'⇆',allhit:'💥',hitfire:'🔥',awild:'✦',arev:'⇄',askip:'⊘',askip2:'⊘⊘',adraw2:'+2',adraw4:'+4',at2:'◎2',aswap:'⇆'};
 const DRAWV={draw2:2,draw4:4,wrev4:4,wd6:6,wd10:10};
 const MODES={
+  classic:{name:'Cosmic',d:'The classic game: match color or number, then play to 500 points.'},
   liars:{name:"Liar's Match",d:'Liar cards are played face down. Bluff your way out, or call out someone else.'},
   mercy:{name:'No Mercy',d:'Stack draw cards, wipe out whole colors, and hit 25 cards and you\'re out.'},
-  flex:{name:'Flex',d:'Two-sided cards and a Power card let you flex into a different color.'}};
+  flex:{name:'Flex',d:'Two-sided cards and a Power card let you flex into a different color.'},
+  spin:{name:'Spin',d:'Spin cards make the next player spin a wheel of chaos. First to 500 points wins.'},
+  allwild:{name:'All Wild',d:'Every card is wild, so just play one. The action cards are what matter.'},
+  attack:{name:'Attack',d:'No drawing: hit the launcher and hope cards fire out. First to 500 points wins.'},
+  dare:{name:'Dare',d:'Draw 2 or take the dare. Pick a dare list and play to 500 points.'},
+  party:{name:'Party',d:'Built for a crowd: Speed Play, Point Taken, Pile Up and linked players. Best with 6+ players.'}};
+const OPPS=()=>selMode==='party'?[5,7,9,11,15]:[1,2,3,4,5];
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const pick=a=>a[Math.floor(Math.random()*a.length)],mod=(a,n)=>((a%n)+n)%n;
-const lab=c=>c.k==='num'?c.n:LAB[c.k];
+const lab=c=>c.k==='num'?c.n:(c.d?'#'+c.d:LAB[c.k]);
 const isWild=c=>c.c===null;
-const desc=c=>c.k==='wild'?`${CN[c.c]} (wild)`:c.c?`${CN[c.c]} ${c.k==='num'?c.n:(c.flex?'Flex ':'')+KN[c.k]}`:KN[c.k];
-let G=null,uid=0,waiter=null,selMode='liars',selOpp=3;
+const desc=c=>c.k==='wild'?`${CN[c.c]} (wild)`:c.c?`${CN[c.c]} ${c.k==='num'?c.n:(c.flex?'Flex ':'')+KN[c.k]+(c.d?' #'+c.d:'')}`:KN[c.k]+(c.d?' #'+c.d:'');
+let G=null,uid=0,waiter=null,selMode='classic',selOpp=3,selDare='family',houseText='';
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const DARENAMES={family:'Family',showoff:'Showoff',daredevil:'Daredevil',house:'House Rules'};
+const DARELISTS={
+family:['Talk like a pirate until your next turn.','Remain perfectly frozen until your next turn.','Whisper everything you say until your next turn.','Keep one hand on top of your head until your next turn.','End every sentence with "meow" until your next turn.','Answer every question with a question until your next turn.','Speak in slow motion until your next turn.','Sing every sentence you say until your next turn.','Start every sentence with "please" until your next turn.','Talk like a robot until your next turn.','Clap twice before every sentence until your next turn.','Speak in an accent of your choice until your next turn.','Refer to yourself in the third person until your next turn.','Don\'t say "yes" or "no" until your next turn.','Make a funny face and hold it for 15 seconds.'],
+showoff:['Do your best dance move for 10 seconds.','Tell a joke. Everyone must at least smile.','Do your best celebrity impression.','Rap about this game for 15 seconds.','Show off a talent of your choice.','Strike a superhero pose and hold it until your next turn.','Do 10 jumping jacks.','Give a dramatic speech about your hand of cards.','Sing the chorus of any song.','Act out a famous movie scene.','Do your best victory dance.','Tell a 20-second story using three words picked by the table.','Do your best impression of another player.','Strut across the room like a runway model.','Play air guitar for 15 seconds.'],
+daredevil:['Balance a card on your head until your next turn.','Stand on one foot for 30 seconds (if you\'re able).','Hold a plank for 20 seconds (if you\'re able).','Say the alphabet backwards.','Hold your breath for 15 seconds.','Say a tongue twister three times fast.','Do 5 push-ups (if you\'re able).','Use only your non-dominant hand until your next turn.','Hold a wall sit for 20 seconds (if you\'re able).','Spin around 5 times, then say your full name.','Count backwards from 30 with no mistakes.','Keep a straight face for 15 seconds while everyone tries to make you laugh.','Name 5 animals while standing on one leg.','Name 10 foods in 10 seconds.','Do 15 squats (if you\'re able).']};
+function buildDares(){
+  if(selDare==='house'){const l=houseText.split('\n').map(x=>x.trim()).filter(Boolean);return Array.from({length:15},(_,i)=>l[i]||'Do any dare the table agrees on.')}
+  return DARELISTS[selDare].slice()}
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function buildDeck(mode){const d=[];
@@ -139,6 +165,31 @@ function buildDeck(mode){const d=[];
       for(let n=0;n<=9;n++)add({c,k:'num',n},2);
       add({c,k:'draw2'},3);add({c,k:'draw4'},2);add({c,k:'skip'},3);add({c,k:'rev'},3);add({c,k:'discall'},3);add({c,k:'skipall'},2)}
     for(const k of ['wrev4','wd6','wd10','roul'])add({c:null,k},6)
+  }else if(mode==='spin'||mode==='classic'){
+    for(const c of COLORS){
+      for(let n=0;n<=9;n++)add({c,k:'num',n});
+      if(mode==='spin')for(let n=1;n<=5;n++)add({c,k:'num',n,spin:true});
+      for(const k of ['draw2','rev','skip'])add({c,k},2)}
+    add({c:null,k:'swild'},4);add({c:null,k:'wild4'},4)
+  }else if(mode==='party'){
+    for(const c of COLORS){
+      for(let n=1;n<=9;n++)add({c,k:'num',n},4);
+      add({c,k:'skip'},3);add({c,k:'rev'},3);add({c,k:'draw2'},2);add({c,k:'pt'},2)}
+    add({c:null,k:'swild'},12);add({c:null,k:'wild4'},12);add({c:null,k:'dtog'},8);add({c:null,k:'pileup'},8)
+  }else if(mode==='dare'){
+    for(const c of COLORS){
+      add({c,k:'num',n:0});for(let n=1;n<=9;n++)add({c,k:'num',n},2);
+      for(const k of ['rev','skip'])add({c,k},2);
+      for(let i=0;i<2;i++)add({c,k:'dare',d:1+Math.floor(Math.random()*15)})}
+    for(let i=0;i<8;i++)add({c:null,k:'wdare',d:1+Math.floor(Math.random()*15)})
+  }else if(mode==='attack'){
+    for(const c of COLORS){
+      for(let n=1;n<=9;n++)add({c,k:'num',n},2);
+      for(const k of ['hit2','rev','skip'])add({c,k},2);
+      add({c,k:'discall'});add({c,k:'trade'})}
+    add({c:null,k:'swild'},4);add({c:null,k:'allhit'},2);add({c:null,k:'hitfire'},2)
+  }else if(mode==='allwild'){
+    [['awild',24],['arev',14],['askip',14],['askip2',10],['adraw2',14],['adraw4',10],['at2',14],['aswap',12]].forEach(([k,t])=>add({c:null,k},t))
   }else{
     COLORS.forEach((c,ci)=>{
       for(let n=1;n<=8;n++){add({c,k:'num',n,flip:n===3||n===6});add({c,k:'num',n,flex:true,f:COLORS[(ci+1+n%3)%4]})}
@@ -150,7 +201,10 @@ function matches(c,t){return c.c===t.c||(c.k==='num'&&t.k==='num'&&c.n===t.n)||(
 const aliveCount=()=>G.players.filter(x=>!x.out).length;
 const others=p=>G.players.filter(x=>x!==p&&!x.out);
 function nextAlive(){let i=G.cur;do{i=mod(i+G.dir,G.players.length)}while(G.players[i].out);return G.players[i]}
-function draw(p,n){for(let i=0;i<n;i++){
+function takeCard(){if(!G.deck.length&&(G.disc.length>1||G.aside.length)){const top=G.disc.pop();G.deck=shuffle([...G.disc,...G.aside]);G.aside=[];G.disc=[top]}return G.deck.pop()}
+function draw(p,n){
+  if(G.links&&!G._lk&&n>0&&G.links.includes(p)){const o=G.links[0]===p?G.links[1]:G.links[0];if(o&&o!==p){G._lk=true;log(`🔗 ${nm(o)} draw${o.human?'':'s'} ${n} too`);draw(o,n);G._lk=false}}
+  for(let i=0;i<n;i++){
   if(p.out)return;
   if(!G.deck.length&&(G.disc.length>1||G.aside.length)){const top=G.disc.pop();G.deck=shuffle([...G.disc,...G.aside]);G.aside=[];G.disc=[top]}
   if(!G.deck.length)return;p.hand.push(G.deck.pop());
@@ -163,10 +217,17 @@ function setStatus(m){$('#status').textContent=m}
 /* ---------- which sides of a card can be played right now ---------- */
 function sidesFor(p,c){
   const m=G.mode,t=G.top;
+  if(m==='allwild')return['r'];
+  if(m==='dare'||m==='party')return(isWild(c)||matches(c,t))?['r']:[];
+  if(m==='attack'){if(c.k==='trade'&&p.hand.length===1)return[];return(isWild(c)||matches(c,t))?['r']:[]}
   if(m==='liars')return(c.liar||matches(c,t))?['r']:[];
   if(m==='mercy'){
     if(G.pending>0)return(DRAWV[c.k]&&DRAWV[c.k]>=G.lastVal)?['r']:[];
     return(isWild(c)||matches(c,t))?['r']:[]}
+  if(m==='spin'||m==='classic'){
+    if(c.k==='swild')return['r'];
+    if(c.k==='wild4')return m==='classic'?['r']:p.hand.some(h=>h!==c&&h.c===t.c)?[]:['r'];
+    return matches(c,t)?['r']:[]}
   if(c.k==='wflip')return['r'];
   if(isWild(c))return(c.flex&&p.power)?['r','f']:['r'];
   const reg=matches(c,t),s=[];
@@ -177,11 +238,11 @@ function sidesFor(p,c){
 /* ---------- rendering ---------- */
 function cardHTML(c,dim){
   const raw=String(lab(c)),l=(c.k==='num'&&(c.n===6||c.n===9))?`<u>${c.n}</u>`:raw,s=c.c?SH[c.c]:'✦';
-  return `<div class="card ${c.c||'W'} ${c.liar?'liar':''} ${dim?'dim':''}" data-id="${c.id}" ${dim===undefined?'':'tabindex="0"'} title="${desc(c)}${c.liar?' (Liar card)':''}${c.f?' · flex side: '+CN[c.f]:''}"><b class="cn">${s}</b><span class="big ${raw.length>2?'sm':''}">${l}</span><b class="cm">${s}</b>${c.liar?'<em class="lb">🎭</em>':c.flip?'<em class="lb">⟳</em>':''}${c.f?`<i class="fx ${c.f}">${SH[c.f]}</i>`:''}</div>`}
+  return `<div class="card ${c.c||'W'} ${c.liar?'liar':''} ${c.spin?'spin':''} ${dim?'dim':''}" data-id="${c.id}" ${dim===undefined?'':'tabindex="0"'} title="${desc(c)}${c.liar?' (Liar card)':''}${c.f?' · flex side: '+CN[c.f]:''}"><b class="cn">${s}</b><span class="big ${raw.length>2?'sm':''}">${l}</span><b class="cm">${s}</b>${c.liar?'<em class="lb">🎭</em>':c.spin?'<em class="lb">🌀</em>':c.flip?'<em class="lb">⟳</em>':''}${c.f?`<i class="fx ${c.f}">${SH[c.f]}</i>`:''}</div>`}
 function render(){
   if(!G)return;
   const me=G.players[0],myTurn=G.humanTurn,M=G.mode==='mercy';
-  $('#opps').innerHTML=G.players.slice(1).map((p,i)=>`<div class="opp ${G.cur===i+1?'act':''} ${p.out?'out':''}"><div class="av">${p.out?'💥':p.av}</div><div class="nm">${p.name}</div>${p.out?'<div class="ct">out</div>':`<div class="fan">${'<i></i>'.repeat(Math.min(p.hand.length,8))}</div><div class="ct">${p.hand.length} card${p.hand.length===1?'':'s'}${G.mode==='flex'?(p.power?' · ⚡':' · ⭕'):''}</div>`}</div>`).join('');
+  $('#opps').innerHTML=G.players.slice(1).map((p,i)=>`<div class="opp ${G.cur===i+1?'act':''} ${p.out?'out':''}"><div class="av">${p.out?'💥':p.av}</div><div class="nm">${p.name}${G.links&&G.links.includes(p)?' 🔗':''}</div>${p.out?'<div class="ct">out</div>':`<div class="fan">${'<i></i>'.repeat(Math.min(p.hand.length,8))}</div><div class="ct">${p.hand.length} card${p.hand.length===1?'':'s'}${G.mode==='flex'?(p.power?' · ⚡':' · ⭕'):''}</div>`}</div>`).join('');
   $('#drawPile').innerHTML=`<span>${G.deck.length}</span>`;
   $('#drawPile').classList.toggle('ready',!!myTurn&&!G.drew);
   $('#discard').innerHTML=G.topFace?cardHTML(G.topCard):`<div class="card back"><span>🎭</span></div>`;
@@ -189,10 +250,14 @@ function render(){
   $('#claim').textContent=(G.topFace?'':'Claimed: ')+`${SH[t.c]} ${t.k==='wild'?CN[t.c]:desc(t)}`;
   $('#claim').style.background=t.c?`color-mix(in srgb,${col} 35%,#10122e)`:'#10122e';
   $('#claim').style.borderColor=col;
+  if(G.mode==='allwild'){$('#claim').textContent='';$('#claim').style.display='none'}else $('#claim').style.display='';
   $('#dir').textContent=G.dir===1?'↻ clockwise':'↺ counter-clockwise';
   let mi='';
   if(M)mi=G.pending>0?`Draw stack: +${G.pending}. Beat +${G.lastVal} or take it.`:(me.out?'You are out!':`Out at 25 cards (you: ${me.hand.length})`);
   if(G.mode==='flex')mi=me.power?'⚡ Power ON: flex sides available':'⭕ Power OFF: regular sides only';
+  if(SCORED())mi=`Round ${G.round}: ${G.players.map((p,i)=>`${p.human?'You':p.name} ${G.scores[i]}`).join(' · ')} (to 500)`;
+  if(G.mode==='party')mi=G.links?`🔗 Linked: ${G.links.map(nm).join(' + ')}`:'Speed Play: match number + color to jump in';
+  if(G.mode==='dare')mi=me.dare?`🎯 Your dare: ${me.dare}`:`Dare list: ${DARENAMES[G.dareList]}`;
   $('#modeinfo').textContent=mi;
   const sorted=[...me.hand].sort((a,b)=>(COLORS.indexOf(a.c)<0?9:COLORS.indexOf(a.c))-(COLORS.indexOf(b.c)<0?9:COLORS.indexOf(b.c))||(a.n??20)-(b.n??20)||a.k.localeCompare(b.k));
   $('#hand').innerHTML=sorted.map(c=>{
@@ -200,7 +265,7 @@ function render(){
     if(myTurn)dim=G.drew?c!==G.drew:!sidesFor(me,c).length;
     return cardHTML(c,G.laying?false:myTurn?dim:false)}).join('');
   const anyLegal=!!myTurn&&me.hand.some(c=>sidesFor(me,c).length);
-  $('#drawBtn').textContent=M?(G.pending>0?`Take ${G.pending} cards`:'Draw until playable'):'Draw a card';
+  $('#drawBtn').textContent=M?(G.pending>0?`Take ${G.pending} cards`:'Draw until playable'):G.mode==='attack'?'Hit the launcher':'Draw a card';
   $('#drawBtn').disabled=!myTurn||!!G.drew||(M&&G.pending===0&&anyLegal);
   $('#passBtn').disabled=!myTurn||!G.drew||M;
 }
@@ -208,16 +273,94 @@ function render(){
 /* ---------- modals ---------- */
 function modal(html){const m=$('#modal');m.innerHTML=`<div class="box">${html}</div>`;m.classList.add('on');m.onclick=null;return m}
 function closeModal(){$('#modal').classList.remove('on')}
-function pickColor(msg){return new Promise(r=>{modal(`<h2>${msg}</h2><div class="cols">${COLORS.map(c=>`<button class="cb ${c}" data-c="${c}">${SH[c]} ${CN[c]}</button>`).join('')}</div>`).onclick=e=>{const b=e.target.closest('[data-c]');if(b){closeModal();r(b.dataset.c)}}})}
+function pickColor(msg,only){return new Promise(r=>{modal(`<h2>${msg}</h2><div class="cols">${(only||COLORS).map(c=>`<button class="cb ${c}" data-c="${c}">${SH[c]} ${CN[c]}</button>`).join('')}</div>`).onclick=e=>{const b=e.target.closest('[data-c]');if(b){closeModal();r(b.dataset.c)}}})}
 function pickPlayer(msg){return new Promise(r=>{
   const os=others(G.players[0]);if(os.length===1)return r(os[0]);
   modal(`<h2>${msg||'Choose a player'}</h2><div class="cols">${os.map(p=>`<button data-i="${G.players.indexOf(p)}">${p.av} ${p.name} (${p.hand.length})</button>`).join('')}</div>`).onclick=e=>{const b=e.target.closest('[data-i]');if(b){closeModal();r(G.players[+b.dataset.i])}}})}
 function pickLaid(laid,col){return new Promise(r=>{modal(`<h2>Wild Challenge: ${CN[col]}</h2><p>Everyone claims their card is ${CN[col]}. Flip one to check?</p><div class="cols">${laid.map((l,i)=>`<button data-i="${i}">Flip ${l.q.name}'s card</button>`).join('')}<button data-i="-1">No challenge</button></div>`).onclick=e=>{const b=e.target.closest('[data-i]');if(b){closeModal();r(laid[+b.dataset.i]||null)}}})}
 const FXTXT={skip:'Skip ALL others: you go again',rev:'Reverse, then skip the next player',draw2:'Every other player draws 1',wt2:'A player you choose draws 2',wall:'Every other player draws 2',wd4:'A player you choose draws 4'};
 function pickSide(c){return new Promise(r=>{modal(`<h2>${desc(c)}</h2><p>Which side do you play?</p><div class="cols" style="flex-direction:column"><button data-s="r">Regular side${isWild(c)?': classic wild':''}</button><button data-s="f">⚡ Flex side (uses your Power): ${FXTXT[c.k]||'color '+CN[c.f]}</button></div>`).onclick=e=>{const b=e.target.closest('[data-s]');if(b){closeModal();r(b.dataset.s)}}})}
-function askChallenge(p){return new Promise(r=>{modal(`<h2>${p.name} played a Flex Wild Draw 4</h2><p>Draw 4 and lose your turn, or challenge? If they held a card matching the color, they draw 4 instead. If not, you draw 6.</p><div class="cols"><button data-v="0">Draw 4</button><button data-v="1">Challenge!</button></div>`).onclick=e=>{const b=e.target.closest('[data-v]');if(b){closeModal();r(b.dataset.v==='1')}}})}
+function askChallenge(p){return new Promise(r=>{modal(`<h2>${p.name} played a Wild Draw 4</h2><p>Draw 4 and lose your turn, or challenge? If they held a card matching the color, they draw 4 instead. If not, you draw 6.</p><div class="cols"><button data-v="0">Draw 4</button><button data-v="1">Challenge!</button></div>`).onclick=e=>{const b=e.target.closest('[data-v]');if(b){closeModal();r(b.dataset.v==='1')}}})}
 
+function pickNumber(nums){return new Promise(r=>{modal(`<h2>Discard Number: pick a number</h2><div class="cols">${nums.map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>`).onclick=e=>{const b=e.target.closest('[data-n]');if(b){closeModal();r(+b.dataset.n)}}})}
+function pickCards(msg,cards,min,max,pre=[]){return new Promise(r=>{
+  let sel=pre.map(c=>c.id);
+  const paint=()=>{
+    const ok=sel.length>=min&&sel.length<=max;
+    modal(`<h2>${msg}</h2><div class="pickrow">${cards.map(c=>cardHTML(c,!sel.includes(c.id))).join('')}</div><div class="cols"><button id="ok" ${ok?'':'disabled'}>Confirm (${sel.length})</button></div>`).onclick=e=>{
+      const cd=e.target.closest('.card');
+      if(cd){const id=+cd.dataset.id;if(sel.includes(id))sel=sel.filter(x=>x!==id);else{if(sel.length>=max&&max===1)sel=[];if(sel.length<max)sel.push(id)}paint();return}
+      if(e.target.id==='ok'&&ok){closeModal();r(cards.filter(c=>sel.includes(c.id)))}}};
+  paint()})}
+function pickTwo(){return new Promise(r=>{let sel=[];const paint=()=>{modal(`<h2>Link two players 🔗</h2><p class="note">Whenever one of them draws, the other draws the same amount. A Point Taken ends the link.</p><div class="cols">${G.players.map((q,i)=>`<button data-i="${i}" style="${sel.includes(i)?'background:#7d5cff':''}">${nm(q)} (${q.hand.length})</button>`).join('')}</div><div class="cols"><button id="ok" ${sel.length===2?'':'disabled'}>Link them</button></div>`).onclick=e=>{const b=e.target.closest('[data-i]');if(b){const i=+b.dataset.i;sel=sel.includes(i)?sel.filter(x=>x!==i):sel.length<2?[...sel,i]:[sel[1],i];paint();return}if(e.target.id==='ok'&&sel.length===2){closeModal();r(sel.map(i=>G.players[i]))}}};paint()})}
+function showHand(q){return new Promise(r=>{modal(`<h2>${q.name} shows their hand</h2><div class="pickrow">${q.hand.map(c=>cardHTML(c)).join('')}</div><div class="cols"><button id="ok">OK</button></div>`).onclick=e=>{if(e.target.id==='ok'){closeModal();r()}}})}
+async function showCards(title,items,ms){modal(`<h2>${title}</h2><div class="pickrow">${items.map(([n,c])=>`<div style="text-align:center"><div style="font-size:13px;margin-bottom:4px">${n}</div>${cardHTML(c)}</div>`).join('')}</div>`);await sleep(ms);closeModal()}
+function askDare(d,text){return new Promise(r=>{modal(`<h2>Dare #${d}</h2><p style="font-size:18px">${esc(text)}</p><p class="note">Draw 2 cards, or do the dare until your next turn. Your turn is used up either way.</p><div class="cols"><button data-v="dare">Do the dare</button><button data-v="draw">Draw 2</button></div>`).onclick=e=>{const b=e.target.closest('[data-v]');if(b){closeModal();r(b.dataset.v)}}})}
+function askJudge(p){return new Promise(r=>{modal(`<h2>${p.human?'Dare check':p.name+"'s dare"}</h2><p style="font-size:18px">${esc(p.dare)}</p><p>${p.human?'Did you complete it?':'Did '+p.name+' pull it off? You\'re the judge.'}</p><div class="cols"><button data-v="1">${p.human?'Yes, I did it':'Nailed it'}</button><button data-v="0">${p.human?'No, I failed':'Failed (draws 2)'}</button></div>`).onclick=e=>{const b=e.target.closest('[data-v]');if(b){closeModal();r(b.dataset.v==='1')}}})}
+async function resolveDare(q,d){
+  const text=G.dares[d-1];
+  if(q.human){
+    if(await askDare(d,text)==='dare'){q.dare=text;log(`You take dare #${d}`)}else{draw(q,2);log('You draw 2 instead of the dare')}
+  }else if(Math.random()<.5){q.dare=text;log(`${q.name} takes dare #${d}: ${text}`)}
+  else{draw(q,2);log(`${q.name} draws 2 instead of the dare`)}}
+async function judgeDare(p){
+  const ok=await askJudge(p);p.dare=null;
+  if(ok)log(`${p.human?'You':p.name} completed the dare!`);
+  else{log(p.human?'You failed the dare and draw 2':`${p.name} failed the dare and draws 2`);draw(p,2)}
+  render();await sleep(500)}
 const RULES={
+party:`<p>Built for big groups (the real game is 6 to 16 players, so the menu offers 6 to 16). Be first to get rid of all your cards.</p><ul>
+<li><b>Match</b> the top card by color, number or symbol. Draw one card if you can't play and play it if you can. You may also draw instead of playing.</li>
+<li><b>Speed Play ⚡:</b> if you hold a number card matching both the number and the color of the top card, you can play it out of turn. When it's available you get a short window to hit the button. Then play continues from you.</li>
+<li><b>Draw Two, Reverse, Skip, Wild:</b> as in classic play.</li>
+<li><b>Point Taken ☝️:</b> everyone points at one other player. Each player draws one card per person pointing at them, up to 5, in turn order. It also ends any link.</li>
+<li><b>Wild Pile Up 📚:</b> flip cards from the draw pile into a mini-pile until you get a non-Wild. That card's color continues. The next player must play a card of that color (Wilds count) and pass the pile on. Whoever can't takes the whole mini-pile, and play continues after them.</li>
+<li><b>Wild Drawn Together 🔗:</b> pick two players and a color. Whenever one of them draws, the other draws the same amount. Playing a new one replaces the old link, and Point Taken ends it.</li>
+<li><b>Wild Draw Four:</b> choose a color. The next player draws 4 and loses their turn, or challenges. Challenge a bluff (the player held a card of the color, Wilds count) and they draw 4. Challenge wrongly and you draw 6.</li>
+<li><b>COSMIC!</b> Call it at one card or draw 2 if you're caught. The first player to play their last card wins.</li></ul>`,
+dare:`<p>Be first to get rid of your cards each round and score points for what's left in everyone else's hands. First to 500 wins.</p><ul>
+<li><b>Pick a Dare List</b> on the menu: Family, Showoff, Daredevil, or House Rules where you write your own (one per line). Each list has 15 dares.</li>
+<li><b>Match</b> the top card by color, number or symbol. Draw one card if you can't play, and play it if you can.</li>
+<li><b>Dare card:</b> the next player must draw 2 cards, or do the dare matching the number on the card. It can go on a matching color or another Dare card.</li>
+<li><b>Wild Dare:</b> same, and you also choose the color. You can play it any time.</li>
+<li>Choosing the dare or drawing both use up that player's turn.</li>
+<li><b>Doing a dare:</b> it lasts until your next turn. Then the group judges whether you pulled it off. Fail and you draw 2. When a bot takes a dare, you're the judge.</li>
+<li><b>Reverse and Skip</b> work as usual. In a 2-player game Reverse acts like Skip.</li>
+<li><b>COSMIC!</b> Call it at one card or draw 2 if you're caught.</li>
+<li><b>Scoring:</b> numbers at face value, Reverse, Skip and Dare 20, Wild Dare 50. A final Dare still gets resolved and counted.</li></ul><p class="note">Please keep dares safe and only do what you're comfortable with.</p>`,
+attack:`<p>There's no draw pile to pick from. Instead you hit the card launcher and hope. The launcher is simulated: each press fires 0 to 4 cards at you, and most of the time it's a miss. Be first to go out each round and score points from everyone else's hands. First to 500 wins.</p><ul>
+<li><b>Match</b> the top card by color, number or symbol, or play a Wild.</li>
+<li><b>Can't play, or don't want to?</b> Hit the launcher once. Any cards that shoot out join your hand, and your turn is over either way.</li>
+<li><b>Hit 2:</b> the next player hits the launcher twice and their turn is over.</li>
+<li><b>Reverse and Skip:</b> as usual. With 2 players Reverse acts like Skip.</li>
+<li><b>Discard All:</b> drop every card of its color from your hand (30 points).</li>
+<li><b>Trade Hands:</b> you must swap hands with a player you choose. You can't go out on one.</li>
+<li><b>Wild:</b> call any color.</li>
+<li><b>Wild All Hit:</b> call a color, then every other player hits the launcher once.</li>
+<li><b>Wild Hit-Fire:</b> call a color. The next player keeps hitting until cards fire out, takes them, and loses their turn.</li>
+<li><b>COSMIC!</b> Call it at one card. If you're caught, you hit the launcher twice.</li>
+<li><b>Scoring:</b> numbers at face value, Hit 2, Reverse and Skip 20, Discard All and Trade Hands 30, every Wild 50.</li></ul>`,
+allwild:`<p>Every card is wild, so there's no matching. Just play a card. Be first to get rid of all your cards.</p><ul>
+<li><b>Wild:</b> does nothing, but at least it's one less card.</li>
+<li><b>Wild Reverse:</b> reverses the direction of play.</li>
+<li><b>Wild Skip:</b> the next player loses their turn.</li>
+<li><b>Wild Skip Two:</b> the next two players lose their turns.</li>
+<li><b>Wild Draw Two / Wild Draw Four:</b> the next player draws that many cards and loses their turn.</li>
+<li><b>Wild Targeted Draw Two:</b> a player you choose draws 2 and keeps their turn.</li>
+<li><b>Wild Forced Swap:</b> you must swap hands with a player you choose. Anyone left with one card must call COSMIC!.</li>
+<li><b>Draw instead:</b> you can draw one card rather than play. Then you must play that card or pass.</li>
+<li><b>COSMIC!</b> With one card left, call it before someone catches you, or draw 2. Play your last card to win the round.</li></ul>`,
+classic:`<p>The original game. Be first to play all your cards each round, then score points for the cards left in everyone else's hands. First to 500 points wins.</p><ul>
+<li><b>Match</b> the top card by color, number or word. Draw Two, Reverse and Skip can go on a matching color or the same action.</li>
+<li><b>Draw Two:</b> next player draws 2 and loses their turn.</li>
+<li><b>Reverse:</b> switches direction of play. With 2 players it works like Skip.</li>
+<li><b>Skip:</b> the next player loses their turn.</li>
+<li><b>Wild:</b> play it any time and call any color.</li>
+<li><b>Wild Draw Four:</b> call a color, and the next player draws 4 and loses their turn. You're only supposed to play it when you hold no card of the current color. If you play it anyway and get challenged, you draw 4. If the challenge was wrong, the challenger draws 6.</li>
+<li><b>Can't or won't play?</b> Draw one card. You may play only that card, otherwise your turn ends.</li>
+<li><b>Two players:</b> Skip, Reverse, Draw Two and Wild Draw Four all give you another turn.</li>
+<li><b>COSMIC!</b> Before your next-to-last card lands, you need to call it. If you're caught before the next player's turn, you draw 4.</li>
+<li><b>Scoring:</b> number cards at face value, Draw Two, Reverse and Skip 20, Wild and Wild Draw Four 50. A final Draw Two or Wild Draw Four is still drawn and counted.</li></ul>`,
 liars:`<p>Be first to empty your hand. Match the top card by color, number or symbol.</p><ul>
 <li><b>Regular cards</b> are played face up and must match.</li>
 <li><b>Liar cards 🎭</b> are always played face down. If one doesn't match, you're bluffing: you claim it's a match.</li>
@@ -236,6 +379,20 @@ mercy:`<p>Be first to empty your hand, or be the last player standing. Match the
 <li><b>Wild Reverse Draw 4</b> reverses play and the next player draws 4 (with 2 players it comes back to you, but you can stack it onward). <b>Wild Draw 6</b> and <b>Wild Draw 10</b> make the next player draw that many and lose their turn.</li>
 <li><b>Wild Color Roulette:</b> the next player picks a color, then flips cards from the draw pile until one matches it. They keep every card and lose their turn.</li>
 <li>With one card left, hit <b>COSMIC!</b> or draw 2 if you're caught.</li></ul>`,
+spin:`<p>Be first to go out each round, then score points for the cards left in everyone else's hands. First player to 500 points wins.</p><ul>
+<li><b>Match</b> the top card by color, number or symbol. Draw Two and Skip can go on matching colors or the same action. Wild can be played any time.</li>
+<li><b>Can't or won't play?</b> Draw one card. You can only play the card you just drew.</li>
+<li><b>Wild Draw Four:</b> next player draws 4 and loses their turn. You can only play it if you have no card matching the color of the top card.</li>
+<li><b>Spin cards 🌀</b> are the numbers 1 to 5 with a swirl. When you play one, the next player must spin the wheel instead of taking their turn.</li>
+<li><b>Almost:</b> the spinner keeps only 2 cards and discards the rest.</li>
+<li><b>Discard Number / Discard Color:</b> the spinner picks a number or color in their hand and may discard those cards.</li>
+<li><b>Draw Red / Draw Blue:</b> the spinner draws until they get that color (or a Wild) and keeps everything.</li>
+<li><b>Trade Hands:</b> everyone passes their hand in the direction of play. Anyone who ends up with one card must call COSMIC!.</li>
+<li><b>Show Hand:</b> the spinner shows their hand to everyone.</li>
+<li><b>War:</b> everyone reveals their highest number card. The highest wins and discards it, and ties go again with the next highest. Play continues after the winner.</li>
+<li><b>UNO Spin 📣:</b> everyone races to hit the button. The first one discards a card of their choice, and play continues after them.</li>
+<li>When several cards are discarded, their owner picks which one lands on top.</li>
+<li><b>Scoring:</b> number cards at face value, Draw Two, Reverse and Skip 20, Wild and Wild Draw Four 50. With one card left, hit <b>COSMIC!</b> or draw 2.</li></ul>`,
 flex:`<p>Be first to empty your hand. Match the top card by color, number or symbol.</p><ul>
 <li><b>Flex cards</b> have a regular side and a flex side with a second color (shown in the small tab at the bottom). Playing the flex side lets you match that second color, but play continues in the card's regular color.</li>
 <li><b>Power cards:</b> everyone starts with Power ON (⚡). Use a flex side and your Power flips OFF (⭕). Play a number card with the ⟳ icon to flip it again. When everyone's Power is OFF, all reset to ON.</li>
@@ -253,12 +410,15 @@ function showMenu(msg){
   const demo=[{c:'R',k:'num',n:7},{c:'Y',k:'skip'},{c:null,k:'wd10'},{c:'B',k:'draw2'},{c:'G',k:'num',n:3}].map((c,i)=>cardHTML({...c,id:'d'+i,liar:false,flex:false,f:null,flip:false})).join('');
   modal(`<div class="menu"><div class="demo">${demo}</div><h1>✦ Cosmic Match</h1>${msg?`<p class="msg">${msg}</p>`:'<p class="sub">Pick a mode, choose your opponents, and play.</p>'}
   <div class="modes">${Object.entries(MODES).map(([k,m])=>`<div class="mode ${k===selMode?'sel':''}" data-m="${k}" role="button" tabindex="0"><div><b>${m.name}</b><span>${m.d}</span></div><button data-r="${k}">Rules</button></div>`).join('')}</div>
-  <h2>Opponents</h2><div class="cols seg">${[1,2,3,4,5].map(n=>`<button class="${n===selOpp?'on':''}" data-n="${n}">${n}</button>`).join('')}</div>
+  ${selMode==='dare'?`<h2>Dare list</h2><div class="cols seg">${Object.entries(DARENAMES).map(([k,n])=>`<button class="${k===selDare?'on':''}" data-d="${k}">${n}</button>`).join('')}</div>${selDare==='house'?`<textarea id="hr" placeholder="Write your own dares, one per line. Dare card #1 uses line 1, #2 uses line 2, and so on up to 15.">${esc(houseText)}</textarea>`:''}`:''}
+  <h2>Opponents</h2><div class="cols seg">${OPPS().map(n=>`<button class="${n===selOpp?'on':''}" data-n="${n}">${n}</button>`).join('')}</div>
   <div class="cols"><button class="go" id="go">Start game</button></div></div>`).onclick=e=>{
     const r=e.target.closest('[data-r]');if(r){showRules(r.dataset.r,()=>showMenu(msg));return}
-    const m=e.target.closest('[data-m]');if(m){selMode=m.dataset.m;showMenu(msg);return}
+    const m=e.target.closest('[data-m]');if(m){selMode=m.dataset.m;if(selMode==='party'&&selOpp<5)selOpp=7;else if(selMode!=='party'&&selOpp>5)selOpp=3;showMenu(msg);return}
+    const dd=e.target.closest('[data-d]');if(dd){selDare=dd.dataset.d;showMenu(msg);return}
     const n=e.target.closest('[data-n]');if(n){selOpp=+n.dataset.n;showMenu(msg);return}
-    if(e.target.id==='go'){closeModal();start(selOpp,selMode)}}}
+    if(e.target.id==='go'){closeModal();start(selOpp,selMode)}};
+  $('#modal').oninput=e=>{if(e.target.id==='hr')houseText=e.target.value}}
 
 /* ---------- timed windows ---------- */
 function race(label,ms,bots=[]){return new Promise(res=>{
@@ -274,31 +434,56 @@ async function challengeWin(p){
   const r=await race(p.human?null:`Challenge ${p.name}!`,3200,bots);
   return r==='me'?G.players[0]:r;
 }
+const PEN=()=>G.mode==='classic'?4:2;
+const SCORED=()=>['spin','classic','attack','dare'].includes(G.mode);
+const PENT=()=>G.mode==='attack'?'hit the launcher twice':`draw ${PEN()}`;
+async function penalty(p){if(G.mode==='attack')await hit(p,2);else draw(p,PEN())}
 async function cosmic(p){
   if(p.human){
     setStatus('One card left: call COSMIC!');
     const bot=G.players.find(x=>!x.human&&!x.out);
     const r=await race('COSMIC! ✦',2600,bot?[{who:bot,ms:2200}]:[]);
-    if(r==='me')log('You called COSMIC!');else{log(`${r?r.name:'Someone'} caught you! You draw 2`);draw(p,2)}
+    if(r==='me')log('You called COSMIC!');else{log(`${r?r.name:'Someone'} caught you! You ${PENT()}`);await penalty(p)}
   }else{
     if(Math.random()<.8){log(`${p.name}: "COSMIC!"`);await sleep(600);return}
     setStatus(`${p.name} forgot to call!`);
     const r=await race(G.players[0].out?null:`Catch ${p.name}!`,2400);
-    if(r==='me'){log(`You caught ${p.name}! They draw 2`);draw(p,2)}else log(`${p.name}: "COSMIC!" just in time`);
+    if(r==='me'){log(`You caught ${p.name}! They ${PENT()}`);await penalty(p)}else log(`${p.name}: "COSMIC!" just in time`);
   }
 }
 
 /* ---------- shared turn plumbing ---------- */
 function checkWin(){
   if(G.over)return true;
-  const al=G.players.filter(p=>!p.out),w=al.find(p=>!p.hand.length)||(al.length===1?al[0]:null);
+  const al=G.players.filter(p=>!p.out),w=G.roundWinner||al.find(p=>!p.hand.length)||(al.length===1?al[0]:null);
   if(!w)return false;
   G.over=true;G.humanTurn=false;render();
+  if(SCORED()){roundOver(w);return true}
   showMenu(w.human?'🏆 You win! Nicely played.':`${w.av} ${w.name} wins this round.`);return true}
-async function finishTurn(p,skip){
+const cardPts=c=>c.k==='num'?c.n:['swild','wild4','allhit','hitfire','wdare'].includes(c.k)?50:(c.k==='discall'||c.k==='trade')?30:20;
+function roundOver(w){
+  const wi=G.players.indexOf(w);
+  const pts=G.players.reduce((s,p)=>s+(p===w?0:p.hand.reduce((a,c)=>a+cardPts(c),0)),0);
+  G.scores[wi]+=pts;
+  const table=G.players.map((p,i)=>`${p.human?'You':p.name}: ${G.scores[i]}`).join(' · ');
+  if(G.scores[wi]>=500){G.final=true;showMenu(`${w.human?'🏆 You reach':w.av+' '+w.name+' reaches'} 500 points!<br><small>${table}</small>`);return}
+  modal(`<h2>${w.human?'You win':w.name+' wins'} the round: +${pts}</h2><p>${table}</p><p>First to 500 wins.</p><div class="cols"><button id="nr">Next round</button></div>`).onclick=e=>{if(e.target.id==='nr'){closeModal();G.round++;G.log=[];$('#log').innerHTML='';deal();run()}}}
+async function speedPlay(p){
+  const t=G.top;if(t.k!=='num')return null;
+  const nxt=nextAlive(),match=h=>h.k==='num'&&h.c===t.c&&h.n===t.n;
+  const elig=G.players.filter(q=>q!==p&&q!==nxt&&!q.out&&q.hand.some(match));
+  if(!elig.length)return null;
+  const hu=elig.find(q=>q.human),bots=elig.filter(q=>!q.human&&Math.random()<.3).map(b=>({who:b,ms:500+Math.random()*1500}));
+  if(!hu&&!bots.length)return null;
+  if(hu)setStatus(`⚡ Speed Play! You hold a matching ${desc(t)}`);
+  const r=hu?await race(`⚡ Speed Play: ${desc(t)}`,2200,bots):await race(null,1200,bots);
+  const q=r==='me'?hu:r;if(!q)return null;
+  return{q,card:q.hand.find(match)}}
+async function finishTurn(p,skip,noCos){
   render();if(checkWin())return;
-  if(p.hand.length===1)await cosmic(p);
+  if(p.hand.length===1&&!noCos)await cosmic(p);
   if(checkWin())return;
+  if(G.mode==='party'){const sp=await speedPlay(p);if(sp){log(`⚡ ${nm(sp.q)} speed-play${sp.q.human?'':'s'} ${desc(sp.card)}!`);G.cur=G.players.indexOf(sp.q);await playStd(sp.q,sp.card,{side:'r'});return}}
   advance(1+skip)}
 function mostColor(p){const cnt={R:0,Y:0,G:0,B:0};p.hand.forEach(c=>c.c&&cnt[c.c]++);return [...COLORS].sort((a,b)=>cnt[b]-cnt[a])[0]}
 const playCard=(p,c,o)=>G.mode==='liars'?playLiar(p,c,o):playStd(p,c,o);
@@ -372,22 +557,96 @@ async function drawUntil(p){
     if(sidesFor(p,d).length){found=d;break}
     await sleep(110)}
   log(`${p.name} draws ${cnt} card${cnt===1?'':'s'}`);return p.out?null:found}
+function fire(){const r=Math.random();return r<.45?0:r<.75?1:r<.92?2:r<.98?3:4}
+async function hit(p,times,until){
+  let total=0;
+  for(let i=0;i<(until?25:times);i++){
+    const k=fire();if(k)draw(p,k);total+=k;
+    log(`${p.human?'You hit':p.name+' hits'} the launcher… ${k?`💥 ${k} card${k===1?'':'s'} shoot out!`:'nothing happens'}`);
+    render();await sleep(750);
+    if(until&&k)break}
+  return total}
 async function playStd(p,c,o={}){
   const M=G.mode==='mercy',F=G.mode==='flex',prev=G.top,fx=o.side==='f';
-  const hadMatch=p.hand.some(h=>h!==c&&(h.c===prev.c||isWild(h)));
+  const hadMatch=p.hand.some(h=>h!==c&&(h.c===prev.c||(G.mode!=='classic'&&isWild(h))));
   p.hand.splice(p.hand.indexOf(c),1);
   G.disc.push(c);G.topCard=c;G.topFace=true;
   G.top={c:isWild(c)?(o.color||prev.c):c.c,k:isWild(c)?'wild':c.k,n:c.n};
   log(`${p.name} plays ${desc(c)}${fx?' (flex side)':''}${isWild(c)&&o.color?' → '+CN[o.color]:''}`);
   if(F){if(fx)p.power=false;if(c.flip)p.power=!p.power}
   render();await sleep(500);
-  if(!p.hand.length)return finishTurn(p,0);
-  const n=aliveCount(),nx=nextAlive();let skip=0;
+  const S=SCORED();
+  if(S&&!p.hand.length)G.roundWinner=p;
+  if(!p.hand.length&&!S)return finishTurn(p,0);
+  const n=aliveCount(),nx=nextAlive();let skip=0,noCos=false;
   const addP=v=>{G.pending+=v;G.lastVal=v;log(`Draw stack: +${G.pending}`)};
   switch(c.k){
     case 'num':
       if(M&&c.n===7&&o.target){[p.hand,o.target.hand]=[o.target.hand,p.hand];log(`${p.name} swaps hands with ${o.target.name}`)}
       if(M&&c.n===0)passHands();
+      if(S&&c.spin){
+        if(p.hand.length===1&&!G.roundWinner)await cosmic(p);
+        noCos=true;log(`${nx.name} must spin the wheel!`);
+        const ap=await spinWheel(nx);G.cur=G.players.indexOf(ap)}
+      break;
+    case 'swild':case 'awild':break;
+    case 'dtog':{
+      const pair=p.human?await pickTwo():[...G.players].filter(x=>x!==p).sort((a,b)=>a.hand.length-b.hand.length).slice(0,2);
+      if(pair.length<2){log('Not enough players to link');break}
+      G.links=pair;log(`🔗 ${pair.map(nm).join(' and ')} are linked!`);break}
+    case 'pt':{
+      G.links=null;log('Point Taken! 3…2…1… everyone points!');
+      const cnt=new Map();
+      for(const q of G.players.filter(x=>!x.out)){
+        let t;
+        if(q.human)t=await pickPlayer('Point at someone!');
+        else{const cand=others(q);t=Math.random()<.5?[...cand].sort((a,b)=>a.hand.length-b.hand.length)[0]:pick(cand)}
+        cnt.set(t,(cnt.get(t)||0)+1)}
+      for(let i=1;i<=G.players.length;i++){
+        const q=G.players[mod(G.cur+G.dir*i,G.players.length)],c=cnt.get(q)||0,k=Math.min(c,5);
+        if(k){log(`${nm(q)} ${q.human?'were':'was'} pointed at ${c} time${c===1?'':'s'}: draw${q.human?'':'s'} ${k}`);draw(q,k);render();await sleep(350)}}
+      break}
+    case 'pileup':{
+      const pile=[];let cd;
+      do{cd=takeCard();if(!cd)break;pile.push(cd)}while(isWild(cd));
+      if(!pile.length){log('The draw pile is empty');break}
+      const col=pile[pile.length-1].c;G.top={c:col,k:'wild'};
+      log(`${nm(p)} start${p.human?'':'s'} a mini-pile (${pile.length}). ${CN[col]} continues!`);render();await sleep(700);
+      let q=nx;
+      for(let g=0;g<80;g++){
+        const el=q.hand.filter(h=>h.c===col||isWild(h));
+        if(!el.length){q.hand.push(...pile);log(`${nm(q)} can't play and ${q.human?'take':'takes'} the mini-pile (${pile.length})!`);break}
+        const ch=q.human?(await pickCards(`Mini-pile (${pile.length})! Play a ${CN[col]} or Wild card to pass it on`,el,1,1,[]))[0]:[...el].sort((a,b)=>cardPts(b)-cardPts(a))[0];
+        q.hand.splice(q.hand.indexOf(ch),1);G.disc.splice(G.disc.length-1,0,ch);
+        log(`${nm(q)} play${q.human?'':'s'} ${desc(ch)} and pass${q.human?'':'es'} it on`);render();await sleep(550);
+        if(!q.hand.length)break;
+        q=G.players[mod(G.players.indexOf(q)+G.dir,G.players.length)]}
+      G.cur=G.players.indexOf(q);break}
+    case 'dare':case 'wdare':skip=1;await resolveDare(nx,c.d);break;
+    case 'hit2':log(`${nx.name} must hit the launcher twice`);await hit(nx,2);skip=1;break;
+    case 'trade':if(o.target){[p.hand,o.target.hand]=[o.target.hand,p.hand];log(`${p.name} trades hands with ${o.target.name}`)}break;
+    case 'allhit':
+      log('Everyone else hits the launcher!');
+      for(let i=1;i<G.players.length;i++)await hit(G.players[mod(G.cur+G.dir*i,G.players.length)],1);
+      break;
+    case 'hitfire':log(`${nx.name} hits until it fires, then loses their turn`);await hit(nx,0,true);skip=1;break;
+    case 'arev':G.dir*=-1;log('Direction reversed');skip=n===2?1:0;break;
+    case 'askip':skip=1;log(`${nx.name} is skipped`);break;
+    case 'askip2':skip=Math.min(2,n-1);log(skip>1?'The next two players are skipped':`${nx.name} is skipped`);break;
+    case 'adraw2':draw(nx,2);skip=1;log(`${nx.name} draws 2 and is skipped`);break;
+    case 'adraw4':draw(nx,4);skip=1;log(`${nx.name} draws 4 and is skipped`);break;
+    case 'at2':if(o.target){draw(o.target,2);log(`${o.target.name} draws 2`)}break;
+    case 'aswap':
+      if(o.target){[p.hand,o.target.hand]=[o.target.hand,p.hand];log(`${p.name} swaps hands with ${o.target.name}`);render();if(o.target.hand.length===1)await cosmic(o.target)}
+      break;
+    case 'wild4':
+      if(G.mode==='classic'||G.mode==='party'){
+        const ch=nx.human?await askChallenge(p):Math.random()<.3;
+        if(ch){
+          if(hadMatch){log(`Challenge! ${p.name} was guilty and draws 4`);draw(p,4)}
+          else{log(`Challenge failed! ${nx.name} draws 6 and is skipped`);draw(nx,6);skip=1}
+        }else{draw(nx,4);skip=1;log(`${nx.name} draws 4 and is skipped`)}
+      }else{draw(nx,4);skip=1;log(`${nx.name} draws 4 and is skipped`)}
       break;
     case 'skip':skip=(F&&fx)?n-1:1;log(skip===n-1&&n>2?'Everyone else is skipped':`${nx.name} is skipped`);break;
     case 'rev':G.dir*=-1;log('Direction reversed');skip=(F&&fx)?1:(n===2?1:0);break;
@@ -421,15 +680,105 @@ async function playStd(p,c,o={}){
       break;
   }
   if(F&&G.players.every(q=>!q.power)){G.players.forEach(q=>q.power=true);log('All Power cards reset to ⚡')}
-  await finishTurn(p,skip)}
+  await finishTurn(p,skip,noCos||!!G.roundWinner)}
+
+/* ---------- Spin wheel ---------- */
+const WHEEL=[{k:'almost',t:'Almost',i:'☝️'},{k:'dnum',t:'Discard Number',i:'#️⃣'},{k:'dcol',t:'Discard Color',i:'🎨'},{k:'dred',t:'Draw Red',i:'🟥'},{k:'dblue',t:'Draw Blue',i:'🟦'},{k:'trade',t:'Trade Hands',i:'🔄'},{k:'show',t:'Show Hand',i:'👁️'},{k:'war',t:'War',i:'⚔️'},{k:'unospin',t:'UNO Spin',i:'📣'}];
+const WCOL=['#7d5cff','#e04cc2','#ff4f6d','#ffc43a','#35d49a','#4a9dff'];
+async function showWheel(q,idx){
+  const seg=360/WHEEL.length,bg=WHEEL.map((w,i)=>`${WCOL[i%6]} ${i*seg}deg ${(i+1)*seg}deg`).join(',');
+  modal(`<div class="wheelwrap"><div class="pointer">▼</div><div class="wheel" id="wheel" style="background:conic-gradient(${bg})">${WHEEL.map((w,i)=>{const a=i*seg+seg/2;return `<span class="wl" style="transform:rotate(${a}deg) translateY(-92px)"><i style="transform:translate(-50%,-50%) rotate(${-a}deg)">${w.i}</i></span>`}).join('')}</div><h2 id="wres">${q.human?'You spin':q.name+' spins'} the wheel…</h2></div>`);
+  await sleep(80);
+  $('#wheel').style.transform=`rotate(${1440-(idx*seg+seg/2)}deg)`;
+  await sleep(2400);
+  $('#wres').textContent=`${WHEEL[idx].i} ${WHEEL[idx].t}!`;
+  await sleep(1300);closeModal()}
+async function discardMany(q,cards){
+  if(!cards.length)return;
+  let top=cards[cards.length-1];
+  if(cards.length>1){
+    if(q.human)top=(await pickCards('Pick the card that ends up on top',cards,1,1,[cards[0]]))[0];
+    else{const mc=mostColor(q);top=cards.find(c=>c.c===mc)||cards.find(c=>!isWild(c))||top}}
+  G.disc.push(...cards.filter(c=>c!==top),top);G.topCard=top;
+  const col=isWild(top)?(q.human?await pickColor('Choose a color'):mostColor(q)):top.c;
+  G.top={c:col,k:isWild(top)?'wild':top.k,n:top.n};
+  log(`${q.human?'You discard':q.name+' discards'} ${cards.length} card${cards.length===1?'':'s'}. Top: ${desc(G.top)}`);render()}
+async function warRound(q){
+  const used=new Map();let cont=G.players.filter(p=>p.hand.some(c=>c.k==='num'));
+  if(!cont.length){log('Nobody has a number card');return q}
+  let winner=null;
+  for(let r=0;r<15&&!winner;r++){
+    const prev=cont;
+    const rev=cont.map(p=>({p,c:p.hand.filter(c=>c.k==='num'&&!(used.get(p)||[]).includes(c)).sort((a,b)=>b.n-a.n)[0]})).filter(x=>x.c);
+    if(!rev.length){winner=pick(prev);break}
+    rev.forEach(x=>used.set(x.p,[...(used.get(x.p)||[]),x.c]));
+    await showCards(r?'War continues!':'War!',rev.map(x=>[x.p.human?'You':x.p.name,x.c]),1700);
+    const mx=Math.max(...rev.map(x=>x.c.n));cont=rev.filter(x=>x.c.n===mx).map(x=>x.p);
+    if(cont.length===1)winner=cont[0]}
+  const cards=used.get(winner)||[];
+  winner.hand=winner.hand.filter(c=>!cards.includes(c));
+  log(`${winner.human?'You win':winner.name+' wins'} the war!`);
+  await discardMany(winner,cards);return winner}
+async function spinWheel(q){
+  const idx=Math.floor(Math.random()*WHEEL.length),w=WHEEL[idx];
+  log(`${q.human?'You spin':q.name+' spins'} the wheel…`);
+  await showWheel(q,idx);log(`Wheel: ${w.t}!`);
+  let after=q;
+  switch(w.k){
+    case 'almost':
+      if(q.hand.length>2){
+        let keep;
+        if(q.human)keep=await pickCards('Almost! Choose 2 cards to keep',q.hand,2,2,[]);
+        else{const mc=mostColor(q);keep=[...q.hand].sort((a,b)=>(isWild(a)?0:a.c===mc?1:2)-(isWild(b)?0:b.c===mc?1:2)).slice(0,2)}
+        const dis=q.hand.filter(c=>!keep.includes(c));q.hand=keep;await discardMany(q,dis)}
+      else log('Already at 2 cards or fewer');
+      break;
+    case 'dnum':{
+      const nums=[...new Set(q.hand.filter(c=>c.k==='num').map(c=>c.n))].sort((a,b)=>a-b);
+      if(!nums.length){log('No number cards to discard');break}
+      const n=q.human?await pickNumber(nums):nums.sort((a,b)=>q.hand.filter(c=>c.n===b).length-q.hand.filter(c=>c.n===a).length)[0];
+      const m=q.hand.filter(c=>c.k==='num'&&c.n===n),dis=q.human?await pickCards(`Discard which ${n}s? (keep some if you like)`,m,0,m.length,m):m;
+      q.hand=q.hand.filter(c=>!dis.includes(c));await discardMany(q,dis);break}
+    case 'dcol':{
+      const cols=COLORS.filter(c=>q.hand.some(h=>h.c===c));
+      if(!cols.length){log('No colored cards to discard');break}
+      const col=q.human?await pickColor('Discard Color: pick a color',cols):[...cols].sort((a,b)=>q.hand.filter(c=>c.c===b).length-q.hand.filter(c=>c.c===a).length)[0];
+      const m=q.hand.filter(c=>c.c===col),dis=q.human?await pickCards(`Discard which ${CN[col]} cards? (keep some if you like)`,m,0,m.length,m):m;
+      q.hand=q.hand.filter(c=>!dis.includes(c));await discardMany(q,dis);break}
+    case 'dred':case 'dblue':{
+      const col=w.k==='dred'?'R':'B';let cnt=0;
+      for(let i=0;i<60;i++){const b=q.hand.length;draw(q,1);if(q.hand.length===b)break;cnt++;const d=q.hand[q.hand.length-1];if(d.c===col||isWild(d))break}
+      log(`${q.human?'You draw':q.name+' draws'} ${cnt} card${cnt===1?'':'s'}`);break}
+    case 'trade':
+      passHands();render();await sleep(700);
+      for(const p of G.players)if(p.hand.length===1)await cosmic(p);
+      break;
+    case 'show':
+      if(q.human)log('You show your hand to everyone');else await showHand(q);
+      break;
+    case 'war':after=await warRound(q);break;
+    case 'unospin':{
+      const bots=G.players.filter(x=>!x.human).map(b=>({who:b,ms:700+Math.random()*1800}));
+      setStatus('UNO Spin! Be first to hit the button!');
+      const r=await race('UNO Spin! 📣',3500,bots);
+      const win=r==='me'?G.players[0]:(r||pick(bots).who);
+      log(`${win.human?'You yell':win.name+' yells'} it first!`);
+      if(win.hand.length){
+        const c=win.human?(await pickCards('Discard one card',win.hand,1,1,[]))[0]:pick(win.hand);
+        win.hand.splice(win.hand.indexOf(c),1);await discardMany(win,[c])}
+      after=win;break}
+  }
+  render();return after}
 
 /* ---------- turns ---------- */
 function waitAction(){return new Promise(r=>{waiter=r})}
 function act(a){if(waiter){const w=waiter;waiter=null;w(a)}}
 async function humanOpts(p,c,side){
   const o={side};
-  if(isWild(c)&&c.k!=='roul')o.color=await pickColor('Choose a color');
-  if(G.mode!=='flex'&&c.k==='num'&&c.n===7)o.target=await pickPlayer('Swap hands with…');
+  if(isWild(c)&&c.k!=='roul'&&c.k!=='pileup'&&G.mode!=='allwild')o.color=await pickColor('Choose a color');
+  if(G.mode==='attack'&&c.k==='trade')o.target=await pickPlayer('Trade hands with…');
+  if(G.mode==='allwild'&&(c.k==='aswap'||c.k==='at2'))o.target=await pickPlayer(c.k==='aswap'?'Swap hands with…':'Who draws 2?');
+  if((G.mode==='mercy'||G.mode==='liars')&&c.k==='num'&&c.n===7)o.target=await pickPlayer('Swap hands with…');
   if(G.mode==='flex'&&side==='f'&&(c.k==='wt2'||c.k==='wd4'))o.target=await pickPlayer(c.k==='wd4'?'Who draws 4?':'Who draws 2?');
   return o}
 async function humanTurn(p){
@@ -438,11 +787,13 @@ async function humanTurn(p){
     if(drew)return setStatus(M?'Play the card you drew.':'Play the card you drew, or end your turn.');
     if(M&&G.pending>0)return setStatus(`Stack a draw card (+${G.lastVal} or more), or take ${G.pending}.`);
     if(M&&!p.hand.some(c=>sidesFor(p,c).length))return setStatus('No playable card. Draw until you find one.');
+    if(G.mode==='allwild')return setStatus('Your turn: play any card, or draw.');
     setStatus(G.mode==='liars'?`Your turn: match ${desc(G.top)}, play a 🎭 Liar card face down, or draw.`:`Your turn: match ${desc(G.top)}${G.mode==='flex'?' (or use a flex side)':''}.`)};
   while(true){
     G.humanTurn=true;G.drew=drew;render();hint();
     const a=await waitAction();
     if(a.t==='draw'){
+      if(G.mode==='attack'){G.humanTurn=false;G.drew=null;render();await hit(p,1);advance();return}
       if(drew)continue;
       if(M){
         if(G.pending>0){G.humanTurn=false;takePenalty(p);render();await sleep(900);advance();return}
@@ -466,8 +817,8 @@ async function humanTurn(p){
 }
 function botOpts(p,c,side='r'){
   const o={side};
-  if(isWild(c)&&c.k!=='roul')o.color=mostColor(p);
-  if((G.mode!=='flex'&&c.k==='num'&&c.n===7)||(G.mode==='flex'&&side==='f'&&(c.k==='wt2'||c.k==='wd4')))o.target=others(p).sort((a,b)=>a.hand.length-b.hand.length)[0];
+  if(isWild(c)&&c.k!=='roul'&&c.k!=='pileup'&&G.mode!=='allwild')o.color=mostColor(p);
+  if(((G.mode==='mercy'||G.mode==='liars')&&c.k==='num'&&c.n===7)||(G.mode==='flex'&&side==='f'&&(c.k==='wt2'||c.k==='wd4'))||(G.mode==='allwild'&&(c.k==='aswap'||c.k==='at2'))||(G.mode==='attack'&&c.k==='trade'))o.target=others(p).sort((a,b)=>a.hand.length-b.hand.length)[0];
   return o}
 function botPick(p,pool){
   const top=G.top,reg=pool.filter(c=>!c.liar&&matches(c,top)),tl=pool.filter(c=>c.liar&&c.c&&matches(c,top)),lies=pool.filter(c=>c.liar&&c.c&&!matches(c,top));
@@ -486,11 +837,18 @@ async function botTurn(p){
   if(!c){draw(p,1);log(`${p.name} draws a card`);render();await sleep(700);const d=p.hand[p.hand.length-1];c=d?botPick(p,[d]):null;if(!c){advance();return}}
   await playCard(p,c,botOpts(p,c))}
 function botChoose(p){
+  if(G.mode==='allwild'){
+    const nx=nextAlive(),danger=nx.hand.length<=2,minH=Math.min(...others(p).map(q=>q.hand.length));
+    let pool=p.hand.filter(c=>c.k!=='aswap'||p.hand.length>=minH+3);
+    if(!pool.length)pool=p.hand;
+    if(danger){for(const k of ['adraw4','askip2','askip','adraw2','aswap']){const f=pool.filter(c=>c.k===k);if(f.length)return{c:f[0],side:'r'}}}
+    return{c:pick(pool),side:'r'}}
   let pool=p.hand.map(c=>({c,s:sidesFor(p,c)})).filter(x=>x.s.length);
   if(!pool.length)return null;
-  if(G.mode==='flex'){
-    const f=pool.filter(x=>x.c.k!=='wd4'||!p.hand.some(h=>h!==x.c&&(h.c===G.top.c||isWild(h)))||Math.random()<.12);
+  if(G.mode==='flex'||G.mode==='classic'||G.mode==='party'){
+    const f=pool.filter(x=>(x.c.k!=='wd4'&&x.c.k!=='wild4')||!p.hand.some(h=>h!==x.c&&(h.c===G.top.c||isWild(h)))||Math.random()<.12);
     if(f.length)pool=f}
+  if(G.mode==='attack'){const mn=Math.min(...others(p).map(q=>q.hand.length)),f=pool.filter(x=>x.c.k!=='trade'||p.hand.length>=mn+3);if(f.length)pool=f}
   const nw=pool.filter(x=>!isWild(x.c));
   let ch=nw.length&&Math.random()<.8?nw:pool;
   const ac=ch.filter(x=>x.c.k!=='num');
@@ -506,6 +864,7 @@ async function botTurnStd(p){
     takePenalty(p);render();await sleep(800);advance();return}
   let ch=botChoose(p);
   if(!ch){
+    if(G.mode==='attack'){await hit(p,1);advance();return}
     if(M){const d=await drawUntil(p);render();await sleep(500);if(!d||p.out){advance();return}ch={c:d,side:'r'}}
     else{
       draw(p,1);log(`${p.name} draws a card`);render();await sleep(700);
@@ -518,14 +877,19 @@ async function run(){
   while(true){
     if(checkWin())return;
     const p=G.players[G.cur];G.humanTurn=false;render();
+    if(G.mode==='dare'&&p.dare)await judgeDare(p);
     if(p.human)await humanTurn(p);else if(G.mode==='liars')await botTurn(p);else await botTurnStd(p);
   }}
-function start(n,mode){
-  G={mode,players:[{name:'You',human:true,hand:[],power:true},...Array.from({length:n},(_,i)=>({name:NAMES[i],av:AV[i],hand:[],power:true}))],deck:shuffle(buildDeck(mode)),disc:[],dir:1,cur:0,log:[],humanTurn:false,pending:0,lastVal:0,aside:[]};
+function deal(){
+  G.deck=shuffle(buildDeck(G.mode));G.disc=[];G.dir=1;G.cur=0;G.pending=0;G.lastVal=0;G.aside=[];G.roundWinner=null;G.over=false;G.humanTurn=false;G.drew=null;G.laying=false;
+  G.players.forEach(p=>{p.hand=[];p.power=true;p.out=false;p.dare=null});
   for(let r=0;r<7;r++)G.players.forEach(p=>p.hand.push(G.deck.pop()));
-  const idx=G.deck.map((c,i)=>c.k==='num'&&!c.liar?i:-1).filter(i=>i>=0).pop(),first=G.deck.splice(idx,1)[0];
-  G.disc.push(first);G.top={c:first.c,k:'num',n:first.n};G.topCard=first;G.topFace=true;
-  $('#log').innerHTML='';$('#modeTag').textContent=MODES[mode].name;waiter=null;run()}
+  if(G.mode==='allwild'){const first=G.deck.pop();G.disc.push(first);G.top={c:null,k:'wild'};G.topCard=first;G.topFace=true;return}
+  const idx=G.deck.map((c,i)=>c.k==='num'&&!c.liar&&!c.spin?i:-1).filter(i=>i>=0).pop(),first=G.deck.splice(idx,1)[0];
+  G.disc.push(first);G.top={c:first.c,k:'num',n:first.n};G.topCard=first;G.topFace=true}
+function start(n,mode){
+  G={mode,players:[{name:'You',human:true,hand:[],power:true},...Array.from({length:n},(_,i)=>({name:NAMES[i],av:AV[i],hand:[],power:true}))],log:[],scores:Array(n+1).fill(0),round:1,dares:buildDares(),dareList:selDare};
+  deal();$('#log').innerHTML='';$('#modeTag').textContent=MODES[mode].name;waiter=null;run()}
 
 document.addEventListener('click',e=>{
   const cd=e.target.closest('#hand .card');
