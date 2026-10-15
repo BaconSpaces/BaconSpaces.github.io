@@ -187,12 +187,12 @@ textarea{width:100%;min-height:120px;margin-top:8px;border-radius:10px;border:1p
 const COLORS=['R','Y','G','B'],CN={R:'Red',Y:'Gold',G:'Green',B:'Blue'},SH={R:'●',Y:'▲',G:'◆',B:'■'};
 const NAMES=['Nova','Orion','Lyra','Vega','Atlas','Zenith','Pulsar','Quasar','Comet','Astra','Helix','Nebula','Rigel','Sol','Titan'],AV=['🛰️','👽','🌠','🪐','☄️','🚀','🌌','🌙','⭐','🔭','🛸','🌞','🌍','🌑','✨'];
 const nm=q=>q.human?'You':q.name;
-const SW=()=>['mercy','liars','eclipse','bounty','chrono','gambit','open','bookends','duo','stacks','carousel','potato','roundabout','collector','lucky','pyramid','bingo','showcase','relay','beacon','pillars'].includes(G?G.mode:'');
+const SW=()=>['mercy','liars','eclipse','bounty','chrono','gambit','open','bookends','duo','stacks','carousel','potato','roundabout','collector','lucky','pyramid','bingo','showcase','relay','beacon','pillars','cascade','silos','spark'].includes(G?G.mode:'');
 const sortHand=a=>[...a].sort((a,b)=>(COLORS.indexOf(a.c)<0?9:COLORS.indexOf(a.c))-(COLORS.indexOf(b.c)<0?9:COLORS.indexOf(b.c))||(a.n??20)-(b.n??20)||a.k.localeCompare(b.k));
 function swapHands(a,b){if(G.mode==='duo'){const x=a.hand.slice(),y=b.hand.slice();a.hand.splice(0,a.hand.length,...y);b.hand.splice(0,b.hand.length,...x)}else{[a.hand,b.hand]=[b.hand,a.hand]}}
 const total=p=>p.hand.length+(p.vault?p.vault.length:0);
-const KN={draw2:'Draw Two',skip:'Skip',rev:'Reverse',draw4:'Draw Four',discall:'Discard All',skipall:'Skip Everyone',wrev4:'Wild Reverse Draw 4',wd6:'Wild Draw 6',wd10:'Wild Draw 10',roul:'Wild Color Roulette',wflip:'Wild All Flip',wt2:'Flex Wild Target Draw 2',wall:'Flex Wild All Draw',wd4:'Flex Wild Draw 4',wild4:'Wild Draw 4',wildc:'Wild Challenge',wild:'Wild',swild:'Wild',crown:'Wild Crown',quake:'Wild Quake',excavate:'Wild Excavate',landslide:'Wild Landslide',elevator:'Wild Elevator',freespace:'Wild Free Space',reroll:'Wild Re-Roll',mixup:'Wild Mix-Up',daub:'Wild Double Daub',jam:'Wild Jammer',spotlight:'Wild Spotlight',tradeup:'Wild Trade-Up',padlock:'Wild Padlock',pickpocket:'Wild Pickpocket',floodlight:'Wild Floodlight',anchor:'Wild Anchor',backspin:'Wild Backspin',clone:'Wild Clone',callout:'Wild Call-Out',fourleaf:'Wild Four-Leaf',curse:'Wild Curse',dig:'Wild Dig',topple:'Wild Topple',aim:'Wild Aim',jolt:'Wild Jolt',block:'Wild Block',dump:'Wild Double Dump',freeze:'Wild Freeze',cswap:'Wild Swap Card',slide:'Wild Slide',scramble:'Wild Scramble',tagin:'Wild Tag-In',dteam:'Wild Double Team',poster:'Wild Poster',heist:'Wild Heist',rewind:'Wild Rewind',ff:'Wild Fast-Forward',echo:'Wild Echo',jackpot:'Wild Jackpot',insure:'Wild Insurance',meteor:'Meteor',orbit:'Orbit',align:'Wild Align',worbit:'Wild Orbit',vent:'Wild Vent',surge:'Wild Surge',disc2:'Discard Two',wclear:'Wild Clear',wgive:'Wild Give Away',pt:'Point Taken',dtog:'Wild Drawn Together',pileup:'Wild Pile Up',dare:'Dare',wdare:'Wild Dare',hit2:'Hit 2',trade:'Trade Hands',allhit:'Wild All Hit',hitfire:'Wild Hit-Fire',awild:'Wild',arev:'Wild Reverse',askip:'Wild Skip',askip2:'Wild Skip Two',adraw2:'Wild Draw Two',adraw4:'Wild Draw Four',at2:'Wild Targeted Draw Two',aswap:'Wild Forced Swap',cutin:'Wild Cut-In',tofront:'Wild To-Front',rearr:'Wild Rearrange',dfront:'Wild Discard Front',pline:'Wild Pass Line',dbeacon:'Wild Double Beacon',curseb:'Wild Curse Beacon',stealb:'Wild Steal Beacon',blastb:'Wild Beacon Blast',fixb:'Wild Fix Beacon',digP:'Wild Dig Pillar',ptopple:'Wild Topple Pillars',reinforce:'Wild Reinforce',collapse:'Wild Collapse',swapP:'Wild Swap Pillar'};
-const LAB={draw2:'+2',skip:'⊘',rev:'⇄',draw4:'+4',discall:'✖',skipall:'⏭',wrev4:'⇄+4',wd6:'+6',wd10:'+10',roul:'🎲',wflip:'⟲',wt2:'◎2',wall:'✦2',wd4:'+4',wild4:'+4',wildc:'?!',swild:'✦',crown:'👑',quake:'🌋',excavate:'⛏️',landslide:'🪨',elevator:'🛗',freespace:'🆓',reroll:'🎲',mixup:'🌀',daub:'🖍️',jam:'📛',spotlight:'🔦',tradeup:'🔄',padlock:'🔒',pickpocket:'🧤',floodlight:'💡',anchor:'⚓',backspin:'↩️',clone:'🧬',callout:'📣',fourleaf:'🍀',curse:'🕳️',dig:'⛏️',topple:'💥',aim:'🎯',jolt:'🌩️',block:'🚫',dump:'🗑️',freeze:'❄️',cswap:'🔄',slide:'↔️',scramble:'🌀',tagin:'🤝',dteam:'💪',poster:'📜',heist:'🦹',rewind:'⏪',ff:'⏩',echo:'🔁',jackpot:'🎰',insure:'🛡️',meteor:'☄️',orbit:'⟳',align:'🌗',worbit:'✦⟳',vent:'🌬️',surge:'⚡',disc2:'D2',wclear:'🧹',wgive:'🎁',pt:'☝️',dtog:'🔗',pileup:'📚',hit2:'×2',trade:'⇆',allhit:'💥',hitfire:'🔥',awild:'✦',arev:'⇄',askip:'⊘',askip2:'⊘⊘',adraw2:'+2',adraw4:'+4',at2:'◎2',aswap:'⇆',cutin:'✂',tofront:'⬆',rearr:'🔀',dfront:'🗑',pline:'➡',dbeacon:'🍀🍀',curseb:'🕳️',stealb:'🧤',blastb:'💥',fixb:'📌',digP:'⛏️',ptopple:'💥',reinforce:'🧱',collapse:'🏚',swapP:'🔄'};
+const KN={draw2:'Draw Two',skip:'Skip',rev:'Reverse',draw4:'Draw Four',discall:'Discard All',skipall:'Skip Everyone',wrev4:'Wild Reverse Draw 4',wd6:'Wild Draw 6',wd10:'Wild Draw 10',roul:'Wild Color Roulette',wflip:'Wild All Flip',wt2:'Flex Wild Target Draw 2',wall:'Flex Wild All Draw',wd4:'Flex Wild Draw 4',wild4:'Wild Draw 4',wildc:'Wild Challenge',wild:'Wild',swild:'Wild',crown:'Wild Crown',quake:'Wild Quake',excavate:'Wild Excavate',landslide:'Wild Landslide',elevator:'Wild Elevator',freespace:'Wild Free Space',reroll:'Wild Re-Roll',mixup:'Wild Mix-Up',daub:'Wild Double Daub',jam:'Wild Jammer',spotlight:'Wild Spotlight',tradeup:'Wild Trade-Up',padlock:'Wild Padlock',pickpocket:'Wild Pickpocket',floodlight:'Wild Floodlight',anchor:'Wild Anchor',backspin:'Wild Backspin',clone:'Wild Clone',callout:'Wild Call-Out',fourleaf:'Wild Four-Leaf',curse:'Wild Curse',dig:'Wild Dig',topple:'Wild Topple',aim:'Wild Aim',jolt:'Wild Jolt',block:'Wild Block',dump:'Wild Double Dump',freeze:'Wild Freeze',cswap:'Wild Swap Card',slide:'Wild Slide',scramble:'Wild Scramble',tagin:'Wild Tag-In',dteam:'Wild Double Team',poster:'Wild Poster',heist:'Wild Heist',rewind:'Wild Rewind',ff:'Wild Fast-Forward',echo:'Wild Echo',jackpot:'Wild Jackpot',insure:'Wild Insurance',meteor:'Meteor',orbit:'Orbit',align:'Wild Align',worbit:'Wild Orbit',vent:'Wild Vent',surge:'Wild Surge',disc2:'Discard Two',wclear:'Wild Clear',wgive:'Wild Give Away',pt:'Point Taken',dtog:'Wild Drawn Together',pileup:'Wild Pile Up',dare:'Dare',wdare:'Wild Dare',hit2:'Hit 2',trade:'Trade Hands',allhit:'Wild All Hit',hitfire:'Wild Hit-Fire',awild:'Wild',arev:'Wild Reverse',askip:'Wild Skip',askip2:'Wild Skip Two',adraw2:'Wild Draw Two',adraw4:'Wild Draw Four',at2:'Wild Targeted Draw Two',aswap:'Wild Forced Swap',cutin:'Wild Cut-In',tofront:'Wild To-Front',rearr:'Wild Rearrange',dfront:'Wild Discard Front',pline:'Wild Pass Line',dbeacon:'Wild Double Beacon',curseb:'Wild Curse Beacon',stealb:'Wild Steal Beacon',blastb:'Wild Beacon Blast',fixb:'Wild Fix Beacon',digP:'Wild Dig Pillar',ptopple:'Wild Topple Pillars',reinforce:'Wild Reinforce',collapse:'Wild Collapse',swapP:'Wild Swap Pillar',wash:'Wild Wash',surgeC:'Wild Surge Cascade',freezeC:'Wild Freeze Cascade',boost:'Wild Boost',sink:'Wild Sink',siloDig:'Wild Silo Dig',siloTop:'Wild Silo Topple',siloFill:'Wild Silo Fill',siloBurst:'Wild Silo Burst',siloSwap:'Wild Silo Swap',sparkOn:'Wild Spark On',sparkOff:'Wild Spark Off',sparkChain:'Wild Spark Chain',sparkSteal:'Wild Spark Steal',sparkDouble:'Wild Spark Double'};
+const LAB={draw2:'+2',skip:'⊘',rev:'⇄',draw4:'+4',discall:'✖',skipall:'⏭',wrev4:'⇄+4',wd6:'+6',wd10:'+10',roul:'🎲',wflip:'⟲',wt2:'◎2',wall:'✦2',wd4:'+4',wild4:'+4',wildc:'?!',swild:'✦',crown:'👑',quake:'🌋',excavate:'⛏️',landslide:'🪨',elevator:'🛗',freespace:'🆓',reroll:'🎲',mixup:'🌀',daub:'🖍️',jam:'📛',spotlight:'🔦',tradeup:'🔄',padlock:'🔒',pickpocket:'🧤',floodlight:'💡',anchor:'⚓',backspin:'↩️',clone:'🧬',callout:'📣',fourleaf:'🍀',curse:'🕳️',dig:'⛏️',topple:'💥',aim:'🎯',jolt:'🌩️',block:'🚫',dump:'🗑️',freeze:'❄️',cswap:'🔄',slide:'↔️',scramble:'🌀',tagin:'🤝',dteam:'💪',poster:'📜',heist:'🦹',rewind:'⏪',ff:'⏩',echo:'🔁',jackpot:'🎰',insure:'🛡️',meteor:'☄️',orbit:'⟳',align:'🌗',worbit:'✦⟳',vent:'🌬️',surge:'⚡',disc2:'D2',wclear:'🧹',wgive:'🎁',pt:'☝️',dtog:'🔗',pileup:'📚',hit2:'×2',trade:'⇆',allhit:'💥',hitfire:'🔥',awild:'✦',arev:'⇄',askip:'⊘',askip2:'⊘⊘',adraw2:'+2',adraw4:'+4',at2:'◎2',aswap:'⇆',cutin:'✂',tofront:'⬆',rearr:'🔀',dfront:'🗑',pline:'➡',dbeacon:'🍀🍀',curseb:'🕳️',stealb:'🧤',blastb:'💥',fixb:'📌',digP:'⛏️',ptopple:'💥',reinforce:'🧱',collapse:'🏚',swapP:'🔄',wash:'🌊',surgeC:'⚡🌊',freezeC:'❄️🌊',boost:'⬆⬆',sink:'⬇',siloDig:'⛏️',siloTop:'💥',siloFill:'🧱',siloBurst:'💥',siloSwap:'🔄',sparkOn:'✨',sparkOff:'🌑',sparkChain:'🔗',sparkSteal:'🧤',sparkDouble:'✨✨'};
 const DRAWV={draw2:2,draw4:4,wrev4:4,wd6:6,wd10:10,wild4:4};
 const MODES={
   classic:{name:'Cosmic',d:'The classic game: match color or number, then play to 500 points.'},
@@ -227,7 +227,10 @@ const MODES={
   showcase:{name:'Showcase',d:'One card of your hand is on display and anyone can raid it. Five showcase wilds. 0-7 swaps included.'},
   relay:{name:'Relay',d:'Your hand is a line. Only the front card can be played. Draws go to the back. Five relay wilds. 0-7 swaps included.'},
   beacon:{name:'Beacon',d:'One glowing Beacon card plays on anything. Pick a new Beacon after you play it. Five beacon wilds. 0-7 swaps included.'},
-  pillars:{name:'Pillars',d:'Your hand is four pillars. Only the top card of each pillar can be played. Five pillar wilds. 0-7 swaps included.'}};
+  pillars:{name:'Pillars',d:'Your hand is four pillars. Only the top card of each pillar can be played. Five pillar wilds. 0-7 swaps included.'},
+  cascade:{name:'Cascade',d:'Your hand is a waterfall. Only the bottom card is free. Playing it lets the cascade fall. Five cascade wilds. 0-7 swaps included.'},
+  silos:{name:'Silos',d:'Your hand is five silos. Only the top of each silo can be played. Five silo wilds. 0-7 swaps included.'},
+  spark:{name:'Spark',d:'One card sparks each turn and plays on anything. Chain same-color plays after a Spark. Five spark wilds. 0-7 swaps included.'}};
 const OPPS=()=>selMode==='party'?[5,7,9,11,15]:selMode==='duo'?[3,5]:[1,2,3,4,5];
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const pick=a=>a[Math.floor(Math.random()*a.length)],mod=(a,n)=>((a%n)+n)%n;
@@ -266,12 +269,12 @@ function buildDeck(mode){const d=[];
       if(mode==='observatory'){for(let n=1;n<=9;n++)add({c,k:'num',n});add({c,k:'meteor'},2)}
       for(const k of ['draw2','rev','skip'])add({c,k},2)}
     add({c:null,k:'swild'},4);add({c:null,k:'wild4'},4)
-  }else if(mode==='bounty'||mode==='chrono'||mode==='gambit'||mode==='open'||mode==='bookends'||mode==='duo'||mode==='stacks'||mode==='carousel'||mode==='potato'||mode==='roundabout'||mode==='collector'||mode==='lucky'||mode==='pyramid'||mode==='bingo'||mode==='showcase'||mode==='relay'||mode==='beacon'||mode==='pillars'){
+  }else if(mode==='bounty'||mode==='chrono'||mode==='gambit'||mode==='open'||mode==='bookends'||mode==='duo'||mode==='stacks'||mode==='carousel'||mode==='potato'||mode==='roundabout'||mode==='collector'||mode==='lucky'||mode==='pyramid'||mode==='bingo'||mode==='showcase'||mode==='relay'||mode==='beacon'||mode==='pillars'||mode==='cascade'||mode==='silos'||mode==='spark'){
     for(const c of COLORS){
       for(let n=0;n<=9;n++)add({c,k:'num',n},2);
       add({c,k:'skip'},2);add({c,k:'rev'},2);add({c,k:'draw2'},2)}
     add({c:null,k:'swild'},4);
-    const W={bounty:['poster','heist'],chrono:['rewind','ff','echo'],gambit:['jackpot','insure'],open:['freeze','cswap'],bookends:['slide','scramble'],duo:['tagin','dteam'],stacks:['dig','topple'],carousel:['aim','jolt'],potato:['block','dump'],roundabout:['anchor','backspin'],collector:['clone','callout'],lucky:['fourleaf','curse'],pyramid:['crown','quake','excavate','landslide','elevator'],bingo:['freespace','reroll','mixup','daub','jam'],showcase:['spotlight','tradeup','padlock','pickpocket','floodlight'],relay:['cutin','tofront','rearr','dfront','pline'],beacon:['dbeacon','curseb','stealb','blastb','fixb'],pillars:['digP','ptopple','reinforce','collapse','swapP']}[mode];
+    const W={bounty:['poster','heist'],chrono:['rewind','ff','echo'],gambit:['jackpot','insure'],open:['freeze','cswap'],bookends:['slide','scramble'],duo:['tagin','dteam'],stacks:['dig','topple'],carousel:['aim','jolt'],potato:['block','dump'],roundabout:['anchor','backspin'],collector:['clone','callout'],lucky:['fourleaf','curse'],pyramid:['crown','quake','excavate','landslide','elevator'],bingo:['freespace','reroll','mixup','daub','jam'],showcase:['spotlight','tradeup','padlock','pickpocket','floodlight'],relay:['cutin','tofront','rearr','dfront','pline'],beacon:['dbeacon','curseb','stealb','blastb','fixb'],pillars:['digP','ptopple','reinforce','collapse','swapP'],cascade:['wash','surgeC','freezeC','boost','sink'],silos:['siloDig','siloTop','siloFill','siloBurst','siloSwap'],spark:['sparkOn','sparkOff','sparkChain','sparkSteal','sparkDouble']}[mode];
     W.forEach(k=>add({c:null,k},W.length>=5?3:mode==='chrono'?4:6))
   }else if(mode==='overload'){
     for(const c of COLORS){
@@ -335,6 +338,7 @@ function draw(p,n){
   if(G.mode==='twin'){const c=p.hand[p.hand.length-1],l=p.hand.filter(h=>h!==c&&h.side==='L').length,r=p.hand.filter(h=>h!==c&&h.side==='R').length;c.side=l<r?'L':r<l?'R':p.act}
   if(G.mode==='stacks'){const c=p.hand[p.hand.length-1],cnt=k=>p.hand.filter(h=>h!==c&&h.stk===k).length;c.stk=[0,1,2].sort((a,b)=>cnt(a)-cnt(b))[0]}
   if(G.mode==='pillars'){const c=p.hand[p.hand.length-1],cnt=k=>p.hand.filter(h=>h!==c&&h.stk===k).length;c.stk=[0,1,2,3].sort((a,b)=>cnt(a)-cnt(b))[0]}
+  if(G.mode==='silos'){const c=p.hand[p.hand.length-1],cnt=k=>p.hand.filter(h=>h!==c&&h.stk===k).length;c.stk=[0,1,2,3,4].sort((a,b)=>cnt(a)-cnt(b))[0]}
   if(G.mode==='pyramid'||G.mode==='bingo'){const c=p.hand[p.hand.length-1];c.pos=-1;c.gp=-1}
   if(G.mode==='mercy'&&p.hand.length>=25){p.out=true;G.aside.push(...p.hand);p.hand=[];log(`💥 ${p.name} hit 25 cards and is out!`);return}}}
 function drawOthers(p,v){others(p).forEach(q=>draw(q,v))}
@@ -397,11 +401,21 @@ function sidesFor(p,c,free){
     if(p.beacon&&p.beacon.includes(c.id))return['r'];
     return(isWild(c)||matches(c,t))?['r']:[];
   }
-  if(m==='pillars'){
+  if(m==='pillars'||m==='silos'){
     if(!(isWild(c)||matches(c,t)))return[];
     if(free)return['r'];
     const top=[...p.hand].reverse().find(h=>h.stk===c.stk);
     return c===top?['r']:[];
+  }
+  if(m==='cascade'){
+    if(!(isWild(c)||matches(c,t)))return[];
+    if(free)return['r'];
+    // only the last card (bottom of cascade) is free
+    return p.hand.indexOf(c)===p.hand.length-1?['r']:[];
+  }
+  if(m==='spark'){
+    if(p.spark&&p.spark.includes(c.id))return['r'];
+    return(isWild(c)||matches(c,t))?['r']:[];
   }
   if(m==='dare'||m==='party'||m==='overload'||m==='vault'||m==='observatory'||m==='bounty'||m==='chrono'||m==='gambit'||m==='duo'||m==='potato'||m==='roundabout'||m==='collector'||m==='bingo'||m==='showcase')return(isWild(c)||matches(c,t))?['r']:[];
   if(m==='attack'){if(c.k==='trade'&&p.hand.length===1)return[];return(isWild(c)||matches(c,t))?['r']:[]}
@@ -421,7 +435,7 @@ function sidesFor(p,c,free){
   return s}
 
 /* ---------- rendering ---------- */
-const TIPTXT={crown:'Wild. Choose a color. Discard the peak (top card) of your pyramid for free.',quake:'Wild. Choose a color. The next player\'s pyramid is scrambled.',excavate:'Wild. Choose a color, then move any pyramid card to your reserve, where it is always playable.',landslide:'Wild. Choose a color. The next player draws 2 and is skipped.',elevator:'Wild. Choose a color. Your peak card swaps with the next player\'s peak.',freespace:'Wild. Choose a color, then clear any one card on your Bingo card for free.',reroll:'Wild. Choose a color. Shuffle your own Bingo card to line cards up.',mixup:'Wild. Choose a color. The next player\'s Bingo card is shuffled.',daub:'Wild. Choose a color. Your next Bingo makes everyone else draw 2.',jam:'Wild. Choose a color. The next player\'s next Bingo is jammed (no payout).',spotlight:'Wild. Choose a color, then pick which of your cards is on display.',tradeup:'Wild. Choose a color. Your display card swaps with the next player\'s.',padlock:'Wild. Choose a color. Your display card can\'t be raided until your next turn.',pickpocket:'Wild. Choose a color. Take the next player\'s display card (they draw 1).',floodlight:'Wild. Choose a color. Every opponent puts a card of that color on display if they can.',anchor:'Wild. Choose a color. Your hand skips the next hand rotation.',backspin:'Wild. Choose a color. The hand rotation reverses direction.',clone:'Wild. Choose a color. Copy one card in your hand (handy for completing a set).',callout:'Wild. Choose a color and a number. Every other player holding that number draws 1.',fourleaf:'Wild. Choose a color. Next turn you get TWO lucky cards.',curse:'Wild. Choose a color. The next player gets no lucky card on their next turn.',dig:'Wild. Choose a color, then send the top card of one of your stacks to the bottom.',topple:'Wild. Choose a color. The top card of each of the next player\'s stacks goes to the bottom.',aim:'Wild. Choose a color, then pick a card: your window starts there next turn.',jolt:'Wild. Choose a color. The next player\'s window jumps to a random spot.',block:'Wild. Choose a color. The next card passed to you is refused and goes back to the sender.',dump:'Wild. Choose a color. This turn you pass TWO cards instead of one.',freeze:'Wild. Choose a color. The next player cannot play cards of that color this turn.',cswap:'Wild. Choose a color. Swap one of your cards for any card from any player (their hands are face-up).',slide:'Wild. Choose a color, then move any card from your hand to either end of your row.',scramble:'Wild. Choose a color. The next player\'s row is shuffled.',tagin:'Wild. Choose a color. The next player is skipped, so your partner goes next.',dteam:'Wild. Choose a color. Every opponent draws 1.',poster:'Wild. Choose a color, then set the Bounty to any color and number you like.',heist:'Wild. Choose a color. Steal one random card from the next player.',rewind:'Wild. Choose a color. The last card played goes back to its owner (its effects still happen).',ff:'Wild. Choose a color and take another turn right away.',echo:'Wild. Choose a color. The last Skip, Reverse or Draw Two effect happens again.',jackpot:'Wild. Choose a color, then flip the top 3 cards of the deck. Cards matching that color are discarded for free and the rest join your hand.',insure:'Wild. Choose a color. Your next failed Gamble is discarded instead of taken (Shield).',meteor:'Burns every Star in the row and refills it. The next player is skipped.',vent:'Wild. Choose a color. Resets the Mass to 0.',surge:'Wild. Choose a color. The next card played counts double Mass.',worbit:'Wild. Choose a color, then the Sun and Moon piles swap places.',disc2:'Play it with one more card of the same color from your hand (the second card shows on top). Counts as one press on the pile.',wclear:'Wild. Resets that pile\'s Card Counter to green. The next card played there sets the color.',wgive:'Wild. If it overloads the pile, give the cards you must draw to any players. The next card played there sets the color.',skip:'The next player loses their turn.',rev:'Reverses the direction of play. With 2 players it works like a Skip.',draw2:'The next player draws 2 and loses their turn.',draw4:'Adds +4 to the draw stack. The next player must stack a draw card or take it.',discall:'Discard every card of this color from your hand.',skipall:'Skip every other player and take another turn.',wrev4:'Wild. Reverses direction, then the next player faces +4 (stackable). With 2 players it comes back to you.',wd6:'Wild. The next player faces +6 (stackable).',wd10:'Wild. The next player faces +10 (stackable).',roul:'Wild. The next player picks a color, then flips cards from the deck until that color shows up and keeps them all.',swild:'Wild. Play it any time and choose the next color.',wild4:'Wild Draw Four. Choose a color. The next player draws 4 and loses their turn.',wildc:'Wild Challenge. Choose a color. Everyone else lays a card face down claiming that color, and the next player may flip one.',wflip:'Wild. Choose a color. Every player flips their Power card.',wt2:'Wild. Regular side: a classic wild. Flex side: a player you choose draws 2.',wall:'Wild. Regular side: a classic wild. Flex side: every other player draws 2.',wd4:'Wild Draw Four. Regular side: next player draws 4 (or challenges). Flex side: a player you choose draws 4.',hit2:'The next player hits the launcher twice, then their turn is over.',trade:'You must trade hands with a player you choose. It can\'t be your last card.',allhit:'Wild. Choose a color. Every other player hits the launcher once.',hitfire:'Wild. Choose a color. The next player keeps hitting the launcher until cards fire, then loses their turn.',awild:'Does nothing, but it is one less card in your hand.',arev:'Reverses the direction of play.',askip:'The next player loses their turn.',askip2:'The next two players lose their turns.',adraw2:'The next player draws 2 and loses their turn.',adraw4:'The next player draws 4 and loses their turn.',at2:'A player you choose draws 2 and keeps their turn.',aswap:'You must swap hands with a player you choose.',dare:'The next player draws 2, or does the dare for this number.',wdare:'Wild. Choose a color. The next player draws 2, or does the dare for this number.',pt:'Everyone points at a player. Each player draws one card per person pointing at them (max 5).',dtog:'Wild. Link two players: when one draws, the other draws the same amount. Point Taken ends the link.',pileup:'Wild. Flip a mini-pile from the deck. Players must pass it on with cards of that color, and whoever can\'t takes the whole pile.',align:'Wild. Choose a color: both piles turn that color, which sets off an Eclipse if they weren\'t matching.',orbit:'The Sun and Moon piles swap places.',cutin:'Wild. Choose a color. Play any card from your line (not just the front).',tofront:'Wild. Choose a color, then move any card in your line to the front.',rearr:'Wild. Choose a color. Shuffle your entire line.',dfront:'Wild. Choose a color. Discard the front card of your line for free.',pline:'Wild. Choose a color. Pass the front card of your line to the next player.',dbeacon:'Wild. Choose a color. Next turn you get TWO Beacon cards.',curseb:'Wild. Choose a color. The next player has no Beacon on their next turn.',stealb:'Wild. Choose a color. Take the next player\'s Beacon card (they pick a new one).',blastb:'Wild. Choose a color. If your Beacon matches that color, every other player draws 1.',fixb:'Wild. Choose a color, then set any card in your hand as the Beacon.',digP:'Wild. Choose a color, then send the top card of one of your pillars to the bottom.',ptopple:'Wild. Choose a color. The top card of each of the next player\'s pillars goes to the bottom.',reinforce:'Wild. Choose a color. Draw 1 and place it on top of any of your pillars.',collapse:'Wild. Choose a color. Discard the tallest pillar of the next player (or a random one if tied).',swapP:'Wild. Choose a color. Swap one of your pillars with the same-numbered pillar of the next player.'};
+const TIPTXT={crown:'Wild. Choose a color. Discard the peak (top card) of your pyramid for free.',quake:'Wild. Choose a color. The next player\'s pyramid is scrambled.',excavate:'Wild. Choose a color, then move any pyramid card to your reserve, where it is always playable.',landslide:'Wild. Choose a color. The next player draws 2 and is skipped.',elevator:'Wild. Choose a color. Your peak card swaps with the next player\'s peak.',freespace:'Wild. Choose a color, then clear any one card on your Bingo card for free.',reroll:'Wild. Choose a color. Shuffle your own Bingo card to line cards up.',mixup:'Wild. Choose a color. The next player\'s Bingo card is shuffled.',daub:'Wild. Choose a color. Your next Bingo makes everyone else draw 2.',jam:'Wild. Choose a color. The next player\'s next Bingo is jammed (no payout).',spotlight:'Wild. Choose a color, then pick which of your cards is on display.',tradeup:'Wild. Choose a color. Your display card swaps with the next player\'s.',padlock:'Wild. Choose a color. Your display card can\'t be raided until your next turn.',pickpocket:'Wild. Choose a color. Take the next player\'s display card (they draw 1).',floodlight:'Wild. Choose a color. Every opponent puts a card of that color on display if they can.',anchor:'Wild. Choose a color. Your hand skips the next hand rotation.',backspin:'Wild. Choose a color. The hand rotation reverses direction.',clone:'Wild. Choose a color. Copy one card in your hand (handy for completing a set).',callout:'Wild. Choose a color and a number. Every other player holding that number draws 1.',fourleaf:'Wild. Choose a color. Next turn you get TWO lucky cards.',curse:'Wild. Choose a color. The next player gets no lucky card on their next turn.',dig:'Wild. Choose a color, then send the top card of one of your stacks to the bottom.',topple:'Wild. Choose a color. The top card of each of the next player\'s stacks goes to the bottom.',aim:'Wild. Choose a color, then pick a card: your window starts there next turn.',jolt:'Wild. Choose a color. The next player\'s window jumps to a random spot.',block:'Wild. Choose a color. The next card passed to you is refused and goes back to the sender.',dump:'Wild. Choose a color. This turn you pass TWO cards instead of one.',freeze:'Wild. Choose a color. The next player cannot play cards of that color this turn.',cswap:'Wild. Choose a color. Swap one of your cards for any card from any player (their hands are face-up).',slide:'Wild. Choose a color, then move any card from your hand to either end of your row.',scramble:'Wild. Choose a color. The next player\'s row is shuffled.',tagin:'Wild. Choose a color. The next player is skipped, so your partner goes next.',dteam:'Wild. Choose a color. Every opponent draws 1.',poster:'Wild. Choose a color, then set the Bounty to any color and number you like.',heist:'Wild. Choose a color. Steal one random card from the next player.',rewind:'Wild. Choose a color. The last card played goes back to its owner (its effects still happen).',ff:'Wild. Choose a color and take another turn right away.',echo:'Wild. Choose a color. The last Skip, Reverse or Draw Two effect happens again.',jackpot:'Wild. Choose a color, then flip the top 3 cards of the deck. Cards matching that color are discarded for free and the rest join your hand.',insure:'Wild. Choose a color. Your next failed Gamble is discarded instead of taken (Shield).',meteor:'Burns every Star in the row and refills it. The next player is skipped.',vent:'Wild. Choose a color. Resets the Mass to 0.',surge:'Wild. Choose a color. The next card played counts double Mass.',worbit:'Wild. Choose a color, then the Sun and Moon piles swap places.',disc2:'Play it with one more card of the same color from your hand (the second card shows on top). Counts as one press on the pile.',wclear:'Wild. Resets that pile\'s Card Counter to green. The next card played there sets the color.',wgive:'Wild. If it overloads the pile, give the cards you must draw to any players. The next card played there sets the color.',skip:'The next player loses their turn.',rev:'Reverses the direction of play. With 2 players it works like a Skip.',draw2:'The next player draws 2 and loses their turn.',draw4:'Adds +4 to the draw stack. The next player must stack a draw card or take it.',discall:'Discard every card of this color from your hand.',skipall:'Skip every other player and take another turn.',wrev4:'Wild. Reverses direction, then the next player faces +4 (stackable). With 2 players it comes back to you.',wd6:'Wild. The next player faces +6 (stackable).',wd10:'Wild. The next player faces +10 (stackable).',roul:'Wild. The next player picks a color, then flips cards from the deck until that color shows up and keeps them all.',swild:'Wild. Play it any time and choose the next color.',wild4:'Wild Draw Four. Choose a color. The next player draws 4 and loses their turn.',wildc:'Wild Challenge. Choose a color. Everyone else lays a card face down claiming that color, and the next player may flip one.',wflip:'Wild. Choose a color. Every player flips their Power card.',wt2:'Wild. Regular side: a classic wild. Flex side: a player you choose draws 2.',wall:'Wild. Regular side: a classic wild. Flex side: every other player draws 2.',wd4:'Wild Draw Four. Regular side: next player draws 4 (or challenges). Flex side: a player you choose draws 4.',hit2:'The next player hits the launcher twice, then their turn is over.',trade:'You must trade hands with a player you choose. It can\'t be your last card.',allhit:'Wild. Choose a color. Every other player hits the launcher once.',hitfire:'Wild. Choose a color. The next player keeps hitting the launcher until cards fire, then loses their turn.',awild:'Does nothing, but it is one less card in your hand.',arev:'Reverses the direction of play.',askip:'The next player loses their turn.',askip2:'The next two players lose their turns.',adraw2:'The next player draws 2 and loses their turn.',adraw4:'The next player draws 4 and loses their turn.',at2:'A player you choose draws 2 and keeps their turn.',aswap:'You must swap hands with a player you choose.',dare:'The next player draws 2, or does the dare for this number.',wdare:'Wild. Choose a color. The next player draws 2, or does the dare for this number.',pt:'Everyone points at a player. Each player draws one card per person pointing at them (max 5).',dtog:'Wild. Link two players: when one draws, the other draws the same amount. Point Taken ends the link.',pileup:'Wild. Flip a mini-pile from the deck. Players must pass it on with cards of that color, and whoever can\'t takes the whole pile.',align:'Wild. Choose a color: both piles turn that color, which sets off an Eclipse if they weren\'t matching.',orbit:'The Sun and Moon piles swap places.',cutin:'Wild. Choose a color. Play any card from your line (not just the front).',tofront:'Wild. Choose a color, then move any card in your line to the front.',rearr:'Wild. Choose a color. Shuffle your entire line.',dfront:'Wild. Choose a color. Discard the front card of your line for free.',pline:'Wild. Choose a color. Pass the front card of your line to the next player.',dbeacon:'Wild. Choose a color. Next turn you get TWO Beacon cards.',curseb:'Wild. Choose a color. The next player has no Beacon on their next turn.',stealb:'Wild. Choose a color. Take the next player\'s Beacon card (they pick a new one).',blastb:'Wild. Choose a color. If your Beacon matches that color, every other player draws 1.',fixb:'Wild. Choose a color, then set any card in your hand as the Beacon.',digP:'Wild. Choose a color, then send the top card of one of your pillars to the bottom.',ptopple:'Wild. Choose a color. The top card of each of the next player\'s pillars goes to the bottom.',reinforce:'Wild. Choose a color. Draw 1 and place it on top of any of your pillars.',collapse:'Wild. Choose a color. Discard the tallest pillar of the next player (or a random one if tied).',swapP:'Wild. Choose a color. Swap one of your pillars with the same-numbered pillar of the next player.',wash:'Wild. Choose a color. Discard the bottom card of your cascade for free and the rest fall down.',surgeC:'Wild. Choose a color. The next card you play in Cascade counts as free (any card).',freezeC:'Wild. Choose a color. The next player cannot play their bottom cascade card this turn.',boost:'Wild. Choose a color. Move any card in your cascade to the bottom (make it free).',sink:'Wild. Choose a color. The next player\'s cascade is reversed (top becomes bottom).',siloDig:'Wild. Choose a color, then send the top of one of your silos to the bottom.',siloTop:'Wild. Choose a color. Tops of the next player\'s silos go to the bottom.',siloFill:'Wild. Choose a color. Draw 1 and put it on any of your silos.',siloBurst:'Wild. Choose a color. Discard the tallest silo of the next player.',siloSwap:'Wild. Choose a color. Swap one of your silos with the same silo of the next player.',sparkOn:'Wild. Choose a color. Next turn you get TWO Spark cards.',sparkOff:'Wild. Choose a color. The next player has no Spark next turn.',sparkChain:'Wild. Choose a color. After your next Spark play you may chain one more same-color card for free.',sparkSteal:'Wild. Choose a color. Take the next player\'s Spark card.',sparkDouble:'Wild. Choose a color. Your next Spark play also makes every other player draw 1.'};
 function tipLines(c){
   const m=G?G.mode:'',k=c.k,L=[];
   if(k==='num'){
@@ -494,6 +508,9 @@ function render(){
   if(G.mode==='relay')mi='🏃 Only the front of your line can be played. Draws go to the back.';
   if(G.mode==='beacon')mi=me.beacon&&me.beacon.length?'🔦 Your Beacon glows: it plays on anything!':'🔦 One Beacon each turn plays on anything.';
   if(G.mode==='pillars')mi='🏛️ Four pillars. Only the top card of each can be played.';
+  if(G.mode==='cascade')mi='🌊 Only the bottom of your cascade can be played. It falls when you play.';
+  if(G.mode==='silos')mi='🏗️ Five silos. Only the top of each can be played.';
+  if(G.mode==='spark')mi=me.spark&&me.spark.length?'✨ Your Spark glows: it plays on anything!':'✨ One Spark each turn plays on anything.';
   if(G.mode==='potato')mi=me.blockNext?'🚫 You will refuse the next card passed to you. Remember: play one, pass one.':'Remember: play one, pass one.';
   if(G.mode==='bounty')mi='Play the Bounty card to make everyone else draw 1 and shed a card.';
   if(G.mode==='chrono')mi='Rewind, Fast-Forward and Echo bend time.';
@@ -521,12 +538,15 @@ function render(){
   else if(G.mode==='bookends')$('#hand').innerHTML=`<div class="hl2">◀ left end · only the two highlighted end cards can be played · right end ▶</div>`+me.hand.map((c,i)=>`<div class="slot ${i===0||i===me.hand.length-1?'endslot':''}">${hc(c)}</div>`).join('');
   else if(G.mode==='relay')$('#hand').innerHTML=`<div class="hl2">🏃 only the front (leftmost) card can be played · draws go to the back</div>`+me.hand.map((c,i)=>`<div class="slot ${i===0?'endslot':''}">${hc(c)}</div>`).join('');
   else if(G.mode==='pillars')$('#hand').innerHTML=[0,1,2,3].map(k=>{const cs=me.hand.filter(h=>h.stk===k);return `<div class="hgrp"><div class="hl">Pillar ${k+1} · ${cs.length} card${cs.length===1?'':'s'}</div><div class="scol">${cs.length?hc(cs[cs.length-1]):'<span class="note">empty</span>'}${cs.length>1?`<div class="sbks">${'<i></i>'.repeat(Math.min(cs.length-1,4))}</div>`:''}</div></div>`}).join('');
+  else if(G.mode==='silos')$('#hand').innerHTML=[0,1,2,3,4].map(k=>{const cs=me.hand.filter(h=>h.stk===k);return `<div class="hgrp"><div class="hl">Silo ${k+1} · ${cs.length} card${cs.length===1?'':'s'}</div><div class="scol">${cs.length?hc(cs[cs.length-1]):'<span class="note">empty</span>'}${cs.length>1?`<div class="sbks">${'<i></i>'.repeat(Math.min(cs.length-1,4))}</div>`:''}</div></div>`}).join('');
+  else if(G.mode==='cascade')$('#hand').innerHTML=`<div class="hl2">🌊 only the bottom (rightmost) card can be played · the cascade falls when you play it</div>`+me.hand.map((c,i)=>`<div class="slot ${i===me.hand.length-1?'endslot':''}">${hc(c)}</div>`).join('');
   else if(G.mode==='duo')$('#hand').innerHTML=`<div class="hgrp"><div class="hl">🤝 Team hand, shared with ${G.players.filter(q=>q.team===0&&q!==me).map(q=>q.name).join(' & ')}</div><div class="hcards">${sorted.map(hc).join('')}</div></div>`;
   else if(G.mode==='vault')$('#hand').innerHTML=`<div class="hgrp"><div class="hl">Hand</div><div class="hcards">${sorted.map(hc).join('')||'<span class="note">empty: your vault opens next turn</span>'}</div></div>`+(me.vault.length?`<div class="hgrp"><div class="hl">🔒 Vault (${me.vault.length})</div><div class="hcards">${me.vault.map(()=>'<div class="card back" data-tip="&lt;b&gt;Vault card&lt;/b&gt;&lt;div&gt;Hidden. When your hand is empty you open these blind, one per turn.&lt;/div&gt;"><span>🔒</span></div>').join('')}</div></div>`:'');
   else $('#hand').innerHTML=sorted.map(hc).join('');
   if(G.mode==='showcase'&&me.show){const el=document.querySelector(`#hand .card[data-id="${me.show}"]`);if(el)el.classList.add('onshow')}
   if(G.mode==='lucky'&&myTurn&&me.lucky)me.lucky.forEach(id=>{const el=document.querySelector(`#hand .card[data-id="${id}"]`);if(el)el.classList.add('lucky')});
   if(G.mode==='beacon'&&myTurn&&me.beacon)me.beacon.forEach(id=>{const el=document.querySelector(`#hand .card[data-id="${id}"]`);if(el)el.classList.add('lucky')});
+  if(G.mode==='spark'&&myTurn&&me.spark)me.spark.forEach(id=>{const el=document.querySelector(`#hand .card[data-id="${id}"]`);if(el)el.classList.add('lucky')});
   if(armed){const el=document.querySelector(`#hand .card[data-id="${armed}"], #starrow .card[data-id="${armed}"]`);if(el)el.classList.add('armed')}
   const anyLegal=!!myTurn&&me.hand.some(c=>sidesFor(me,c).length);
   $('#drawBtn').textContent=G.mode==='observatory'?'Draw blind':M?(G.pending>0?`Take ${G.pending} cards`:'Draw until playable'):(G.mode==='eclipse'&&G.pending>0)?`Take ${G.pending} cards`:G.mode==='attack'?'Hit the launcher':'Draw a card';
@@ -869,14 +889,41 @@ pillars:`<p><b>Remember it: four pillars, only the tops play.</b> Your hand is f
 <li><b>Wild Collapse 🏚:</b> choose a color. Discard the tallest pillar of the next player.</li>
 <li><b>Wild Swap Pillar 🔄:</b> choose a color. Swap one of your pillars with the same pillar of the next player.</li>
 <li><b>0-7 rule:</b> a 7 swaps hands with any player (pillars and all), a 0 passes every hand in the direction of play.</li>
+<li>Draw Two, Skip, Reverse and Wild work as usual. <b>COSMIC!</b> at one card, or draw 2 if you're caught.</li></ul>`,
+cascade:`<p><b>Remember it: only the bottom of the cascade plays.</b> Your hand is a waterfall. Only the bottom (rightmost) card is free. When you play it the cascade falls. Be first to empty your hand.</p><ul>
+<li>Match the top card by color, number or symbol. Can't play the bottom? Draw one (it goes on top) and play it if you can.</li>
+<li><b>Wild Wash 🌊:</b> discard the bottom card for free and the rest fall.</li>
+<li><b>Wild Surge Cascade ⚡🌊:</b> your next card in Cascade can be any card.</li>
+<li><b>Wild Freeze Cascade ❄️🌊:</b> the next player cannot play their bottom card this turn.</li>
+<li><b>Wild Boost ⬆⬆:</b> move any card in your cascade to the bottom (make it free).</li>
+<li><b>Wild Sink ⬇:</b> reverse the next player's cascade (top becomes bottom).</li>
+<li><b>0-7 rule:</b> a 7 swaps hands with any player, a 0 passes every hand in the direction of play.</li>
+<li>Draw Two, Skip, Reverse and Wild work as usual. <b>COSMIC!</b> at one card, or draw 2 if you're caught.</li></ul>`,
+silos:`<p><b>Remember it: five silos, only the tops play.</b> Your hand is five silos. Only the top card of each silo can be played. Be first to empty your hand.</p><ul>
+<li>Match the top card by color, number or symbol. Can't play? Draw one. It lands on your shortest silo and you may play it.</li>
+<li><b>Wild Silo Dig ⛏️:</b> send the top of one of your silos to the bottom.</li>
+<li><b>Wild Silo Topple 💥:</b> tops of the next player's silos go to the bottom.</li>
+<li><b>Wild Silo Fill 🧱:</b> draw 1 and put it on any of your silos.</li>
+<li><b>Wild Silo Burst 💥:</b> discard the tallest silo of the next player.</li>
+<li><b>Wild Silo Swap 🔄:</b> swap one of your silos with the same silo of the next player.</li>
+<li><b>0-7 rule:</b> a 7 swaps hands with any player (silos and all), a 0 passes every hand in the direction of play.</li>
+<li>Draw Two, Skip, Reverse and Wild work as usual. <b>COSMIC!</b> at one card, or draw 2 if you're caught.</li></ul>`,
+spark:`<p><b>Remember it: one Spark plays on anything.</b> At the start of your turn one card sparks ✨. The Spark can be played on anything. Be first to empty your hand.</p><ul>
+<li>Otherwise match the top card by color, number or symbol. Can't play? Draw one and play it if you can.</li>
+<li><b>Wild Spark On ✨:</b> next turn you get TWO Spark cards.</li>
+<li><b>Wild Spark Off 🌑:</b> the next player has no Spark next turn.</li>
+<li><b>Wild Spark Chain 🔗:</b> after your next Spark you may chain one more same-color card free.</li>
+<li><b>Wild Spark Steal 🧤:</b> take the next player's Spark card.</li>
+<li><b>Wild Spark Double ✨✨:</b> your next Spark also makes everyone else draw 1.</li>
+<li><b>0-7 rule:</b> a 7 swaps hands with any player, a 0 passes every hand in the direction of play.</li>
 <li>Draw Two, Skip, Reverse and Wild work as usual. <b>COSMIC!</b> at one card, or draw 2 if you're caught.</li></ul>`};
 function showRules(mode,back){modal(`<h2 style="margin-top:0">${MODES[mode].name}: how to play</h2>${RULES[mode]}<p>Colors also have shapes: ● Red, ▲ Gold, ◆ Green, ■ Blue.</p><div class="cols"><button id="closeRules">Got it</button></div>`).onclick=e=>{if(e.target.id==='closeRules'||e.target.id==='modal'){closeModal();if(back)back()}}}
-const MODEMETA={classic:['✦','Classic'],liars:['🎭','Bluffing'],mercy:['💀','Brutal'],flex:['🔄','Two-sided'],spin:['🌀','Wheel of chaos'],allwild:['🌈','Anything goes'],attack:['💥','Launcher'],dare:['🎯','Draw 2 or dare'],party:['🎉','Big groups'],eclipse:['🌗','Twin piles'],overload:['⚡','Mass meter'],twin:['🤲','Two hands'],stacks:['🗂️','Play the tops'],roundabout:['🎡','Hands rotate'],pyramid:['🏔️','Free cards'],bingo:['🧩','Clear a line'],showcase:['🪟','On display'],collector:['🧺','Sets vanish'],lucky:['🍀','Lucky card'],carousel:['🎠','Moving window'],potato:['🥔','Pass one on'],open:['🔓','Cards face-up'],bookends:['📖','Ends only'],duo:['🤝','Team hand'],bounty:['💰','Most wanted'],chrono:['⏳','Time tricks'],gambit:['🎲','Risk it'],observatory:['🔭','Face-up draws'],vault:['🔒','Hidden cards'],triple:['🔺','Three piles'],relay:['🏃','Front only'],beacon:['🔦','Glowing card'],pillars:['🏛️','Four tops']};
+const MODEMETA={classic:['✦','Classic'],liars:['🎭','Bluffing'],mercy:['💀','Brutal'],flex:['🔄','Two-sided'],spin:['🌀','Wheel of chaos'],allwild:['🌈','Anything goes'],attack:['💥','Launcher'],dare:['🎯','Draw 2 or dare'],party:['🎉','Big groups'],eclipse:['🌗','Twin piles'],overload:['⚡','Mass meter'],twin:['🤲','Two hands'],stacks:['🗂️','Play the tops'],roundabout:['🎡','Hands rotate'],pyramid:['🏔️','Free cards'],bingo:['🧩','Clear a line'],showcase:['🪟','On display'],collector:['🧺','Sets vanish'],lucky:['🍀','Lucky card'],carousel:['🎠','Moving window'],potato:['🥔','Pass one on'],open:['🔓','Cards face-up'],bookends:['📖','Ends only'],duo:['🤝','Team hand'],bounty:['💰','Most wanted'],chrono:['⏳','Time tricks'],gambit:['🎲','Risk it'],observatory:['🔭','Face-up draws'],vault:['🔒','Hidden cards'],triple:['🔺','Three piles'],relay:['🏃','Front only'],beacon:['🔦','Glowing card'],pillars:['🏛️','Four tops'],cascade:['🌊','Bottom only'],silos:['🏗️','Five tops'],spark:['✨','Spark card']};
 function showMenu(msg){
   const prev=document.querySelector('#modal .menu-body'),st=prev?prev.scrollTop:0;
   const demo=[{c:'R',k:'num',n:7},{c:'Y',k:'skip'},{c:null,k:'wd10'},{c:'B',k:'draw2'},{c:'G',k:'num',n:3}].map((c,i)=>cardHTML({...c,id:'d'+i,liar:false,flex:false,f:null,flip:false})).join('');
   const cur=MODES[selMode],keys=Object.keys(MODES);
-  const ORIG=new Set(['eclipse','overload','twin','vault','observatory','bounty','chrono','gambit','open','bookends','duo','stacks','carousel','potato','roundabout','collector','lucky','pyramid','bingo','showcase','relay','beacon','pillars']);
+  const ORIG=new Set(['eclipse','overload','twin','vault','observatory','bounty','chrono','gambit','open','bookends','duo','stacks','carousel','potato','roundabout','collector','lucky','pyramid','bingo','showcase','relay','beacon','pillars','cascade','silos','spark']);
   const tile=k=>`<div class="mode ${k===selMode?'sel':''}" data-m="${k}" role="button" tabindex="0" aria-pressed="${k===selMode}"><span class="ic">${MODEMETA[k][0]}</span><b>${MODES[k].name}</b><span class="tg">${MODEMETA[k][1]}</span></div>`;
   const tiles1=keys.filter(k=>!ORIG.has(k)).map(tile).join(''),tiles2=keys.filter(k=>ORIG.has(k)).map(tile).join('');
   const dare=selMode==='dare'?`<div class="sect"><h2>Dare list</h2><div class="cols seg">${Object.entries(DARENAMES).map(([k,n])=>`<button class="${k===selDare?'on':''}" data-d="${k}">${n}</button>`).join('')}</div>${selDare==='house'?`<textarea id="hr" placeholder="Write your own dares, one per line. Dare card #1 uses line 1, #2 uses line 2, and so on up to 15.">${esc(houseText)}</textarea>`:''}</div>`:'';
@@ -1158,6 +1205,10 @@ function rollBeacon(p){
   if(p.noBeacon){p.noBeacon=false;p.beacon=[];log(`🕳️ ${nm(p)} ${p.human?'have':'has'} no Beacon this turn`);return}
   const n=p.beac2?2:1;p.beac2=false;
   p.beacon=shuffle(p.hand.filter(h=>!isWild(h))).slice(0,n).map(h=>h.id)}
+function rollSpark(p){
+  if(p.noSpark){p.noSpark=false;p.spark=[];log(`🌑 ${nm(p)} ${p.human?'have':'has'} no Spark this turn`);return}
+  const n=p.spark2?2:1;p.spark2=false;
+  p.spark=shuffle(p.hand.filter(h=>!isWild(h))).slice(0,n).map(h=>h.id)}
 function autoMeld(p){
   for(let n=0;n<=9;n++){
     const cs=p.hand.filter(h=>h.k==='num'&&h.n===n);
@@ -1574,6 +1625,9 @@ async function humanTurn(p){
     if(G.mode==='relay')return setStatus('Your turn: play the front (leftmost) card of your line, or draw.');
     if(G.mode==='beacon')return setStatus(`Your turn: match ${desc(G.top)}, or play your 🔦 Beacon on anything.`);
     if(G.mode==='pillars')return setStatus('Your turn: play the top card of a pillar, or draw.');
+    if(G.mode==='cascade')return setStatus('Your turn: play the bottom (rightmost) card of your cascade, or draw.');
+    if(G.mode==='silos')return setStatus('Your turn: play the top card of a silo, or draw.');
+    if(G.mode==='spark')return setStatus(`Your turn: match ${desc(G.top)}, or play your ✨ Spark on anything.`);
     if(G.mode==='roundabout')return setStatus(`Your turn: match ${desc(G.top)}. Hands rotate after the lap!`);
     if(G.mode==='pyramid')return setStatus('Your turn: play a FREE card (nothing on top of it), or draw.');
     if(G.mode==='bingo')return setStatus(`Your turn: match ${desc(G.top)}. Clear a line for a Bingo!`);
@@ -1585,276 +1639,4 @@ async function humanTurn(p){
     if(G.mode==='potato')return setStatus(`Your turn: match ${desc(G.top)}. After your turn you pass one card to the next player.`);
     if(G.mode==='duo')return setStatus('Your turn: play any card from the team hand, or draw.');
     if(G.mode==='open')return setStatus(G.frozen&&G.frozen.who===G.players[0]?`❄️ Frozen: you can't play ${CN[G.frozen.c]} cards this turn.`:`Your turn: match ${desc(G.top)}. Everyone's hand is open!`);
-    if(G.mode==='bounty'&&G.bounty)return setStatus(`Your turn: match ${desc(G.top)}. Bounty: ${CN[G.bounty.c]} ${G.bounty.n}!`);
-    if(G.mode==='observatory')return setStatus(`Your turn: match ${desc(G.top)}, or take a star / draw blind.`);
-    if(G.mode==='overload')return setStatus(`Your turn: match ${desc(G.top)}. Mass ${G.mass}/${LIMIT}. Draw if every card is too risky!`);
-    if(G.mode==='twin')return setStatus(`Your turn: play from your ${p.act==='L'?'Left':'Right'} hand (or the other if it has no match), or draw.`);
-    if(M&&!p.hand.some(c=>sidesFor(p,c).length))return setStatus('No playable card. Draw until you find one.');
-    if(G.mode==='allwild')return setStatus('Your turn: play any card, or draw.');
-    setStatus(G.mode==='liars'?`Your turn: match ${desc(G.top)}, play a 🎭 Liar card face down, or draw.`:`Your turn: match ${desc(G.top)}${G.mode==='flex'?' (or use a flex side)':''}.`)};
-  while(true){
-    G.humanTurn=true;G.drew=drew;render();hint();
-    const a=await waitAction();
-    if(a.t==='draw'){
-      if(G.mode==='attack'){G.humanTurn=false;G.drew=null;render();await hit(p,1);advance();return}
-      if(E&&G.pending>0){G.humanTurn=false;takePenalty(p);render();await sleep(900);advance();return}
-      if(drew)continue;
-      if(M){
-        if(G.pending>0){G.humanTurn=false;takePenalty(p);render();await sleep(900);advance();return}
-        if(p.hand.some(c=>sidesFor(p,c).length)){setStatus('You have a playable card!');continue}
-        G.humanTurn=false;render();drew=await drawUntil(p);
-        if(p.out||!drew){G.humanTurn=false;render();await sleep(600);advance();return}
-        continue}
-      if(G.mode==='observatory'&&a.star){const ix=G.row.findIndex(x=>x.id===a.star);if(ix<0)continue;drew=takeStar(p,ix);log(`You take ${desc(drew)} from the stars`)}
-      else{draw(p,1);drew=p.hand[p.hand.length-1];log(G.mode==='observatory'?'You draw blind':'You draw a card')}
-      if(!drew||!sidesFor(p,drew,true).length){G.drew=null;G.humanTurn=false;render();log('It can\'t be played');await sleep(900);if(G.mode==='triple')await pressPile(p);advance();return}
-      continue}
-    if(a.t==='pass'){if(!drew||M)continue;G.humanTurn=false;G.drew=null;render();if(G.mode==='triple')await pressPile(p);advance();return}
-    if(a.t==='play'){
-      const c=a.card;
-      if(drew&&c!==drew){setStatus('Only the card you just drew can be played.');continue}
-      const sides=sidesFor(p,c,!!drew);
-      if(!sides.length){setStatus((M||E)&&G.pending>0?'Stack a draw card of equal or higher value, or take the cards.':G.mode==='liars'?'That doesn\'t match. Try a 🎭 Liar card or draw.':'That card can\'t be played right now.');continue}
-      const side=sides.length>1?((E||G.mode==='triple')?await pickPile(c):await pickSide(c)):sides[0];
-      G.humanTurn=false;G.drew=null;render();
-      await playCard(p,c,await humanOpts(p,c,side));return}
-  }
-}
-function botOpts(p,c,side='r'){
-  const o={side};
-  if(G.mode==='bounty'&&c.k==='poster'){const ns=p.hand.filter(h=>h!==c&&h.k==='num'),t=ns.length?pick(ns):{c:pick(COLORS),n:Math.floor(Math.random()*10)};o.bColor=t.c;o.bNum=t.n}
-  if(G.mode==='triple'&&c.k==='disc2'){const same=p.hand.filter(h=>h!==c&&h.c===c.c);o.extra=same.length?(same.find(h=>h.k==='num')||same[0]):null}
-  if(isWild(c)&&c.k!=='roul'&&c.k!=='pileup'&&G.mode!=='allwild'&&G.mode!=='triple')o.color=mostColor(p);
-  if((SW()&&c.k==='num'&&c.n===7)||(G.mode==='flex'&&side==='f'&&(c.k==='wt2'||c.k==='wd4'))||(G.mode==='allwild'&&(c.k==='aswap'||c.k==='at2'))||(G.mode==='attack'&&c.k==='trade'))o.target=others(p).filter(q=>G.mode!=='duo'||q.team!==p.team).sort((a,b)=>a.hand.length-b.hand.length)[0];
-  if(G.mode==='open'&&isWild(c)){
-    const nxp=nextAlive(),cnt=col=>nxp.hand.filter(h=>h.c===col).length;
-    o.color=[...COLORS].sort((a,b)=>c.k==='freeze'?cnt(b)-cnt(a):cnt(a)-cnt(b))[0]}
-  if(G.mode==='open'&&c.k==='cswap'){
-    const mine=p.hand.filter(h=>h!==c),give=mine.filter(h=>!isWild(h)),cand=others(p).filter(q=>q.hand.length),tgt=cand.find(q=>q.hand.some(isWild))||cand[0];
-    if(mine.length&&tgt){o.mine=[...(give.length?give:mine)].sort((a,b)=>cardPts(b)-cardPts(a))[0];o.tgt=tgt;o.theirs=tgt.hand.find(isWild)||tgt.hand.find(h=>h.c===o.color)||tgt.hand[0]}}
-  if(G.mode==='bookends'&&c.k==='slide'){
-    const rest=p.hand.filter(h=>h!==c);
-    if(rest.length){o.slideCard=rest.find(h=>h.c===o.color)||pick(rest);o.slideLeft=false}}
-  if(G.mode==='stacks'&&c.k==='dig'){
-    const opts=[0,1,2].map(k=>p.hand.filter(h=>h!==c&&h.stk===k)).map((cs,k)=>({k,cs})).filter(x=>x.cs.length>1);
-    if(opts.length){const good=opts.find(x=>{const sec=x.cs[x.cs.length-2];return isWild(sec)||sec.c===o.color});o.stack=(good||pick(opts)).k}}
-  if(G.mode==='carousel'&&c.k==='aim'){
-    const rest=p.hand.filter(h=>h!==c);let best=null,bv=-1;
-    rest.forEach((h,i)=>{let v=0;for(let j=0;j<3;j++){const q=rest[(i+j)%rest.length];if(q&&(isWild(q)||q.c===o.color))v++}if(v>bv){bv=v;best=h}});
-    o.aimCard=best}
-  if(G.mode==='collector'&&c.k==='clone'){
-    const rest=p.hand.filter(h=>h!==c&&h.k==='num'),cnt=h=>rest.filter(x=>x.n===h.n).length;
-    if(rest.length)o.cloneCard=[...rest].sort((a,b)=>cnt(b)-cnt(a))[0]}
-  if(G.mode==='pyramid'&&c.k==='excavate'){const cs=p.hand.filter(h=>h!==c&&h.pos>=0).sort((a,b)=>a.pos-b.pos);o.exCard=cs.find(h=>h.c===o.color)||cs[0]}
-  if(G.mode==='bingo'&&c.k==='freespace'){
-    const cs=p.hand.filter(h=>h!==c&&h.gp>=0);
-    const rem=h=>Math.min(...LINES.map((ln,i)=>(!p.bingos.has(i)&&ln.includes(h.gp))?ln.filter(g=>g!==h.gp&&p.hand.some(x=>x.gp===g&&x!==c)).length:9));
-    o.fsCard=[...cs].sort((a,b)=>rem(a)-rem(b))[0]}
-  if(G.mode==='showcase'&&c.k==='spotlight'){const cs=p.hand.filter(h=>h!==c),nw=cs.filter(h=>!isWild(h));o.spot=[...(nw.length?nw:cs)].sort((a,b)=>cardPts(b)-cardPts(a))[0]}
-  if(G.mode==='collector'&&c.k==='callout'){
-    const cnt=n=>others(p).filter(q=>q.hand.some(h=>h.k==='num'&&h.n===n)).length;
-    o.num=[0,1,2,3,4,5,6,7,8,9].sort((a,b)=>cnt(b)-cnt(a)+(Math.random()-.5)*.5)[0]}
-  return o}
-function botPick(p,pool){
-  const top=G.top,reg=pool.filter(c=>!c.liar&&matches(c,top)),tl=pool.filter(c=>c.liar&&c.c&&matches(c,top)),lies=pool.filter(c=>c.liar&&c.c&&!matches(c,top));
-  const wc=pool.filter(c=>c.k==='wildc'),w4=pool.filter(c=>c.k==='wild4'),noCol=!p.hand.some(c=>c.c===top.c),r=Math.random(),safe=[...reg,...tl];
-  if(w4.length&&noCol&&r<.6)return w4[0];
-  if(wc.length&&r<.3)return wc[0];
-  if(safe.length&&r<.88){const a=safe.filter(c=>c.k!=='num');return pick(a.length&&Math.random()<.5?a:safe)}
-  if(lies.length&&Math.random()<.55)return pick(lies);
-  if(w4.length&&Math.random()<.2)return w4[0];
-  if(safe.length)return pick(safe);
-  if(wc.length)return wc[0];
-  return null}
-async function botTurn(p){
-  setStatus(`${p.name} is thinking…`);render();await sleep(1000);
-  let c=botPick(p,p.hand);
-  if(!c){draw(p,1);log(`${p.name} draws a card`);render();await sleep(700);const d=p.hand[p.hand.length-1];c=d?botPick(p,[d]):null;if(!c){advance();return}}
-  await playCard(p,c,botOpts(p,c))}
-function botChoose(p){
-  if(G.mode==='showcase'){
-    const raids=[];others(p).forEach(q=>{if(q.lock)return;const sc=q.hand.find(h=>h.id===q.show);if(sc&&sidesFor(p,sc).length)raids.push({c:sc,side:'r'})});
-    const hasOwn=p.hand.some(c=>sidesFor(p,c).length);
-    if(raids.length&&(!hasOwn||Math.random()<.15))return pick(raids)}
-  if(G.mode==='bingo'){
-    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
-    if(!opts.length)return null;
-    const sc=o=>{let v=Math.random()*2;if(o.c.gp>=0)LINES.forEach((ln,i)=>{if(p.bingos.has(i)||!ln.includes(o.c.gp))return;const left=ln.filter(g=>g!==o.c.gp&&p.hand.some(x=>x.gp===g)).length;if(left===0)v+=6;else if(left===1)v+=1.5});if(isWild(o.c))v-=1;return v};
-    return [...opts].sort((a,b)=>sc(b)-sc(a))[0]}
-  if(G.mode==='overload'){
-    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
-    if(!opts.length)return null;
-    const val=c=>{const v=c.k==='num'?c.n:(c.k==='swild'||c.k==='vent'||c.k==='surge')?0:5;return G.dbl?v*2:v};
-    const safe=opts.filter(o=>o.c.k==='vent'||G.mass+val(o.c)<LIMIT);
-    if(!safe.length)return Math.random()<.75?null:[...opts].sort((a,b)=>val(a.c)-val(b.c))[0];
-    const nxh=nextAlive().hand.length;
-    const sc=o=>{const c=o.c;let v=val(c)*(G.mass<12?.4:-.2)+Math.random()*3;
-      if(c.k==='vent')v+=G.mass>=18?7:-6;
-      if(c.k==='surge')v+=(G.mass>=12&&G.mass<=24)?4:-5;
-      if(c.k==='draw2'||c.k==='skip')v+=nxh<=3?3:0;
-      return v};
-    return [...safe].sort((a,b)=>sc(b)-sc(a))[0]}
-  if(G.mode==='triple'){
-    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
-    if(!opts.length)return null;
-    const sc=o=>{const pl=G.piles['abc'.indexOf(o.side)],r=ratio(pl);let v=Math.random()*1.5-r*4;
-      if(o.c.k==='wclear')v+=r*8-2;
-      if(o.c.k==='wgive')v+=r*6-1;
-      if(o.c.k==='disc2')v+=2;
-      if(isWild(o.c)&&o.c.k==='swild')v-=1.5;
-      return v};
-    return [...opts].sort((a,b)=>sc(b)-sc(a))[0]}
-  if(G.mode==='eclipse'){
-    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
-    if(!opts.length)return null;
-    const nxh=nextAlive().hand.length,mn=Math.min(...others(p).map(q=>q.hand.length));
-    const sc=x=>{
-      const i=x.side==='a'?0:1,other=G.piles[1-i],col=isWild(x.c)?mostColor(p):x.c.c;let v=Math.random()*2;
-      if(col===other.c&&G.piles[i].c!==other.c&&G.piles[0].c!==G.piles[1].c)v+=5;
-      if(x.c.k==='draw2'||x.c.k==='wild4')v+=nxh<=3?3:.5;
-      if(x.c.k==='skip'&&nxh<=2)v+=2;
-      if(isWild(x.c))v-=1.5;
-      if(x.c.k==='num'&&x.c.n===7)v+=p.hand.length>=mn+3?3:-3;
-      return v};
-    opts.sort((a,b)=>sc(b)-sc(a));return opts[0]}
-  if(G.mode==='allwild'){
-    const nx=nextAlive(),danger=nx.hand.length<=2,minH=Math.min(...others(p).map(q=>q.hand.length));
-    let pool=p.hand.filter(c=>c.k!=='aswap'||p.hand.length>=minH+3);
-    if(!pool.length)pool=p.hand;
-    if(danger){for(const k of ['adraw4','askip2','askip','adraw2','aswap']){const f=pool.filter(c=>c.k===k);if(f.length)return{c:f[0],side:'r'}}}
-    return{c:pick(pool),side:'r'}}
-  let pool=p.hand.map(c=>({c,s:sidesFor(p,c)})).filter(x=>x.s.length);
-  if(!pool.length)return null;
-  if(G.mode==='flex'||G.mode==='classic'||G.mode==='party'){
-    const f=pool.filter(x=>(x.c.k!=='wd4'&&x.c.k!=='wild4')||!p.hand.some(h=>h!==x.c&&(h.c===G.top.c||isWild(h)))||Math.random()<.12);
-    if(f.length)pool=f}
-  if(G.mode==='attack'){const mn=Math.min(...others(p).map(q=>q.hand.length)),f=pool.filter(x=>x.c.k!=='trade'||p.hand.length>=mn+3);if(f.length)pool=f}
-  const nw=pool.filter(x=>!isWild(x.c));
-  let ch=nw.length&&Math.random()<.8?nw:pool;
-  const ac=ch.filter(x=>x.c.k!=='num');
-  if(ac.length&&Math.random()<.45)ch=ac;
-  const x=pick(ch);
-  return {c:x.c,side:x.s.length>1&&Math.random()<.5?'f':x.s[0]}}
-async function botTurnStd(p){
-  setStatus(`${p.name} is thinking…`);render();await sleep(1000);
-  const M=G.mode==='mercy',E=G.mode==='eclipse';
-  if((M||E)&&G.pending>0){
-    const st=p.hand.filter(h=>DRAWV[h.k]&&DRAWV[h.k]>=G.lastVal).sort((a,b)=>DRAWV[a.k]-DRAWV[b.k]);
-    if(st.length&&Math.random()<.85){await playCard(p,st[0],botOpts(p,st[0],E?pick(sidesFor(p,st[0])):'r'));return}
-    takePenalty(p);render();await sleep(800);advance();return}
-  let ch=botChoose(p);
-  if(!ch){
-    if(G.mode==='attack'){await hit(p,1);advance();return}
-    if(M){const d=await drawUntil(p);render();await sleep(500);if(!d||p.out){advance();return}ch={c:d,side:'r'}}
-    else{
-      if(G.mode==='observatory')obsDraw(p);else{draw(p,1);log(`${p.name} draws a card`)}
-      render();await sleep(700);
-      const d=p.hand[p.hand.length-1],s=d?sidesFor(p,d,true):[];
-      if(!s.length||Math.random()<.15){if(G.mode==='triple')await pressPile(p);advance();return}
-      ch={c:d,side:s[0]}}}
-  await playCard(p,ch.c,botOpts(p,ch.c,ch.side))}
-
-async function run(){
-  while(true){
-    if(checkWin())return;
-    const p=G.players[G.cur];G.humanTurn=false;render();
-    if(G.mode==='collector'){autoMeld(p);render();if(checkWin())return}
-    if(G.mode==='lucky'){rollLucky(p);render()}
-    if(G.mode==='beacon'){rollBeacon(p);render()}
-    if(G.mode==='showcase')p.lock=false;
-    if(G.mode==='gambit'){G.chain=0;G.carry=0}
-    if(G.mode==='triple'){const r=Math.random(),sz=r<.45?3:r<.85?2:1;G.lit=shuffle([0,1,2]).slice(0,sz).sort();render()}
-    if(G.mode==='vault'&&!p.hand.length&&p.vault.length){await openVault(p);continue}
-    if(G.mode==='dare'&&p.dare)await judgeDare(p);
-    if(p.human)await humanTurn(p);else if(G.mode==='liars')await botTurn(p);else await botTurnStd(p);
-    if(G.mode==='potato'&&!G.over)await passPotato(p);
-    if(G.mode==='roundabout'&&!G.over){G.turns++;if(G.turns%aliveCount()===0)await rotateLap()}
-  }}
-function deal(){
-  G.deck=shuffle(buildDeck(G.mode));G.disc=[];G.dir=1;G.cur=0;G.pending=0;G.lastVal=0;G.aside=[];G.roundWinner=null;G.over=false;G.humanTurn=false;G.drew=null;G.laying=false;
-  G.mass=0;G.dbl=false;G.lit=[0,1,2];
-  G.row=[];G.hist=[];G.lastFx=null;G.chain=0;G.carry=0;G.turns=0;G.rot=1;newBounty();
-  G.players.forEach(p=>{p.bingos=new Set();p.daub=false;p.jam=false;p.lock=false;p.show=null;p.anchor=false;p.lucky=[];p.luck2=false;p.noLucky=false;p.ptr=0;p.blockNext=false;p.dump=false;p.shield=false;p.autoNo=false;p.hand=[];p.power=true;p.out=false;p.dare=null;p.act='L';p.vault=[];p.beacon=[];p.beac2=false;p.noBeacon=false});
-  G.frozen=null;
-  G.players.forEach((p,i)=>{p.team=i%2});
-  if(G.mode==='duo'){const pools=[[],[]];G.players.forEach((p,i)=>{p.hand=pools[i%2]})}
-  const per=G.mode==='twin'||G.mode==='stacks'||G.mode==='pillars'?8:G.mode==='duo'?5:G.mode==='pyramid'?10:G.mode==='bingo'?9:7;
-  for(let r=0;r<per;r++)G.players.forEach(p=>{const c=G.deck.pop();if(G.mode==='twin')c.side=r<4?'L':'R';if(G.mode==='stacks')c.stk=r%3;if(G.mode==='pillars')c.stk=r%4;if(G.mode==='pyramid')c.pos=r;if(G.mode==='bingo')c.gp=r;p.hand.push(c)});
-  if(G.mode==='vault')for(let r=0;r<3;r++)G.players.forEach(p=>p.vault.push(G.deck.pop()));
-  if(G.mode==='showcase')G.players.forEach(fixShow);
-  if(G.mode==='beacon')G.players.forEach(p=>{const non=p.hand.filter(h=>!isWild(h));p.beacon=non.length?[pick(non).id]:[]});
-  if(G.mode==='observatory')refillRow();
-  if(G.mode==='triple'){
-    const take=()=>{const idx=G.deck.map((c,i)=>c.k==='num'?i:-1).filter(i=>i>=0).pop();return G.deck.splice(idx,1)[0]};
-    G.piles=[0,1,2].map(()=>{const a=take();return{c:a.c,k:'num',n:a.n,wild:false,card:a,count:0,limit:5+Math.floor(Math.random()*8)}});
-    G.top=G.piles[0];G.topCard=G.piles[0].card;G.topFace=true;return}
-  if(G.mode==='eclipse'){
-    const take=()=>{const idx=G.deck.map((c,i)=>c.k==='num'?i:-1).filter(i=>i>=0).pop();return G.deck.splice(idx,1)[0]};
-    const a=take(),b=take(),mk=c=>({c:c.c,k:'num',n:c.n,card:c});
-    G.piles=[mk(a),mk(b)];G.top=G.piles[0];G.topCard=a;G.topFace=true;return}
-  if(G.mode==='allwild'){const first=G.deck.pop();G.disc.push(first);G.top={c:null,k:'wild'};G.topCard=first;G.topFace=true;return}
-  const idx=G.deck.map((c,i)=>c.k==='num'&&!c.liar&&!c.spin?i:-1).filter(i=>i>=0).pop(),first=G.deck.splice(idx,1)[0];
-  G.disc.push(first);G.top={c:first.c,k:'num',n:first.n};G.topCard=first;G.topFace=true}
-function start(n,mode){
-  G={mode,players:[{name:'You',human:true,hand:[],power:true},...Array.from({length:n},(_,i)=>({name:NAMES[i],av:AV[i],hand:[],power:true}))],log:[],scores:Array(n+1).fill(0),round:1,dares:buildDares(),dareList:selDare};
-  deal();$('#log').innerHTML='';$('#modeTag').textContent=MODES[mode].name;waiter=null;run()}
-
-document.addEventListener('click',e=>{
-  const cd=e.target.closest('#hand .card, #starrow .card, #opps .showc .card');
-  if(cd&&G){
-    const isStar=!!cd.closest('#starrow');
-    const isOpp=!!cd.closest('#opps');
-    const c=isStar?G.row.find(x=>x.id==cd.dataset.id):isOpp?(()=>{const q=G.players.find(x=>x!==G.players[0]&&x.show==cd.dataset.id);return q&&!q.lock?q.hand.find(h=>h.id==cd.dataset.id):null})():G.players[0].hand.find(x=>x.id==cd.dataset.id);
-    if(isOpp&&!c){setStatus('🔒 That display card is padlocked');return}
-    if(c){
-      const touch=e.pointerType==='touch'||Date.now()-lastTouch<700;
-      if(touch&&cd.dataset.tip&&String(armed)!==String(c.id)){clearArmed();armed=c.id;cd.classList.add('armed');showTip(cd,isStar?'Tap again to take it':'Tap again to play');return}
-      clearArmed();hideTip();
-      if(isStar)act({t:'draw',star:c.id});else act({t:'play',card:c})}
-    return}
-  if(e.target.closest('#drawBtn,#drawPile'))act({t:'draw'});
-  if(e.target.closest('#passBtn'))act({t:'pass'});
-});
-document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&(e.target.classList.contains('card')||e.target.classList.contains('mode'))){e.preventDefault();e.target.click()}});
-$('#rulesBtn').onclick=()=>{if(!$('#modal').classList.contains('on'))showRules(G?G.mode:selMode,()=>{})};
-$('#newBtn').onclick=()=>location.reload();
-let lastTouch=0,tipTimer=null,lpTimer=null,tipSuppress=false,armed=null,infoMode=false;
-const touchUI=()=>!!(window.matchMedia&&window.matchMedia('(hover: none)').matches)||innerWidth<600;
-function clearArmed(){armed=null;if(document.querySelectorAll)document.querySelectorAll('.card.armed').forEach(x=>x.classList.remove('armed'))}
-function showTip(el,extra){
-  const t=el.getAttribute('data-tip');if(!t)return;
-  const tip=$('#tip');tip.innerHTML=t+(extra?`<div class="tiphint">${extra}</div>`:'');tip.style.display='block';
-  clearTimeout(tipTimer);
-  if(touchUI()){tip.classList.add('dock');tip.style.left='';tip.style.top='';tipTimer=setTimeout(()=>{hideTip();clearArmed()},7000);return}
-  tip.classList.remove('dock');
-  const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
-  const x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));
-  let y=r.top-h-10;if(y<8)y=r.bottom+10;
-  tip.style.left=x+'px';tip.style.top=y+'px'}
-function hideTip(){const t=$('#tip');if(t)t.style.display='none'}
-const tipCard=e=>e.target&&e.target.closest?e.target.closest('.card[data-tip]'):null;
-document.addEventListener('mouseover',e=>{if(Date.now()-lastTouch<800)return;const c=tipCard(e);if(c)showTip(c)});
-document.addEventListener('mouseout',e=>{if(Date.now()-lastTouch<800)return;if(tipCard(e))hideTip()});
-document.addEventListener('focusin',e=>{const c=tipCard(e);if(c&&Date.now()-lastTouch>800)showTip(c)});
-document.addEventListener('focusout',()=>{if(Date.now()-lastTouch>800)hideTip()});
-document.addEventListener('touchstart',e=>{
-  lastTouch=Date.now();const c=tipCard(e);
-  hideTip();if(!c)clearArmed();
-  clearTimeout(lpTimer);
-  if(c)lpTimer=setTimeout(()=>{showTip(c);tipSuppress=true;setTimeout(()=>{tipSuppress=false},3000)},450)},{passive:true});
-document.addEventListener('touchend',()=>clearTimeout(lpTimer));
-document.addEventListener('touchmove',()=>{clearTimeout(lpTimer);hideTip()},{passive:true});
-document.addEventListener('click',e=>{
-  if(tipSuppress){tipSuppress=false;e.stopImmediatePropagation();e.preventDefault();return}
-  if(infoMode){const c=tipCard(e);if(c){e.stopImmediatePropagation();e.preventDefault();showTip(c);if(!touchUI()){clearTimeout(tipTimer);tipTimer=setTimeout(hideTip,7000)}}}
-},true);
-window.addEventListener('scroll',()=>{if(!touchUI())hideTip()},true);
-$('#infoBtn').onclick=()=>{
-  infoMode=!infoMode;const b=$('#infoBtn');
-  b.classList.toggle('on',infoMode);b.setAttribute('aria-pressed',String(infoMode));
-  b.textContent=infoMode?'ℹ Info: on':'ℹ Info';
-  document.body.classList.toggle('infomode',infoMode);hideTip();clearArmed()};
-showMenu();
-</script>
-</body>
-</html>
+    if(G.mode==='bounty'&&G.bounty)return setStatus(`Your turn: match ${desc(G.top)}. Bounty:
