@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="description" content="Cosmic Match – a free browser card game with dozens of unique modes. Play classic, No Mercy, Pyramid, Relay, Coil and more.">
+<meta name="theme-color" content="#0d0d2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Cosmic Match</title>
 <style>
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
@@ -10,8 +15,9 @@
 html,body{min-height:100%}
 body{font-family:ui-rounded,"Avenir Next","Nunito","Trebuchet MS",system-ui,sans-serif;color:var(--tx);background:radial-gradient(ellipse at 50% -10%,#32206e 0,#0d0d2b 48%,#05050f 100%) fixed;overflow-x:hidden}
 #stars{position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 90px 120px,#bcd,transparent),radial-gradient(1.5px 1.5px at 160px 60px,#fff,transparent),radial-gradient(1px 1px at 210px 170px,#cbe,transparent);background-size:240px 200px}
-#app{position:relative;max-width:900px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;gap:10px;padding:max(10px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}
-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#app{position:relative;max-width:900px;width:100%;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;gap:10px;padding:max(10px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));box-sizing:border-box}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#opps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 h1{font-size:24px;letter-spacing:.5px;font-weight:800;background:linear-gradient(90deg,var(--B),#b58cff,var(--R));-webkit-background-clip:text;background-clip:text;color:transparent}
 #modeTag{display:block;font-size:12px;color:var(--mute);margin-top:2px}
 .ghost,button{font:inherit;color:var(--tx);background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:700}
@@ -19,7 +25,6 @@ h1{font-size:24px;letter-spacing:.5px;font-weight:800;background:linear-gradient
 button:hover:not(:disabled){background:rgba(255,255,255,.16)}
 button:disabled{opacity:.35;cursor:default}
 button:focus-visible,.card:focus-visible,.mode:focus-visible{outline:3px solid #fff;outline-offset:2px}
-#opps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .opp{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:8px 12px;text-align:center;min-width:104px;transition:border-color .2s,box-shadow .2s}
 .opp.act{border-color:#b58cff;box-shadow:0 0 18px #7d5cff88}
 .opp.out{opacity:.4}
@@ -60,9 +65,14 @@ button:focus-visible,.card:focus-visible,.mode:focus-visible{outline:3px solid #
 @keyframes shrink{to{transform:scaleX(0)}}
 @keyframes pulse{to{transform:scale(1.06)}}
 #log{font-size:13px;color:var(--mute);text-align:center;min-height:68px;line-height:1.35}
-#hand{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:12px 4px 6px;margin-top:auto}
-#hand .card{cursor:pointer}
+#hand{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:8px;padding:12px 4px 10px;margin-top:auto;max-width:100%;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#7d5cff44 transparent}
+#hand::-webkit-scrollbar{height:6px}
+#hand::-webkit-scrollbar-thumb{background:#7d5cff66;border-radius:4px}
+#hand .card{cursor:pointer;flex:0 0 auto}
 #hand .card:hover:not(.dim){transform:translateY(-9px)}
+#hand .slot{display:inline-flex;flex:0 0 auto}
+#hand .hl2{flex:0 0 100%;text-align:center;margin-bottom:4px}
+.hgrp{flex:0 0 auto;max-width:100%}
 .dim{opacity:.38;filter:grayscale(.4)}
 #modal{position:fixed;inset:0;background:#03030cd0;display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
 #modal.on{display:flex}
@@ -119,10 +129,10 @@ button:focus-visible,.card:focus-visible,.mode:focus-visible{outline:3px solid #
 .card.armed{transform:translateY(-12px)!important;outline:3px solid #fff;outline-offset:2px}
 .ghost.on{background:#7d5cff;border-color:#b58cff}
 body.infomode .card[data-tip]{cursor:help}
-#starrow{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
+#starrow{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #starrow:empty{display:none}
 #starrow .lbl{flex:0 0 100%;text-align:center;font-size:12px;color:var(--mute);font-weight:800}
-#starrow .card{cursor:pointer}
+#starrow .card{cursor:pointer;flex:0 0 auto}
 .bounty{padding:4px 12px;border-radius:99px;border:2px solid #ffc43a;background:rgba(255,196,58,.15);font-weight:800;font-size:13px;text-align:center}
 .open{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:300px;margin:4px 0}
 .open .card{width:30px;height:44px;border-radius:6px;border-width:1px}
@@ -157,7 +167,47 @@ body.infomode .card[data-tip]{cursor:help}
 .twin .pc{margin-top:5px;font-size:12px;font-weight:800;padding:2px 8px;border-radius:99px;border:2px solid #fff8;display:inline-block}
 textarea{width:100%;min-height:120px;margin-top:8px;border-radius:10px;border:1px solid var(--line);background:#0c0e2a;color:var(--tx);font:inherit;padding:8px;resize:vertical}
 .note{font-size:12px;color:var(--mute);margin-top:4px}
-@media(max-width:560px){.card{width:52px;height:76px}.card .big{font-size:26px}.card .big.sm{font-size:16px}.card .fx{width:20px;height:13px;font-size:8px}#hand{gap:6px}h1{font-size:20px}.hero h1{font-size:30px}.mode{padding:8px 3px}.mode .ic{font-size:20px}.mode b{font-size:13px}.menu-body{padding:16px 14px 8px}.detail{flex-direction:column;align-items:stretch;text-align:left}.opp{min-width:84px;padding:6px 8px}#table{gap:12px}#info{min-width:100px}}
+/* Open-hand tiny cards already exist; keep them tight */
+.open{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.open .card{width:28px;height:40px;flex:0 0 auto}
+/* Pillar / Silo groups stay on screen */
+.hgrp{min-width:0}
+.scol{max-width:100%}
+/* Extra-small screens */
+@media(max-width:560px){
+  .card{width:48px;height:70px}
+  .card .big{font-size:22px}
+  .card .big.sm{font-size:14px}
+  .card .fx{width:18px;height:12px;font-size:7px}
+  .card .cn,.card .cm{font-size:11px}
+  #hand{gap:5px;padding:10px 2px 8px}
+  .hgrp{padding:4px 4px 6px}
+  .hgrp .hl{font-size:11px}
+  h1{font-size:18px}
+  .hero h1{font-size:26px}
+  .mode{padding:7px 2px}
+  .mode .ic{font-size:18px}
+  .mode b{font-size:12px}
+  .modes{grid-template-columns:repeat(3,1fr);gap:6px}
+  .menu-body{padding:14px 10px 6px}
+  .detail{flex-direction:column;align-items:stretch;text-align:left}
+  .opp{min-width:72px;padding:5px 6px}
+  .opp .av{font-size:20px}
+  #table{gap:10px;padding:10px 0 4px}
+  #info{min-width:90px}
+  .open .card{width:24px;height:34px}
+  .showc .card{width:34px;height:50px}
+  .pyr .card,.phold{width:40px;height:58px}
+  .pyr .card .big{font-size:16px}
+}
+@media(max-width:380px){
+  .card{width:42px;height:62px}
+  .card .big{font-size:18px}
+  .card .big.sm{font-size:12px}
+  #hand{gap:4px}
+  .modes{grid-template-columns:repeat(2,1fr)}
+  .opp{min-width:64px}
+}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1615,4 +1665,366 @@ async function spinWheel(q){
     case 'dcol':{
       const cols=COLORS.filter(c=>q.hand.some(h=>h.c===c));
       if(!cols.length){log('No colored cards to discard');break}
-      const col=q.human?await pickColor('Discard Color: pick a color',cols):[...cols].sort((a,b)=>q.ha
+      const col=q.human?await pickColor('Discard Color: pick a color',cols):[...cols].sort((a,b)=>q.hand.filter(c=>c.c===b).length-q.hand.filter(c=>c.c===a).length)[0];
+      const m=q.hand.filter(c=>c.c===col),dis=q.human?await pickCards(`Discard which ${CN[col]} cards? (keep some if you like)`,m,0,m.length,m):m;
+      q.hand=q.hand.filter(c=>!dis.includes(c));await discardMany(q,dis);break}
+    case 'dred':case 'dblue':{
+      const col=w.k==='dred'?'R':'B';let cnt=0;
+      for(let i=0;i<60;i++){const b=q.hand.length;draw(q,1);if(q.hand.length===b)break;cnt++;const d=q.hand[q.hand.length-1];if(d.c===col||isWild(d))break}
+      log(`${q.human?'You draw':q.name+' draws'} ${cnt} card${cnt===1?'':'s'}`);break}
+    case 'trade':
+      passHands();render();await sleep(700);
+      for(const p of G.players)if(p.hand.length===1)await cosmic(p);
+      break;
+    case 'show':
+      if(q.human)log('You show your hand to everyone');else await showHand(q);
+      break;
+    case 'war':after=await warRound(q);break;
+    case 'unospin':{
+      const bots=G.players.filter(x=>!x.human).map(b=>({who:b,ms:700+Math.random()*1800}));
+      setStatus('UNO Spin! Be first to hit the button!');
+      const r=await race('UNO Spin! 📣',3500,bots);
+      const win=r==='me'?G.players[0]:(r||pick(bots).who);
+      log(`${win.human?'You yell':win.name+' yells'} it first!`);
+      if(win.hand.length){
+        const c=win.human?(await pickCards('Discard one card',win.hand,1,1,[]))[0]:pick(win.hand);
+        win.hand.splice(win.hand.indexOf(c),1);await discardMany(win,[c])}
+      after=win;break}
+  }
+  render();return after}
+
+/* ---------- turns ---------- */
+function waitAction(){return new Promise(r=>{waiter=r})}
+function act(a){if(waiter){const w=waiter;waiter=null;w(a)}}
+async function humanOpts(p,c,side){
+  const o={side};
+  if(G.mode==='triple'&&c.k==='disc2'){const same=p.hand.filter(h=>h!==c&&h.c===c.c);if(same.length){const ex=await pickCards(`Discard Two: add one more ${CN[c.c]} card to play with it (or none)`,same,0,1,[]);o.extra=ex[0]||null}}
+  if(isWild(c)&&c.k!=='roul'&&c.k!=='pileup'&&G.mode!=='allwild'&&G.mode!=='triple')o.color=await pickColor('Choose a color');
+  if(G.mode==='open'&&c.k==='cswap'){
+    const mine=p.hand.filter(h=>h!==c);
+    if(mine.length){
+      const [m1]=await pickCards('Wild Swap Card: pick YOUR card to give away',mine,1,1,[]);
+      const tgt=await pickPlayer('Swap with whom?');
+      if(tgt.hand.length){const [t1]=await pickCards(`Pick the card to take from ${tgt.name}`,tgt.hand,1,1,[]);o.mine=m1;o.tgt=tgt;o.theirs=t1}}}
+  if(G.mode==='collector'&&c.k==='clone'){const rest=p.hand.filter(h=>h!==c);if(rest.length){const [cc]=await pickCards('Wild Clone: pick a card to copy',rest,1,1,[]);o.cloneCard=cc}}
+  if(G.mode==='pyramid'&&c.k==='excavate'){const cs=p.hand.filter(h=>h!==c&&h.pos>=0);if(cs.length){const [x]=await pickCards('Wild Excavate: pick a pyramid card to move to your reserve',cs,1,1,[]);o.exCard=x}}
+  if(G.mode==='bingo'&&c.k==='freespace'){const cs=p.hand.filter(h=>h!==c&&h.gp>=0);if(cs.length){const [x]=await pickCards('Wild Free Space: pick a card on your Bingo card to clear',cs,1,1,[]);o.fsCard=x}}
+  if(G.mode==='showcase'&&c.k==='spotlight'){const cs=p.hand.filter(h=>h!==c);if(cs.length){const [x]=await pickCards('Wild Spotlight: pick the card to put on display',cs,1,1,[]);o.spot=x}}
+  if(G.mode==='collector'&&c.k==='callout')o.num=await pickNumber([0,1,2,3,4,5,6,7,8,9],'Wild Call-Out: pick a number');
+  if(G.mode==='stacks'&&c.k==='dig')o.stack=await pickStack(p,c);
+  if(G.mode==='carousel'&&c.k==='aim'){const rest=p.hand.filter(h=>h!==c);if(rest.length){const [ac]=await pickCards('Wild Aim: pick the card your window starts on next turn',rest,1,1,[]);o.aimCard=ac}}
+  if(G.mode==='bookends'&&c.k==='slide'){
+    const rest=p.hand.filter(h=>h!==c);
+    if(rest.length){const [sc]=await pickCards('Wild Slide: pick a card to move to an end',rest,1,1,[]);o.slideCard=sc;o.slideLeft=await pickEnd()}}
+  if(G.mode==='bounty'&&c.k==='poster'){o.bColor=await pickColor('Wild Poster: set the Bounty color');o.bNum=await pickNumber([0,1,2,3,4,5,6,7,8,9],'Wild Poster: set the Bounty number')}
+  if(G.mode==='attack'&&c.k==='trade')o.target=await pickPlayer('Trade hands with…');
+  if(G.mode==='allwild'&&(c.k==='aswap'||c.k==='at2'))o.target=await pickPlayer(c.k==='aswap'?'Swap hands with…':'Who draws 2?');
+  if(SW()&&c.k==='num'&&c.n===7)o.target=await pickPlayer('Swap hands with…');
+  if(G.mode==='flex'&&side==='f'&&(c.k==='wt2'||c.k==='wd4'))o.target=await pickPlayer(c.k==='wd4'?'Who draws 4?':'Who draws 2?');
+  return o}
+async function humanTurn(p){
+  let drew=null;const M=G.mode==='mercy',E=G.mode==='eclipse';
+  const hint=()=>{
+    if(drew)return setStatus(M?'Play the card you drew.':'Play the card you drew, or end your turn.');
+    if((M||E)&&G.pending>0)return setStatus(`Stack a draw card (+${G.lastVal} or more), or take ${G.pending}.`);
+    if(E)return setStatus('Your turn: play on ☀ Sun or ☾ Moon, or draw. Line up both colors for an Eclipse!');
+    if(G.mode==='triple')return setStatus(`Your turn: play on a lit pile (${G.lit.map(i=>i+1).join(', ')}), or draw. No play? You press a pile!`);
+    if(G.mode==='bookends')return setStatus('Your turn: play one of your two end cards (highlighted), or draw.');
+    if(G.mode==='relay')return setStatus('Your turn: play the front (leftmost) card of your line, or draw.');
+    if(G.mode==='beacon')return setStatus(`Your turn: match ${desc(G.top)}, or play your 🔦 Beacon on anything.`);
+    if(G.mode==='pillars')return setStatus('Your turn: play the top card of a pillar, or draw.');
+    if(G.mode==='cascade')return setStatus('Your turn: play the bottom (rightmost) card of your cascade, or draw.');
+    if(G.mode==='silos')return setStatus('Your turn: play the top card of a silo, or draw.');
+    if(G.mode==='spark')return setStatus(`Your turn: match ${desc(G.top)}, or play your ✨ Spark on anything.`);
+    if(G.mode==='coil')return setStatus(`Your turn: play a free coil card (highlighted ${me.coilEven?'even':'odd'} positions), or draw.`);
+    if(G.mode==='nest')return setStatus('Your turn: play the outermost (rightmost) card of your nest, or draw.');
+    if(G.mode==='pulse')return setStatus(`Your turn: match ${desc(G.top)}, or play your 💓 Pulse on anything.`);
+    if(G.mode==='roundabout')return setStatus(`Your turn: match ${desc(G.top)}. Hands rotate after the lap!`);
+    if(G.mode==='pyramid')return setStatus('Your turn: play a FREE card (nothing on top of it), or draw.');
+    if(G.mode==='bingo')return setStatus(`Your turn: match ${desc(G.top)}. Clear a line for a Bingo!`);
+    if(G.mode==='showcase')return setStatus(`Your turn: match ${desc(G.top)}, or raid a display card.`);
+    if(G.mode==='collector')return setStatus(`Your turn: match ${desc(G.top)}. Collect 3 of a number to make them vanish.`);
+    if(G.mode==='lucky')return setStatus(`Your turn: match ${desc(G.top)}, or play your 🍀 lucky card on anything.`);
+    if(G.mode==='stacks')return setStatus('Your turn: play the top card of a stack, or draw.');
+    if(G.mode==='carousel')return setStatus('Your turn: play one of the 3 highlighted cards, or draw.');
+    if(G.mode==='potato')return setStatus(`Your turn: match ${desc(G.top)}. After your turn you pass one card to the next player.`);
+    if(G.mode==='duo')return setStatus('Your turn: play any card from the team hand, or draw.');
+    if(G.mode==='open')return setStatus(G.frozen&&G.frozen.who===G.players[0]?`❄️ Frozen: you can't play ${CN[G.frozen.c]} cards this turn.`:`Your turn: match ${desc(G.top)}. Everyone's hand is open!`);
+    if(G.mode==='bounty'&&G.bounty)return setStatus(`Your turn: match ${desc(G.top)}. Bounty: ${CN[G.bounty.c]} ${G.bounty.n}!`);
+    if(G.mode==='observatory')return setStatus(`Your turn: match ${desc(G.top)}, or take a star / draw blind.`);
+    if(G.mode==='overload')return setStatus(`Your turn: match ${desc(G.top)}. Mass ${G.mass}/${LIMIT}. Draw if every card is too risky!`);
+    if(G.mode==='twin')return setStatus(`Your turn: play from your ${p.act==='L'?'Left':'Right'} hand (or the other if it has no match), or draw.`);
+    if(M&&!p.hand.some(c=>sidesFor(p,c).length))return setStatus('No playable card. Draw until you find one.');
+    if(G.mode==='allwild')return setStatus('Your turn: play any card, or draw.');
+    setStatus(G.mode==='liars'?`Your turn: match ${desc(G.top)}, play a 🎭 Liar card face down, or draw.`:`Your turn: match ${desc(G.top)}${G.mode==='flex'?' (or use a flex side)':''}.`)};
+  while(true){
+    G.humanTurn=true;G.drew=drew;render();hint();
+    const a=await waitAction();
+    if(a.t==='draw'){
+      if(G.mode==='attack'){G.humanTurn=false;G.drew=null;render();await hit(p,1);advance();return}
+      if(E&&G.pending>0){G.humanTurn=false;takePenalty(p);render();await sleep(900);advance();return}
+      if(drew)continue;
+      if(M){
+        if(G.pending>0){G.humanTurn=false;takePenalty(p);render();await sleep(900);advance();return}
+        if(p.hand.some(c=>sidesFor(p,c).length)){setStatus('You have a playable card!');continue}
+        G.humanTurn=false;render();drew=await drawUntil(p);
+        if(p.out||!drew){G.humanTurn=false;render();await sleep(600);advance();return}
+        continue}
+      if(G.mode==='observatory'&&a.star){const ix=G.row.findIndex(x=>x.id===a.star);if(ix<0)continue;drew=takeStar(p,ix);log(`You take ${desc(drew)} from the stars`)}
+      else{draw(p,1);drew=p.hand[p.hand.length-1];log(G.mode==='observatory'?'You draw blind':'You draw a card')}
+      if(!drew||!sidesFor(p,drew,true).length){G.drew=null;G.humanTurn=false;render();log('It can\'t be played');await sleep(900);if(G.mode==='triple')await pressPile(p);advance();return}
+      continue}
+    if(a.t==='pass'){if(!drew||M)continue;G.humanTurn=false;G.drew=null;render();if(G.mode==='triple')await pressPile(p);advance();return}
+    if(a.t==='play'){
+      const c=a.card;
+      if(drew&&c!==drew){setStatus('Only the card you just drew can be played.');continue}
+      const sides=sidesFor(p,c,!!drew);
+      if(!sides.length){setStatus((M||E)&&G.pending>0?'Stack a draw card of equal or higher value, or take the cards.':G.mode==='liars'?'That doesn\'t match. Try a 🎭 Liar card or draw.':'That card can\'t be played right now.');continue}
+      const side=sides.length>1?((E||G.mode==='triple')?await pickPile(c):await pickSide(c)):sides[0];
+      G.humanTurn=false;G.drew=null;render();
+      await playCard(p,c,await humanOpts(p,c,side));return}
+  }
+}
+function botOpts(p,c,side='r'){
+  const o={side};
+  if(G.mode==='bounty'&&c.k==='poster'){const ns=p.hand.filter(h=>h!==c&&h.k==='num'),t=ns.length?pick(ns):{c:pick(COLORS),n:Math.floor(Math.random()*10)};o.bColor=t.c;o.bNum=t.n}
+  if(G.mode==='triple'&&c.k==='disc2'){const same=p.hand.filter(h=>h!==c&&h.c===c.c);o.extra=same.length?(same.find(h=>h.k==='num')||same[0]):null}
+  if(isWild(c)&&c.k!=='roul'&&c.k!=='pileup'&&G.mode!=='allwild'&&G.mode!=='triple')o.color=mostColor(p);
+  if((SW()&&c.k==='num'&&c.n===7)||(G.mode==='flex'&&side==='f'&&(c.k==='wt2'||c.k==='wd4'))||(G.mode==='allwild'&&(c.k==='aswap'||c.k==='at2'))||(G.mode==='attack'&&c.k==='trade'))o.target=others(p).filter(q=>G.mode!=='duo'||q.team!==p.team).sort((a,b)=>a.hand.length-b.hand.length)[0];
+  if(G.mode==='open'&&isWild(c)){
+    const nxp=nextAlive(),cnt=col=>nxp.hand.filter(h=>h.c===col).length;
+    o.color=[...COLORS].sort((a,b)=>c.k==='freeze'?cnt(b)-cnt(a):cnt(a)-cnt(b))[0]}
+  if(G.mode==='open'&&c.k==='cswap'){
+    const mine=p.hand.filter(h=>h!==c),give=mine.filter(h=>!isWild(h)),cand=others(p).filter(q=>q.hand.length),tgt=cand.find(q=>q.hand.some(isWild))||cand[0];
+    if(mine.length&&tgt){o.mine=[...(give.length?give:mine)].sort((a,b)=>cardPts(b)-cardPts(a))[0];o.tgt=tgt;o.theirs=tgt.hand.find(isWild)||tgt.hand.find(h=>h.c===o.color)||tgt.hand[0]}}
+  if(G.mode==='bookends'&&c.k==='slide'){
+    const rest=p.hand.filter(h=>h!==c);
+    if(rest.length){o.slideCard=rest.find(h=>h.c===o.color)||pick(rest);o.slideLeft=false}}
+  if(G.mode==='stacks'&&c.k==='dig'){
+    const opts=[0,1,2].map(k=>p.hand.filter(h=>h!==c&&h.stk===k)).map((cs,k)=>({k,cs})).filter(x=>x.cs.length>1);
+    if(opts.length){const good=opts.find(x=>{const sec=x.cs[x.cs.length-2];return isWild(sec)||sec.c===o.color});o.stack=(good||pick(opts)).k}}
+  if(G.mode==='carousel'&&c.k==='aim'){
+    const rest=p.hand.filter(h=>h!==c);let best=null,bv=-1;
+    rest.forEach((h,i)=>{let v=0;for(let j=0;j<3;j++){const q=rest[(i+j)%rest.length];if(q&&(isWild(q)||q.c===o.color))v++}if(v>bv){bv=v;best=h}});
+    o.aimCard=best}
+  if(G.mode==='collector'&&c.k==='clone'){
+    const rest=p.hand.filter(h=>h!==c&&h.k==='num'),cnt=h=>rest.filter(x=>x.n===h.n).length;
+    if(rest.length)o.cloneCard=[...rest].sort((a,b)=>cnt(b)-cnt(a))[0]}
+  if(G.mode==='pyramid'&&c.k==='excavate'){const cs=p.hand.filter(h=>h!==c&&h.pos>=0).sort((a,b)=>a.pos-b.pos);o.exCard=cs.find(h=>h.c===o.color)||cs[0]}
+  if(G.mode==='bingo'&&c.k==='freespace'){
+    const cs=p.hand.filter(h=>h!==c&&h.gp>=0);
+    const rem=h=>Math.min(...LINES.map((ln,i)=>(!p.bingos.has(i)&&ln.includes(h.gp))?ln.filter(g=>g!==h.gp&&p.hand.some(x=>x.gp===g&&x!==c)).length:9));
+    o.fsCard=[...cs].sort((a,b)=>rem(a)-rem(b))[0]}
+  if(G.mode==='showcase'&&c.k==='spotlight'){const cs=p.hand.filter(h=>h!==c),nw=cs.filter(h=>!isWild(h));o.spot=[...(nw.length?nw:cs)].sort((a,b)=>cardPts(b)-cardPts(a))[0]}
+  if(G.mode==='collector'&&c.k==='callout'){
+    const cnt=n=>others(p).filter(q=>q.hand.some(h=>h.k==='num'&&h.n===n)).length;
+    o.num=[0,1,2,3,4,5,6,7,8,9].sort((a,b)=>cnt(b)-cnt(a)+(Math.random()-.5)*.5)[0]}
+  return o}
+function botPick(p,pool){
+  const top=G.top,reg=pool.filter(c=>!c.liar&&matches(c,top)),tl=pool.filter(c=>c.liar&&c.c&&matches(c,top)),lies=pool.filter(c=>c.liar&&c.c&&!matches(c,top));
+  const wc=pool.filter(c=>c.k==='wildc'),w4=pool.filter(c=>c.k==='wild4'),noCol=!p.hand.some(c=>c.c===top.c),r=Math.random(),safe=[...reg,...tl];
+  if(w4.length&&noCol&&r<.6)return w4[0];
+  if(wc.length&&r<.3)return wc[0];
+  if(safe.length&&r<.88){const a=safe.filter(c=>c.k!=='num');return pick(a.length&&Math.random()<.5?a:safe)}
+  if(lies.length&&Math.random()<.55)return pick(lies);
+  if(w4.length&&Math.random()<.2)return w4[0];
+  if(safe.length)return pick(safe);
+  if(wc.length)return wc[0];
+  return null}
+async function botTurn(p){
+  setStatus(`${p.name} is thinking…`);render();await sleep(1000);
+  let c=botPick(p,p.hand);
+  if(!c){draw(p,1);log(`${p.name} draws a card`);render();await sleep(700);const d=p.hand[p.hand.length-1];c=d?botPick(p,[d]):null;if(!c){advance();return}}
+  await playCard(p,c,botOpts(p,c))}
+function botChoose(p){
+  if(G.mode==='showcase'){
+    const raids=[];others(p).forEach(q=>{if(q.lock)return;const sc=q.hand.find(h=>h.id===q.show);if(sc&&sidesFor(p,sc).length)raids.push({c:sc,side:'r'})});
+    const hasOwn=p.hand.some(c=>sidesFor(p,c).length);
+    if(raids.length&&(!hasOwn||Math.random()<.15))return pick(raids)}
+  if(G.mode==='bingo'){
+    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
+    if(!opts.length)return null;
+    const sc=o=>{let v=Math.random()*2;if(o.c.gp>=0)LINES.forEach((ln,i)=>{if(p.bingos.has(i)||!ln.includes(o.c.gp))return;const left=ln.filter(g=>g!==o.c.gp&&p.hand.some(x=>x.gp===g)).length;if(left===0)v+=6;else if(left===1)v+=1.5});if(isWild(o.c))v-=1;return v};
+    return [...opts].sort((a,b)=>sc(b)-sc(a))[0]}
+  if(G.mode==='overload'){
+    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
+    if(!opts.length)return null;
+    const val=c=>{const v=c.k==='num'?c.n:(c.k==='swild'||c.k==='vent'||c.k==='surge')?0:5;return G.dbl?v*2:v};
+    const safe=opts.filter(o=>o.c.k==='vent'||G.mass+val(o.c)<LIMIT);
+    if(!safe.length)return Math.random()<.75?null:[...opts].sort((a,b)=>val(a.c)-val(b.c))[0];
+    const nxh=nextAlive().hand.length;
+    const sc=o=>{const c=o.c;let v=val(c)*(G.mass<12?.4:-.2)+Math.random()*3;
+      if(c.k==='vent')v+=G.mass>=18?7:-6;
+      if(c.k==='surge')v+=(G.mass>=12&&G.mass<=24)?4:-5;
+      if(c.k==='draw2'||c.k==='skip')v+=nxh<=3?3:0;
+      return v};
+    return [...safe].sort((a,b)=>sc(b)-sc(a))[0]}
+  if(G.mode==='triple'){
+    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
+    if(!opts.length)return null;
+    const sc=o=>{const pl=G.piles['abc'.indexOf(o.side)],r=ratio(pl);let v=Math.random()*1.5-r*4;
+      if(o.c.k==='wclear')v+=r*8-2;
+      if(o.c.k==='wgive')v+=r*6-1;
+      if(o.c.k==='disc2')v+=2;
+      if(isWild(o.c)&&o.c.k==='swild')v-=1.5;
+      return v};
+    return [...opts].sort((a,b)=>sc(b)-sc(a))[0]}
+  if(G.mode==='eclipse'){
+    const opts=[];p.hand.forEach(c=>sidesFor(p,c).forEach(sd=>opts.push({c,side:sd})));
+    if(!opts.length)return null;
+    const nxh=nextAlive().hand.length,mn=Math.min(...others(p).map(q=>q.hand.length));
+    const sc=x=>{
+      const i=x.side==='a'?0:1,other=G.piles[1-i],col=isWild(x.c)?mostColor(p):x.c.c;let v=Math.random()*2;
+      if(col===other.c&&G.piles[i].c!==other.c&&G.piles[0].c!==G.piles[1].c)v+=5;
+      if(x.c.k==='draw2'||x.c.k==='wild4')v+=nxh<=3?3:.5;
+      if(x.c.k==='skip'&&nxh<=2)v+=2;
+      if(isWild(x.c))v-=1.5;
+      if(x.c.k==='num'&&x.c.n===7)v+=p.hand.length>=mn+3?3:-3;
+      return v};
+    opts.sort((a,b)=>sc(b)-sc(a));return opts[0]}
+  if(G.mode==='allwild'){
+    const nx=nextAlive(),danger=nx.hand.length<=2,minH=Math.min(...others(p).map(q=>q.hand.length));
+    let pool=p.hand.filter(c=>c.k!=='aswap'||p.hand.length>=minH+3);
+    if(!pool.length)pool=p.hand;
+    if(danger){for(const k of ['adraw4','askip2','askip','adraw2','aswap']){const f=pool.filter(c=>c.k===k);if(f.length)return{c:f[0],side:'r'}}}
+    return{c:pick(pool),side:'r'}}
+  let pool=p.hand.map(c=>({c,s:sidesFor(p,c)})).filter(x=>x.s.length);
+  if(!pool.length)return null;
+  if(G.mode==='flex'||G.mode==='classic'||G.mode==='party'){
+    const f=pool.filter(x=>(x.c.k!=='wd4'&&x.c.k!=='wild4')||!p.hand.some(h=>h!==x.c&&(h.c===G.top.c||isWild(h)))||Math.random()<.12);
+    if(f.length)pool=f}
+  if(G.mode==='attack'){const mn=Math.min(...others(p).map(q=>q.hand.length)),f=pool.filter(x=>x.c.k!=='trade'||p.hand.length>=mn+3);if(f.length)pool=f}
+  const nw=pool.filter(x=>!isWild(x.c));
+  let ch=nw.length&&Math.random()<.8?nw:pool;
+  const ac=ch.filter(x=>x.c.k!=='num');
+  if(ac.length&&Math.random()<.45)ch=ac;
+  const x=pick(ch);
+  return {c:x.c,side:x.s.length>1&&Math.random()<.5?'f':x.s[0]}}
+async function botTurnStd(p){
+  setStatus(`${p.name} is thinking…`);render();await sleep(1000);
+  const M=G.mode==='mercy',E=G.mode==='eclipse';
+  if((M||E)&&G.pending>0){
+    const st=p.hand.filter(h=>DRAWV[h.k]&&DRAWV[h.k]>=G.lastVal).sort((a,b)=>DRAWV[a.k]-DRAWV[b.k]);
+    if(st.length&&Math.random()<.85){await playCard(p,st[0],botOpts(p,st[0],E?pick(sidesFor(p,st[0])):'r'));return}
+    takePenalty(p);render();await sleep(800);advance();return}
+  let ch=botChoose(p);
+  if(!ch){
+    if(G.mode==='attack'){await hit(p,1);advance();return}
+    if(M){const d=await drawUntil(p);render();await sleep(500);if(!d||p.out){advance();return}ch={c:d,side:'r'}}
+    else{
+      if(G.mode==='observatory')obsDraw(p);else{draw(p,1);log(`${p.name} draws a card`)}
+      render();await sleep(700);
+      const d=p.hand[p.hand.length-1],s=d?sidesFor(p,d,true):[];
+      if(!s.length||Math.random()<.15){if(G.mode==='triple')await pressPile(p);advance();return}
+      ch={c:d,side:s[0]}}}
+  await playCard(p,ch.c,botOpts(p,ch.c,ch.side))}
+
+async function run(){
+  while(true){
+    if(checkWin())return;
+    const p=G.players[G.cur];G.humanTurn=false;render();
+    if(G.mode==='collector'){autoMeld(p);render();if(checkWin())return}
+    if(G.mode==='lucky'){rollLucky(p);render()}
+    if(G.mode==='beacon'){rollBeacon(p);render()}
+    if(G.mode==='spark'){rollSpark(p);render()}
+    if(G.mode==='pulse'){rollPulse(p);render()}
+    if(G.mode==='showcase')p.lock=false;
+    if(G.mode==='gambit'){G.chain=0;G.carry=0}
+    if(G.mode==='triple'){const r=Math.random(),sz=r<.45?3:r<.85?2:1;G.lit=shuffle([0,1,2]).slice(0,sz).sort();render()}
+    if(G.mode==='vault'&&!p.hand.length&&p.vault.length){await openVault(p);continue}
+    if(G.mode==='dare'&&p.dare)await judgeDare(p);
+    if(p.human)await humanTurn(p);else if(G.mode==='liars')await botTurn(p);else await botTurnStd(p);
+    if(G.mode==='potato'&&!G.over)await passPotato(p);
+    if(G.mode==='roundabout'&&!G.over){G.turns++;if(G.turns%aliveCount()===0)await rotateLap()}
+  }}
+function deal(){
+  G.deck=shuffle(buildDeck(G.mode));G.disc=[];G.dir=1;G.cur=0;G.pending=0;G.lastVal=0;G.aside=[];G.roundWinner=null;G.over=false;G.humanTurn=false;G.drew=null;G.laying=false;
+  G.mass=0;G.dbl=false;G.lit=[0,1,2];
+  G.row=[];G.hist=[];G.lastFx=null;G.chain=0;G.carry=0;G.turns=0;G.rot=1;newBounty();
+  G.players.forEach(p=>{p.bingos=new Set();p.daub=false;p.jam=false;p.lock=false;p.show=null;p.anchor=false;p.lucky=[];p.luck2=false;p.noLucky=false;p.ptr=0;p.blockNext=false;p.dump=false;p.shield=false;p.autoNo=false;p.hand=[];p.power=true;p.out=false;p.dare=null;p.act='L';p.vault=[];p.beacon=[];p.beac2=false;p.noBeacon=false;p.spark=[];p.spark2=false;p.noSpark=false;p.coilEven=false;p.pulse=[];p.pulse2=false;p.noPulse=false});
+  G.frozen=null;
+  G.players.forEach((p,i)=>{p.team=i%2});
+  if(G.mode==='duo'){const pools=[[],[]];G.players.forEach((p,i)=>{p.hand=pools[i%2]})}
+  const per=G.mode==='twin'||G.mode==='stacks'||G.mode==='pillars'||G.mode==='silos'?8:G.mode==='duo'?5:G.mode==='pyramid'?10:G.mode==='bingo'?9:7;
+  for(let r=0;r<per;r++)G.players.forEach(p=>{const c=G.deck.pop();if(G.mode==='twin')c.side=r<4?'L':'R';if(G.mode==='stacks')c.stk=r%3;if(G.mode==='pillars')c.stk=r%4;if(G.mode==='silos')c.stk=r%5;if(G.mode==='pyramid')c.pos=r;if(G.mode==='bingo')c.gp=r;p.hand.push(c)});
+  if(G.mode==='vault')for(let r=0;r<3;r++)G.players.forEach(p=>p.vault.push(G.deck.pop()));
+  if(G.mode==='showcase')G.players.forEach(fixShow);
+  if(G.mode==='beacon')G.players.forEach(p=>{const non=p.hand.filter(h=>!isWild(h));p.beacon=non.length?[pick(non).id]:[]});
+  if(G.mode==='spark')G.players.forEach(p=>{const non=p.hand.filter(h=>!isWild(h));p.spark=non.length?[pick(non).id]:[]});
+  if(G.mode==='pulse')G.players.forEach(p=>{const non=p.hand.filter(h=>!isWild(h));p.pulse=non.length?[pick(non).id]:[]});
+  if(G.mode==='coil')G.players.forEach(p=>{p.coilEven=false});
+  if(G.mode==='observatory')refillRow();
+  if(G.mode==='triple'){
+    const take=()=>{const idx=G.deck.map((c,i)=>c.k==='num'?i:-1).filter(i=>i>=0).pop();return G.deck.splice(idx,1)[0]};
+    G.piles=[0,1,2].map(()=>{const a=take();return{c:a.c,k:'num',n:a.n,wild:false,card:a,count:0,limit:5+Math.floor(Math.random()*8)}});
+    G.top=G.piles[0];G.topCard=G.piles[0].card;G.topFace=true;return}
+  if(G.mode==='eclipse'){
+    const take=()=>{const idx=G.deck.map((c,i)=>c.k==='num'?i:-1).filter(i=>i>=0).pop();return G.deck.splice(idx,1)[0]};
+    const a=take(),b=take(),mk=c=>({c:c.c,k:'num',n:c.n,card:c});
+    G.piles=[mk(a),mk(b)];G.top=G.piles[0];G.topCard=a;G.topFace=true;return}
+  if(G.mode==='allwild'){const first=G.deck.pop();G.disc.push(first);G.top={c:null,k:'wild'};G.topCard=first;G.topFace=true;return}
+  const idx=G.deck.map((c,i)=>c.k==='num'&&!c.liar&&!c.spin?i:-1).filter(i=>i>=0).pop(),first=G.deck.splice(idx,1)[0];
+  G.disc.push(first);G.top={c:first.c,k:'num',n:first.n};G.topCard=first;G.topFace=true}
+function start(n,mode){
+  G={mode,players:[{name:'You',human:true,hand:[],power:true},...Array.from({length:n},(_,i)=>({name:NAMES[i],av:AV[i],hand:[],power:true}))],log:[],scores:Array(n+1).fill(0),round:1,dares:buildDares(),dareList:selDare};
+  deal();$('#log').innerHTML='';$('#modeTag').textContent=MODES[mode].name;waiter=null;run()}
+
+document.addEventListener('click',e=>{
+  const cd=e.target.closest('#hand .card, #starrow .card, #opps .showc .card');
+  if(cd&&G){
+    const isStar=!!cd.closest('#starrow');
+    const isOpp=!!cd.closest('#opps');
+    const c=isStar?G.row.find(x=>x.id==cd.dataset.id):isOpp?(()=>{const q=G.players.find(x=>x!==G.players[0]&&x.show==cd.dataset.id);return q&&!q.lock?q.hand.find(h=>h.id==cd.dataset.id):null})():G.players[0].hand.find(x=>x.id==cd.dataset.id);
+    if(isOpp&&!c){setStatus('🔒 That display card is padlocked');return}
+    if(c){
+      const touch=e.pointerType==='touch'||Date.now()-lastTouch<700;
+      if(touch&&cd.dataset.tip&&String(armed)!==String(c.id)){clearArmed();armed=c.id;cd.classList.add('armed');showTip(cd,isStar?'Tap again to take it':'Tap again to play');return}
+      clearArmed();hideTip();
+      if(isStar)act({t:'draw',star:c.id});else act({t:'play',card:c})}
+    return}
+  if(e.target.closest('#drawBtn,#drawPile'))act({t:'draw'});
+  if(e.target.closest('#passBtn'))act({t:'pass'});
+});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&(e.target.classList.contains('card')||e.target.classList.contains('mode'))){e.preventDefault();e.target.click()}});
+$('#rulesBtn').onclick=()=>{if(!$('#modal').classList.contains('on'))showRules(G?G.mode:selMode,()=>{})};
+$('#newBtn').onclick=()=>location.reload();
+let lastTouch=0,tipTimer=null,lpTimer=null,tipSuppress=false,armed=null,infoMode=false;
+const touchUI=()=>!!(window.matchMedia&&window.matchMedia('(hover: none)').matches)||innerWidth<600;
+function clearArmed(){armed=null;if(document.querySelectorAll)document.querySelectorAll('.card.armed').forEach(x=>x.classList.remove('armed'))}
+function showTip(el,extra){
+  const t=el.getAttribute('data-tip');if(!t)return;
+  const tip=$('#tip');tip.innerHTML=t+(extra?`<div class="tiphint">${extra}</div>`:'');tip.style.display='block';
+  clearTimeout(tipTimer);
+  if(touchUI()){tip.classList.add('dock');tip.style.left='';tip.style.top='';tipTimer=setTimeout(()=>{hideTip();clearArmed()},7000);return}
+  tip.classList.remove('dock');
+  const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+  const x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));
+  let y=r.top-h-10;if(y<8)y=r.bottom+10;
+  tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){const t=$('#tip');if(t)t.style.display='none'}
+const tipCard=e=>e.target&&e.target.closest?e.target.closest('.card[data-tip]'):null;
+document.addEventListener('mouseover',e=>{if(Date.now()-lastTouch<800)return;const c=tipCard(e);if(c)showTip(c)});
+document.addEventListener('mouseout',e=>{if(Date.now()-lastTouch<800)return;if(tipCard(e))hideTip()});
+document.addEventListener('focusin',e=>{const c=tipCard(e);if(c&&Date.now()-lastTouch>800)showTip(c)});
+document.addEventListener('focusout',()=>{if(Date.now()-lastTouch>800)hideTip()});
+document.addEventListener('touchstart',e=>{
+  lastTouch=Date.now();const c=tipCard(e);
+  hideTip();if(!c)clearArmed();
+  clearTimeout(lpTimer);
+  if(c)lpTimer=setTimeout(()=>{showTip(c);tipSuppress=true;setTimeout(()=>{tipSuppress=false},3000)},450)},{passive:true});
+document.addEventListener('touchend',()=>clearTimeout(lpTimer));
+document.addEventListener('touchmove',()=>{clearTimeout(lpTimer);hideTip()},{passive:true});
+document.addEventListener('click',e=>{
+  if(tipSuppress){tipSuppress=false;e.stopImmediatePropagation();e.preventDefault();return}
+  if(infoMode){const c=tipCard(e);if(c){e.stopImmediatePropagation();e.preventDefault();showTip(c);if(!touchUI()){clearTimeout(tipTimer);tipTimer=setTimeout(hideTip,7000)}}}
+},true);
+window.addEventListener('scroll',()=>{if(!touchUI())hideTip()},true);
+$('#infoBtn').onclick=()=>{
+  infoMode=!infoMode;const b=$('#infoBtn');
+  b.classList.toggle('on',infoMode);b.setAttribute('aria-pressed',String(infoMode));
+  b.textContent=infoMode?'ℹ Info: on':'ℹ Info';
+  document.body.classList.toggle('infomode',infoMode);hideTip();clearArmed()};
+showMenu();
+</script>
+</body>
+</html>
